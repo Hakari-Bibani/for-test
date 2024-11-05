@@ -5,35 +5,37 @@ import time
 st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="centered")
 
 # Dynamic title with animation
-st.title("🧪 Elephant Toothpaste Reaction")
+st.markdown("<h1 style='text-align: center; color: darkblue;'>🧪 Elephant Toothpaste Reaction 🧪</h1>", unsafe_allow_html=True)
 st.write("A fun and colorful chemistry experiment simulation!")
 
-# Beaker and Cylinder Setup
-col1, col2 = st.columns(2)
-
-# Display the setup: H₂O₂ and KI solution
-col1.image("beaker_h2o2.png", caption="H₂O₂ Solution", width=150)  # Placeholder for H₂O₂ beaker image
-col2.image("cylinder_ki.png", caption="30% KI Solution", width=150)  # Placeholder for KI cylinder image
+# Display initial setup with text labels for H₂O₂ and KI solution
+st.write("### 🧴 Experiment Setup")
+st.write("1. Beaker containing **H₂O₂ (Hydrogen Peroxide)** solution.")
+st.write("2. Larger cylinder containing **30% KI (Potassium Iodide) solution**.")
 
 # Button to Start Experiment
 start_button = st.button("Start Experiment")
 
 if start_button:
     # Step 1: Display Pouring Effect
-    st.write("Pouring H₂O₂ into the KI solution...")
-    time.sleep(1)  # Pause to simulate pouring
-
-    # Step 2: Show Reaction and Foam Animation
-    st.write("🎉 The reaction begins!")
-    st.image("foam_sequence_1.png", width=250)  # Start of foam sequence image
-    time.sleep(1)
-    st.image("foam_sequence_2.png", width=300)  # Mid foam sequence image
-    time.sleep(1)
-    st.image("foam_sequence_3.png", width=350)  # Full eruption foam image
-
+    st.write("### 🔄 Pouring H₂O₂ into the KI solution...")
+    with st.empty():
+        for i in range(5):
+            st.write(f"Pouring...{'💧' * (i+1)}")
+            time.sleep(0.3)
+    
+    # Step 2: The Reaction
+    st.write("### 🎉 Reaction Begins!")
+    with st.empty():
+        for foam_level in range(1, 6):
+            st.write("🧪" + "🌊" * foam_level)  # Simulating rising foam with emojis
+            time.sleep(0.5)
+    
     # Display the Chemical Equation
-    st.write("**Chemical Equation:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
-
+    st.write("### Chemical Equation")
+    st.latex(r"2\text{H}_2\text{O}_2 \rightarrow 2\text{H}_2\text{O} + \text{O}_2")
+    
     # Optional Ingredients Note
     st.write("📝 **Note:** For a more colorful reaction, you can add food coloring to the H₂O₂. "
              "Adding liquid soap will help trap the oxygen, creating even more foam!")
+
