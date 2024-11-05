@@ -1,14 +1,6 @@
 import streamlit as st
-import numpy as np
 import time
-from streamlit_lottie import st_lottie
-import requests
-
-def load_lottie_url(url: str):
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
+from PIL import Image
 
 def run_experiment():
     st.title("Elephant Toothpaste Reaction")
@@ -16,22 +8,21 @@ def run_experiment():
     # Display beaker and cylinder
     col1, col2 = st.columns(2)
     with col1:
-        st.image("https://via.placeholder.com/150x200?text=H2O2", caption="H2O2")
+        beaker = Image.open("beaker.png")
+        st.image(beaker, caption="H2O2")
     with col2:
-        st.image("https://via.placeholder.com/150x200?text=KI", caption="KI")
+        cylinder = Image.open("cylinder.png")
+        st.image(cylinder, caption="KI")
 
     if st.button("Start Experiment"):
-        # Animate pouring solution from beaker to cylinder
-        lottie_url = "https://assets4.lottiefiles.com/packages/lf20_FI4tnv.json"
-        lottie_animation = load_lottie_url(lottie_url)
-        st_lottie(lottie_animation, height=300, width=600)
+        # Simulate pouring solution from beaker to cylinder
+        st.write("Pouring solution...")
+        time.sleep(2)
 
         # Simulate reaction
-        time.sleep(2)
-        st.markdown("**Dramatic reaction occurs!**")
-        lottie_url = "https://assets4.lottiefiles.com/packages/lf20_KvMFxO.json"
-        lottie_animation = load_lottie_url(lottie_url)
-        st_lottie(lottie_animation, height=400, width=800)
+        st.write("**Dramatic reaction occurs!**")
+        reaction = Image.open("reaction.png")
+        st.image(reaction, use_column_width=True)
 
         # Display chemical equation
         st.markdown("**Chemical Equation:**")
