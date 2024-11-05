@@ -49,12 +49,14 @@ def main():
     if 'reaction_state' not in st.session_state:
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
+        st.session_state.show_equation = False
 
     # Functions for beaker and cylinder visuals
     def draw_beaker(label, color, pouring=False):
+        # Adjusted beaker position for pouring animation above cylinder mouth
         rotation = "135deg" if pouring else "0deg"
         return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: auto;">
+        <div style="position: relative; width: 100px; height: 150px; margin: auto; transform: translate(30px, -20px);">
             <div style="
                 position: absolute;
                 width: 80px;
@@ -121,11 +123,14 @@ def main():
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
             time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 200  # Foam rises
+            st.session_state.foam_height = 200  # Foam rises dramatically
+            time.sleep(2)  # Pause for foam animation
+            st.session_state.show_equation = True  # Show equation after foam animation
+            st.session_state.reaction_state = 'complete'
             st.experimental_rerun()
 
     # Display chemical equation and note after reaction
-    if st.session_state.reaction_state == 'pouring':
+    if st.session_state.show_equation:
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
             <h3>Chemical Equation:</h3>
@@ -141,9 +146,10 @@ def main():
         """)
 
         # Reset state for repeat experiment
-        time.sleep(2)
-        st.session_state.reaction_state = 'ready'
-        st.session_state.foam_height = 50
+        if st.session_state.reaction_state == 'complete':
+            st.session_state.reaction_state = 'ready'
+            st.session_state.foam_height = 50
+            st.session_state.show_equation = False
 
 if __name__ == "__main__":
     main()
