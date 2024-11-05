@@ -1,7 +1,6 @@
 import streamlit as st
 import time
 import random
-from streamlit.components.v1 import html
 
 # Title with Wave Animation
 st.markdown(
@@ -60,7 +59,7 @@ if st.button("Start Experiment"):
     st.write("### Reaction In Progress")
 
     # Pouring Animation
-    html(
+    st.markdown(
         """
         <style>
         @keyframes pour {
