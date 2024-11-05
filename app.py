@@ -168,9 +168,9 @@ def animate_experiment():
     # Step 1: Move papers to center of beakers with slight rotation
     litmus_placeholder.markdown("""
         <div class='litmus-container'>
-            <div class='litmus' style='background-color: #FFFACD; transform: translate(-15px, 80px) rotate(-5deg);'></div>
-            <div class='litmus' style='background-color: #FFFACD; transform: translate(0px, 80px) rotate(2deg);'></div>
-            <div class='litmus' style='background-color: #FFFACD; transform: translate(15px, 80px) rotate(5deg);'></div>
+            <div class='litmus' style='background-color: #FFFACD; transform: translate(-10px, 90px) rotate(-3deg);'></div>
+            <div class='litmus' style='background-color: #FFFACD; transform: translate(0px, 90px) rotate(0deg);'></div>
+            <div class='litmus' style='background-color: #FFFACD; transform: translate(10px, 90px) rotate(3deg);'></div>
         </div>
     """, unsafe_allow_html=True)
     time.sleep(1.5)
@@ -178,9 +178,9 @@ def animate_experiment():
     # Step 2: Color change while in solutions with slight movement
     litmus_placeholder.markdown("""
         <div class='litmus-container'>
-            <div class='litmus' style='background: linear-gradient(to bottom, #FF6347 60%, #FFFACD); transform: translate(-15px, 80px) rotate(-3deg);'></div>
-            <div class='litmus' style='background: linear-gradient(to bottom, #90EE90 60%, #FFFACD); transform: translate(0px, 80px) rotate(0deg);'></div>
-            <div class='litmus' style='background: linear-gradient(to bottom, #4682B4 60%, #FFFACD); transform: translate(15px, 80px) rotate(3deg);'></div>
+            <div class='litmus' style='background: linear-gradient(to bottom, #FF6347 60%, #FFFACD); transform: translate(-10px, 90px) rotate(-3deg);'></div>
+            <div class='litmus' style='background: linear-gradient(to bottom, #90EE90 60%, #FFFACD); transform: translate(0px, 90px) rotate(0deg);'></div>
+            <div class='litmus' style='background: linear-gradient(to bottom, #4682B4 60%, #FFFACD); transform: translate(10px, 90px) rotate(3deg);'></div>
         </div>
     """, unsafe_allow_html=True)
     time.sleep(2)
@@ -201,11 +201,11 @@ def animate_experiment():
 # Initial render
 render_initial_state()
 
-# Add start button with enhanced styling
+# Add start button with light grey styling
 st.markdown("""
     <style>
         .stButton>button {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: #d3d3d3;
             color: white;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
@@ -213,12 +213,12 @@ st.markdown("""
             padding: 12px 30px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 4px 15px rgba(211, 211, 211, 0.3);
         }
         .stButton>button:hover {
-            background: linear-gradient(45deg, #2980b9, #3498db);
+            background: #c0c0c0;
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            box-shadow: 0 6px 20px rgba(211, 211, 211, 0.4);
         }
         .stButton>button:active {
             transform: translateY(-1px);
