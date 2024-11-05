@@ -1,130 +1,85 @@
 import streamlit as st
 import time
 
-# Set page config
-st.set_page_config(page_title="pH Test Simulation")
+st.title("Test the pH of different solutions using litmus paper!")
 
-# Custom CSS for styling
-st.markdown("""
-<style>
-    .main-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-    }
-    .title {
-        text-align: center;
-        font-size: 24px;
-        padding: 20px;
-    }
-    .paper {
-        width: 30px;
-        height: 100px;
-        background-color: #FFE135;
-        margin: 10px auto;
-        display: block;
-        transition: background-color 0.5s ease;
-    }
-    .beaker {
-        width: 120px;
-        height: 140px;
-        border: 4px solid #e6e6e6;
-        border-top: none;
-        margin: 20px auto;
-        position: relative;
-        overflow: hidden;
-    }
-    .solution {
-        width: 100%;
-        height: 80%;
-        position: absolute;
-        bottom: 0;
-        animation: wave 2s infinite ease-in-out;
-    }
-    @keyframes wave {
-        0%, 100% { transform: translateY(2px); }
-        50% { transform: translateY(-2px); }
-    }
-    @keyframes dip {
-        0% { transform: translateY(0); }
-        20% { transform: translateY(140px); }
-        70% { transform: translateY(140px); }
-        100% { transform: translateY(0); }
-    }
-    .animate-dip-1 { animation: dip 6s forwards; }
-    .animate-dip-2 { animation: dip 6s forwards; }
-    .animate-dip-3 { animation: dip 6s forwards; }
-    
-    #start-btn {
-        margin: 20px auto;
-        display: block;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Placeholders for litmus paper and beakers display
+litmus_placeholder = st.empty()
+beakers_placeholder = st.empty()
 
-# Main content
-st.markdown("""
-<div class="main-container">
-    <h1 class="title">Test the pH of different solutions using litmus paper!</h1>
-    
-    <!-- Litmus Papers -->
-    <div id="paper1" class="paper"></div>
-    <div id="paper2" class="paper"></div>
-    <div id="paper3" class="paper"></div>
-    
-    <!-- Beakers -->
-    <div class="beaker">
-        <div class="solution" style="background-color: rgba(211,211,211,0.7);"></div>
-    </div>
-    <div class="beaker">
-        <div class="solution" style="background-color: rgba(211,211,211,0.7);"></div>
-    </div>
-    <div class="beaker">
-        <div class="solution" style="background-color: rgba(176,224,230,0.7);"></div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# Function to render the initial setup with pale yellow litmus strips and realistic beakers
+def render_initial_state():
+    with litmus_placeholder.container():
+        st.write("### Litmus Papers")
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around;'>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
-# Start button
-start_button = st.button("Start Experiment")
+    with beakers_placeholder.container():
+        st.write("### Beakers with Solutions")
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:20px;'>
+                <div style='background-color: #D3D3D3; width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px;'>HCl</div>
+                <div style='background-color: #ADD8E6; width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px;'>H₂O</div>
+                <div style='background-color: #D3D3D3; width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px;'>NaOH</div>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
-# Animation script
-if start_button:
-    animation_script = """
-    <script>
-        function animate() {
-            const papers = document.querySelectorAll('.paper');
-            
-            // Remove any existing animation classes
-            papers.forEach(paper => {
-                paper.classList.remove('animate-dip-1', 'animate-dip-2', 'animate-dip-3');
-                paper.style.backgroundColor = '#FFE135';  // Reset to yellow
-            });
-            
-            // Add animation classes
-            papers[0].classList.add('animate-dip-1');
-            papers[1].classList.add('animate-dip-2');
-            papers[2].classList.add('animate-dip-3');
-            
-            // Change colors during animation
-            setTimeout(() => {
-                papers[0].style.backgroundColor = '#ff6666';  // Red for acid
-                papers[1].style.backgroundColor = '#6666ff';  // Blue for base
-                papers[2].style.backgroundColor = '#90EE90';  // Light green for neutral
-            }, 2000);
-        }
-        
-        // Run animation
-        if (document.readyState === 'complete') {
-            animate();
-        } else {
-            window.addEventListener('load', animate);
-        }
-    </script>
-    """
-    
-    st.markdown(animation_script, unsafe_allow_html=True)
-    time.sleep(6)  # Wait for animation to complete
-    st.experimental_rerun()
+# Function to animate litmus paper diving into beakers, changing colors, and returning
+def start_experiment():
+    # Step 1: Move litmus papers to the beakers
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:100px;'>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px;'></div>
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(1)
+
+    # Step 2: Display litmus papers inside the solutions with initial color change
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:0px;'>
+                <div style='background-color: #FF6347; width:30px; height:80px;'></div>  <!-- Acid turns red -->
+                <div style='background-color: #90EE90; width:30px; height:80px;'></div>  <!-- Neutral turns light green -->
+                <div style='background-color: #4682B4; width:30px; height:80px;'></div>  <!-- Base turns blue -->
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(3)  # Pause to show color change
+
+    # Step 3: Lift the litmus papers back to their original positions with new colors
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around;'>
+                <div style='background-color: #FF6347; width:30px; height:80px;'></div>  <!-- Acid stays red -->
+                <div style='background-color: #90EE90; width:30px; height:80px;'></div>  <!-- Neutral stays light green -->
+                <div style='background-color: #4682B4; width:30px; height:80px;'></div>  <!-- Base stays blue -->
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(3)  # Show final state before resetting
+
+    # Reset to the initial state
+    render_initial_state()
+
+# Display the initial setup
+render_initial_state()
+
+# Button to start the experiment
+if st.button("Start Experiment"):
+    start_experiment()
