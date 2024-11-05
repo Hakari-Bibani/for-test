@@ -1,117 +1,162 @@
 import streamlit as st
 import time
 
-# Set up page configuration
-st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="centered")
-
-# Custom CSS for animations and styling
-st.markdown("""
-<style>
-    /* Title styling */
-    .title {
-        font-size: 2.8em;
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 30px;
-        padding: 20px;
-    }
-
-    /* Container styling */
-    .experiment-container {
-        position: relative;
-        height: 300px;
-        margin: 20px auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* Beaker styling */
-    .beaker {
-        width: 100px;
-        height: 120px;
-        border: 4px solid #444;
-        border-radius: 5px 5px 10px 10px;
-        background: rgba(173, 216, 230, 0.7); /* H2O2 solution color */
-        transition: transform 1.5s ease;
-        transform-origin: bottom right;
-    }
-    
-    .cylinder {
-        width: 140px;
-        height: 200px;
-        border: 4px solid #444;
-        border-radius: 10px 10px 20px 20px;
-        background: rgba(200, 200, 200, 0.7); /* KI solution color */
-        overflow: hidden;
-        position: relative;
-    }
-
-    /* Foam eruption */
-    @keyframes foam-eruption {
-        from { height: 0; }
-        to { height: 300px; }
-    }
-
-    .foam {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 0;
-        background: linear-gradient(to top, #ff6b6b, #ff8e8e, #ffb3b3, #ffd8d8);
-        animation: foam-eruption 2s forwards;
-    }
-
-    /* Hidden note and equation styling */
-    .equation, .note {
-        text-align: center;
-        font-size: 1.2em;
-        opacity: 0;
-        transition: opacity 2s ease;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Title display
-st.markdown("<h1 class='title'>Elephant Toothpaste Reaction</h1>", unsafe_allow_html=True)
-
-# Experiment container
-beaker_placeholder = st.empty()
-cylinder_placeholder = st.empty()
-foam_placeholder = st.empty()
-
-# Button for starting the experiment
-if st.button("Start Experiment"):
-    # Step 1: Display beaker tilting
-    with beaker_placeholder.container():
-        st.markdown("""
-        <div class="experiment-container">
-            <div class="beaker" style="transform: rotate(135deg);"></div>
-            <div class="cylinder"></div>
-        </div>
-        """, unsafe_allow_html=True)
-    time.sleep(1.5)  # Pause for pour animation
-
-    # Step 2: Show foam eruption
-    foam_placeholder.markdown("""
-    <div class="experiment-container">
-        <div class="foam"></div>
-    </div>
-    """, unsafe_allow_html=True)
-    time.sleep(2)  # Allow time for foam to animate
-
-    # Step 3: Display equation and optional note
+def run_experiment():
+    # Custom CSS for enhanced styling and animations
     st.markdown("""
-    <div class="equation" style="opacity: 1;">
-        2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
-    </div>
-    <div class="note" style="opacity: 1;">
-        Note: Adding food coloring and liquid soap creates a colorful foam effect!
-    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
+        
+        .title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.8em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #2c3e50, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: gradient 3s linear infinite, float 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        
+        .beaker-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+        
+        .beaker, .cylinder {
+            width: 120px;
+            height: 180px;
+            border: 3px solid #ddd;
+            border-top: 15px solid #ddd;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            position: relative;
+            margin: 0 20px;
+        }
+        
+        .solution {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            border-radius: 0 0 17px 17px;
+            animation: liquidWave 4s infinite ease-in-out;
+        }
+        
+        .solution::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            height: 20px;
+            background: inherit;
+            filter: blur(5px);
+            opacity: 0.7;
+            animation: surfaceWave 2s infinite ease-in-out;
+        }
+        
+        @keyframes liquidWave {
+            0%, 100% { transform: translateY(2px) scaleY(1.02); }
+            50% { transform: translateY(-2px) scaleY(0.98); }
+        }
+        
+        @keyframes surfaceWave {
+            0%, 100% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+        }
+        
+        .reaction {
+            background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            height: 0;
+            overflow: hidden;
+            animation: foam 1.5s ease forwards;
+        }
+        
+        @keyframes foam {
+            from { height: 0; }
+            to { height: 300%; }
+        }
+        
+    </style>
     """, unsafe_allow_html=True)
+
+    # Display the title
+    st.markdown("<h1 class='title'>Elephant Toothpaste Reaction</h1>", unsafe_allow_html=True)
     
-# Reset placeholders to allow rerun
-time.sleep(2)
-beaker_placeholder.empty()
-cylinder_placeholder.empty()
-foam_placeholder.empty()
+    # Display the beaker and cylinder containers
+    beaker_placeholder = st.empty()
+    cylinder_placeholder = st.empty()
+    
+    def render_initial_state():
+        beaker_placeholder.markdown("""
+            <div class="beaker-container">
+                <div class="beaker">
+                    <div class="solution" style="background: rgba(176,224,230,0.7);" id="beaker-solution"></div>
+                </div>
+                <div class="cylinder">
+                    <div class="solution" style="background: rgba(169,169,169,0.7);" id="cylinder-solution"></div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    def animate_reaction():
+        # Step 1: Move beaker and "pour" solution
+        beaker_placeholder.markdown("""
+            <div class="beaker-container">
+                <div class="beaker" style="transform: rotate(-20deg);">
+                    <div class="solution" style="background: rgba(176,224,230,0);"></div>
+                </div>
+                <div class="cylinder">
+                    <div class="reaction"></div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        time.sleep(1.5)
+        
+        # Step 2: Reset beaker position and trigger foam animation in cylinder
+        beaker_placeholder.markdown("""
+            <div class="beaker-container">
+                <div class="beaker">
+                    <div class="solution" style="background: rgba(176,224,230,0.7);"></div>
+                </div>
+                <div class="cylinder">
+                    <div class="reaction"></div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    render_initial_state()
+    
+    if st.button("Start Experiment"):
+        animate_reaction()
+        st.markdown("""
+            **Chemical Equation:**
+            2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
+            
+            **Note:** Optionally, you can add food coloring and liquid soap for more dramatic effect.
+        """)
+        
+        st.button("Repeat Experiment", on_click=run_experiment)
+
+run_experiment()
