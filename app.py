@@ -1,6 +1,5 @@
 import streamlit as st
 import time
-import random
 
 # Title with Wave Animation
 st.markdown(
@@ -35,6 +34,7 @@ st.markdown(
         border: 2px solid #666; 
         border-radius: 10px; 
         position: relative; 
+        overflow: hidden;
     }
     .h2o2 { background-color: lightblue; height: 50%; }
     .ki { background-color: lightgrey; height: 50%; }
@@ -58,38 +58,24 @@ st.markdown(
 if st.button("Start Experiment"):
     st.write("### Reaction In Progress")
 
-    # Pouring Animation
+    # Pouring and Reaction Animation
     st.markdown(
         """
         <style>
-        @keyframes pour {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(45deg); }
-        }
-        .beaker {
-            animation: pour 1s forwards;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    # Delay to simulate pouring time
-    time.sleep(1)
-    
-    # Reaction Animation - Simulate foam rising
-    reaction_height = 50
-    st.write("## Reaction Occurring...")
-    st.markdown(
-        f"""
-        <style>
-        .reaction-container {{
-            width: 150px; 
-            height: 250px; 
-            border: 2px solid #666; 
-            border-radius: 10px; 
-            position: relative; 
+        .reaction-container {
+            width: 150px;
+            height: 250px;
+            border: 2px solid #666;
+            border-radius: 10px;
+            position: relative;
             margin-top: 20px;
+            overflow: hidden;
+            animation: foam-rise 3s ease-in-out forwards;
+        }
+
+        .foam {
+            width: 100%;
+            height: 100%;
             background: repeating-linear-gradient(
                 180deg,
                 #FFC0CB,
@@ -97,24 +83,33 @@ if st.button("Start Experiment"):
                 #FFFFFF 10px,
                 #FFFFFF 20px
             );
-        }}
+            position: absolute;
+            bottom: 0;
+            transform: translateY(100%);
+            animation: foam-animation 3s ease-in-out forwards;
+        }
+
+        @keyframes foam-animation {
+            0% { transform: translateY(100%); }
+            50% { transform: translateY(-50%); }
+            100% { transform: translateY(0%); }
+        }
+
+        @keyframes foam-rise {
+            0% { height: 50px; }
+            50% { height: 150px; }
+            100% { height: 250px; }
+        }
         </style>
-        <div class="reaction-container"></div>
+        <div class="reaction-container">
+            <div class="foam"></div>
+        </div>
         """,
         unsafe_allow_html=True
     )
-    
-    for i in range(0, 15):
-        reaction_height += random.randint(10, 30)
-        st.markdown(
-            f"""
-            <div class="reaction-container" style="height: {reaction_height}px;"></div>
-            """,
-            unsafe_allow_html=True
-        )
-        time.sleep(0.2)
 
     # Display Final Reaction Result
+    time.sleep(3)
     st.write("### Reaction Complete!")
     st.markdown(
         """
