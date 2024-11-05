@@ -10,11 +10,11 @@ def main():
         <style>
         @keyframes rise {
             0% { height: 50%; }
-            100% { height: 200%; }
+            100% { height: 250%; }
         }
         @keyframes pour {
             0% { transform: rotate(0deg); }
-            100% { transform: rotate(135deg); }
+            100% { transform: rotate(60deg); }
         }
         .stButton>button {
             background-color: #4CAF50;
@@ -52,9 +52,9 @@ def main():
 
     # Functions for beaker and cylinder visuals
     def draw_beaker(label, color, pouring=False):
-        rotation = "135deg" if pouring else "0deg"
+        rotation = "60deg" if pouring else "0deg"
         return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: auto;">
+        <div style="position: relative; width: 100px; height: 150px; margin: auto; margin-right: -20px;">
             <div style="
                 position: absolute;
                 width: 80px;
@@ -81,7 +81,7 @@ def main():
         """
 
     def draw_cylinder(foam_height):
-        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA500']
         foam_color = random.choice(colors)
         return f"""
         <div style="position: relative; width: 150px; height: 200px; margin: auto;">
@@ -98,6 +98,7 @@ def main():
                     width: 100%;
                     height: {foam_height}%;
                     background: linear-gradient(45deg, {foam_color}, white);
+                    animation: rise 2s ease-in-out;
                     transition: height 2s;">
                 </div>
             </div>
@@ -108,7 +109,7 @@ def main():
         """
 
     # Displaying the beaker and cylinder with appropriate state
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([2, 2])
     with col1:
         st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
                     unsafe_allow_html=True)
@@ -121,7 +122,7 @@ def main():
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
             time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 200  # Foam rises
+            st.session_state.foam_height = 250  # Dramatic foam rise
             st.experimental_rerun()
 
     # Display chemical equation and note after reaction
