@@ -1,118 +1,160 @@
 import streamlit as st
 import time
-import streamlit.components.v1 as components
 
 st.title("Test the pH of different solutions using litmus paper!")
 
-# Custom CSS for the animation
+# Custom CSS with simpler animations
 st.markdown("""
 <style>
-    .container {
-        display: flex;
-        justify-content: space-around;
-        margin: 20px 0;
-        position: relative;
-        height: 400px;
-    }
-    .beaker {
-        width: 100px;
-        height: 150px;
-        border: 3px solid #333;
-        border-radius: 0 0 20px 20px;
-        position: relative;
-        margin-top: 100px;
-    }
-    .solution {
-        width: 100%;
-        height: 80%;
-        position: absolute;
-        bottom: 0;
-        border-radius: 0 0 17px 17px;
-        animation: bubble 2s infinite;
-    }
-    .litmus {
-        width: 15px;
-        height: 80px;
-        background-color: #f9f9c5;
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        transition: all 0.5s;
-    }
-    @keyframes bubble {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-    .animate-test {
-        animation: dipTest 6s forwards;
-    }
-    @keyframes dipTest {
-        0% { transform: translateX(-50%) translateY(0); }
-        20% { transform: translateX(-50%) translateY(150px); }
-        80% { transform: translateX(-50%) translateY(150px); }
-        100% { transform: translateX(-50%) translateY(0); }
-    }
+.stButton>button {
+    width: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+.experiment-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.beaker {
+    text-align: center;
+    position: relative;
+    width: 150px;
+}
+
+.beaker-img {
+    width: 100px;
+    height: 120px;
+    border: 3px solid #333;
+    border-radius: 0 0 15px 15px;
+    margin: 0 auto;
+    position: relative;
+    background-color: rgba(200, 200, 200, 0.2);
+}
+
+.litmus-paper {
+    width: 20px;
+    height: 80px;
+    margin: 0 auto;
+    background-color: #f9f9c5;
+    position: relative;
+    transition: all 1s ease;
+}
+
+.solution {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75%;
+    border-radius: 0 0 12px 12px;
+}
+
+.acid .solution {
+    background-color: #f0f0f0;
+}
+
+.base .solution {
+    background-color: #f0f0f0;
+}
+
+.neutral .solution {
+    background-color: #e6f3ff;
+}
+
+.dipped {
+    transform: translateY(80px);
+}
+
+.acid-result {
+    background-color: #ff6666 !important;
+}
+
+.base-result {
+    background-color: #6666ff !important;
+}
+
+.neutral-result {
+    background-color: #90EE90 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# HTML for the beakers and litmus papers
-beakers_html = """
-<div class="container">
-    <div class="beaker" id="acid">
-        <div class="solution" style="background-color: #e0e0e0;"></div>
-        <div class="litmus" id="litmus1"></div>
+# HTML Structure
+experiment_html = """
+<div class="experiment-container">
+    <div class="beaker acid">
+        <div class="litmus-paper" id="acid-paper"></div>
+        <div class="beaker-img">
+            <div class="solution"></div>
+        </div>
+        <p>HCl</p>
     </div>
-    <div class="beaker" id="base">
-        <div class="solution" style="background-color: #e0e0e0;"></div>
-        <div class="litmus" id="litmus2"></div>
+    
+    <div class="beaker base">
+        <div class="litmus-paper" id="base-paper"></div>
+        <div class="beaker-img">
+            <div class="solution"></div>
+        </div>
+        <p>NaOH</p>
     </div>
-    <div class="beaker" id="neutral">
-        <div class="solution" style="background-color: #e0f7ff;"></div>
-        <div class="litmus" id="litmus3"></div>
+    
+    <div class="beaker neutral">
+        <div class="litmus-paper" id="neutral-paper"></div>
+        <div class="beaker-img">
+            <div class="solution"></div>
+        </div>
+        <p>H₂O</p>
     </div>
 </div>
 """
 
-# JavaScript for handling the animation
+# JavaScript for animation
 js_code = """
 <script>
-function startTest() {
-    const litmus1 = document.getElementById('litmus1');
-    const litmus2 = document.getElementById('litmus2');
-    const litmus3 = document.getElementById('litmus3');
+function animateLitmusTest() {
+    const papers = ['acid-paper', 'base-paper', 'neutral-paper'];
+    const results = ['acid-result', 'base-result', 'neutral-result'];
     
-    // Reset colors
-    litmus1.style.backgroundColor = '#f9f9c5';
-    litmus2.style.backgroundColor = '#f9f9c5';
-    litmus3.style.backgroundColor = '#f9f9c5';
+    // Reset papers
+    papers.forEach((paper, index) => {
+        const element = document.getElementById(paper);
+        element.className = 'litmus-paper';
+    });
     
-    // Add animation class
-    litmus1.classList.add('animate-test');
-    litmus2.classList.add('animate-test');
-    litmus3.classList.add('animate-test');
-    
-    // Change colors after delay
+    // Dip papers
     setTimeout(() => {
-        litmus1.style.backgroundColor = '#ff6b6b';  // Red for acid
-        litmus2.style.backgroundColor = '#4dabf7';  // Blue for base
-        litmus3.style.backgroundColor = '#8ce99a';  // Light green for neutral
-    }, 1500);
+        papers.forEach(paper => {
+            document.getElementById(paper).classList.add('dipped');
+        });
+    }, 100);
     
-    // Remove animation class after completion
+    // Change colors
     setTimeout(() => {
-        litmus1.classList.remove('animate-test');
-        litmus2.classList.remove('animate-test');
-        litmus3.classList.remove('animate-test');
-    }, 6000);
+        papers.forEach((paper, index) => {
+            document.getElementById(paper).classList.add(results[index]);
+        });
+    }, 2000);
+    
+    // Return to original position
+    setTimeout(() => {
+        papers.forEach(paper => {
+            document.getElementById(paper).classList.remove('dipped');
+        });
+    }, 4000);
 }
 </script>
 """
 
 # Combine HTML and JavaScript
-components.html(f"{beakers_html}{js_code}", height=450)
+st.components.v1.html(f"{experiment_html}{js_code}", height=400)
 
-# Create the start button
-if st.button("Start Test", key="start_test"):
-    js_code = f"<script>startTest()</script>"
-    components.html(js_code, height=0)
+# Button to trigger animation
+if st.button('Start Test'):
+    st.components.v1.html(
+        "<script>animateLitmusTest()</script>",
+        height=0
+    )
