@@ -2,7 +2,7 @@ import streamlit as st
 import time
 
 def run_experiment():
-    # Custom CSS for improved animations and styling
+    # Custom CSS for styling and animations
     st.markdown("""
     <style>
         /* Title styling */
