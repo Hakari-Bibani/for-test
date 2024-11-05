@@ -1,40 +1,43 @@
 import streamlit as st
+import numpy as np
 import time
+from streamlit_lottie import st_lottie
+import requests
 
-# Define title
-st.title("Elephant Toothpaste Reaction")
+def load_lottie_url(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
 
-# Display initial setup with beaker and cylinder using simple text placeholders
-st.write("**Reaction Setup:**")
-st.write("Beaker with **H₂O₂** solution (half-filled)")
-st.write("Cylinder with **KI** solution (half-filled)")
+def run_experiment():
+    st.title("Elephant Toothpaste Reaction")
 
-# Placeholder for updates in the experiment
-reaction_placeholder = st.empty()
+    # Display beaker and cylinder
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("https://via.placeholder.com/150x200?text=H2O2", caption="H2O2")
+    with col2:
+        st.image("https://via.placeholder.com/150x200?text=KI", caption="KI")
 
-# Add the Start Experiment button
-start_experiment = st.button("Start Experiment")
+    if st.button("Start Experiment"):
+        # Animate pouring solution from beaker to cylinder
+        lottie_url = "https://assets4.lottiefiles.com/packages/lf20_FI4tnv.json"
+        lottie_animation = load_lottie_url(lottie_url)
+        st_lottie(lottie_animation, height=300, width=600)
 
-# Run the experiment sequence if the button is clicked
-if start_experiment:
-    # Step 1: Simulate pouring H₂O₂ into the cylinder
-    reaction_placeholder.write("**Step 1:** Pouring the H₂O₂ solution from the beaker into the cylinder...")
-    time.sleep(2)
+        # Simulate reaction
+        time.sleep(2)
+        st.markdown("**Dramatic reaction occurs!**")
+        lottie_url = "https://assets4.lottiefiles.com/packages/lf20_KvMFxO.json"
+        lottie_animation = load_lottie_url(lottie_url)
+        st_lottie(lottie_animation, height=400, width=800)
 
-    # Step 2: Begin reaction, display initial reaction
-    reaction_placeholder.write("**Step 2:** Reaction begins! The solution in the cylinder starts to bubble...")
-    time.sleep(2)
+        # Display chemical equation
+        st.markdown("**Chemical Equation:**")
+        st.latex(r'2H_2O_2 (aq) \rightarrow 2H_2O (l) + O_2 (g)')
 
-    # Step 3: Simulate the dramatic foaming reaction
-    reaction_placeholder.write("**Step 3:** A huge burst of foam erupts from the cylinder, creating a colorful explosion!")
-    time.sleep(2)
+        # Provide note about optional additions
+        st.write("*Note: Food coloring and liquid soap can be optionally added to the experiment.*")
 
-    # Step 4: Display the chemical equation
-    st.write("**Chemical Equation:**")
-    st.latex(r"2 \, \text{H}_2\text{O}_2 (aq) \rightarrow 2 \, \text{H}_2\text{O} (l) + \text{O}_2 (g)")
-
-    # Step 5: Provide an additional note about optional additions
-    st.write("**Note:** Adding food coloring and liquid soap to the solution can make the reaction even more colorful and foamy.")
-
-# Option to rerun experiment by clicking "Start Experiment" again
-st.write("Click 'Start Experiment' again to repeat the reaction.")
+run_experiment()
