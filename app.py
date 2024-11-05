@@ -1,77 +1,94 @@
 import streamlit as st
-import time
-from PIL import Image, ImageDraw
+from PIL import Image
 
-st.title("🧪 Elephant Toothpaste Reaction 🧪")
+# Animation libraries (choose one based on preference and complexity)
+# Option 1: Using matplotlib animation (simpler, good for basic animations)
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
-# Draw initial setup with a larger cylinder containing KI solution
-def draw_initial_cylinder():
-    img = Image.new('RGB', (400, 400), color='white')
-    draw = ImageDraw.Draw(img)
-    
-    # Draw the larger cylinder with KI solution
-    draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
-    draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
-    draw.text((130, 360), "30% KI Solution", fill="black")
-    
-    return img
+# Option 2: Using libraries like moviepy or ffmpeg (more complex, allows for richer visual effects)
+# from moviepy.editor import VideoFileClip  # (or ffmpeg)
 
-# Show initial setup
-st.image(draw_initial_cylinder(), caption="Cylinder with KI Solution (30%)")
+# Function for the pouring animation (using matplotlib animation)
+def animate_pouring(frames):
+    fig, ax = plt.subplots()
+    ax.set_ylim(0, 10)  # Adjust y-limits for pouring animation
+    line, = ax.plot([], [], lw=2)
 
-# Button to start the experiment
-start_experiment = st.button("Start Experiment")
+    def animate(i):
+        y_data = frames[i]
+        line.set_data([0, 1], [0, y_data])
+        return line,
 
-# Function to create frames for pouring and reaction sequence
-def create_reaction_frames():
-    frames = []
-    
-    # Pouring H2O2 into the cylinder
-    for i in range(10):
-        img = Image.new('RGB', (400, 400), color='white')
-        draw = ImageDraw.Draw(img)
-        
-        # Cylinder with KI solution
-        draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
-        draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
-        draw.text((130, 360), "30% KI Solution", fill="black")
-        
-        # Pouring H2O2
-        draw.ellipse([(150 - i * 5, 100 - i * 10), (175 - i * 5, 125 - i * 10)], fill="lightblue")
-        frames.append(img)
-    
-    # Foaming reaction frames
-    for i in range(15):
-        img = Image.new('RGB', (400, 400), color='white')
-        draw = ImageDraw.Draw(img)
-        
-        # Cylinder with KI solution
-        draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
-        draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
-        draw.text((130, 360), "30% KI Solution", fill="black")
-        
-        # Foam rising out of the cylinder
-        draw.rectangle([(125, 250 - i * 10), (275, 250)], fill="orange")
-        for j in range(i):
-            draw.ellipse([(125, 240 - j * 10), (275, 250 - j * 10)], fill="yellow")
-        
-        frames.append(img)
-    
-    return frames
+    anim = FuncAnimation(fig, animate, frames=frames, interval=100, blit=True)
+    st.pyplot(anim)
 
-# Display frames in sequence to simulate animation
-if start_experiment:
-    st.write("Pouring H₂O₂ into KI solution...")
+# Function for the reaction animation (using matplotlib animation)
+def animate_reaction(frames):
+    fig, ax = plt.subplots()
+    ax.set_ylim(0, 15)  # Adjust y-limits for reaction animation
+    foam, = ax.plot([], [], color='lightcoral', lw=2)
 
-    # Generate frames
-    frames = create_reaction_frames()
+    def animate(i):
+        y_data = frames[i]
+        foam.set_data([0, 1], [0, y_data])
+        return foam,
 
-    # Display each frame with a slight delay to simulate animation
-    for frame in frames:
-        st.image(frame, use_column_width=True)
-        time.sleep(0.2)  # Delay to create an animation effect
+    anim = FuncAnimation(fig, animate, frames=frames, interval=100, blit=True)
+    st.pyplot(anim)
 
-    # Display reaction formula and notes
-    st.markdown("### Reaction Formula")
-    st.write("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
-    st.write("Note: The food coloring and liquid soap enhance the reaction for dramatic effect.")
+# Load beaker and cylinder images
+beaker_image = Image.open("beaker.png")  # Replace with your beaker image file
+cylinder_image = Image.open("cylinder.png")  # Replace with your cylinder image file
+
+# Experiment state variables
+st.session_state.experiment_started = False
+h2o2_level = 0  # Track H2O2 level for animation (0-10)
+foam_level = 0  # Track foam level for animation (0-15)
+frames_pouring = range(1, 11)  # Frames for pouring animation
+frames_reaction = range(1, 16)  # Frames for reaction animation
+reaction_notes = "2H₂O₂ (aq) + 2H₂O (l) + KI (aq) → O₂ (g) + I₂ (aq) + H₂O (l)"  # Updated reaction equation
+
+st.title("Elephant Toothpaste Reaction")
+
+# Display beaker and cylinder images (adjust positioning as needed)
+st.image(beaker_image, width=200, use_column_width=True)
+st.image(cylinder_image, width=300, use_column_width=True)
+
+# Display "30% KI solution" text
+st.caption("30% KI solution (light grey)")
+
+# Start experiment button
+if st.button("Start Experiment"):
+    st.session_state.experiment_started = True
+
+if st.session_state.experiment_started:
+    # Animate pouring H2O2
+    animate_pouring(frames_pouring)
+
+    # Simulate reaction delay
+    st.write("Adding catalyst...")
+    st.success("Reaction starting!")
+
+    # Animate foam rising
+    animate_reaction(frames_reaction)
+
+    # Display reaction notes
+    st.markdown(reaction_notes)
+
+# Additional notes (optional)
+st.write("**Safety:**")
+st.write("- Adult supervision is recommended for children.")
+st.write("- Perform the experiment in a well-ventilated area.")
+st.write("- Wear gloves and goggles for protection.")
+st.write("- Dispose of waste properly.")
+
+st.write("**Food coloring and liquid soap (optional):**")
+st.write("- These can be added to the hydrogen peroxide for a more visually appealing reaction.")
+
+# Choose the animation library you prefer (comment out the other option):
+# st.pyplot(animate_pouring(frames_pouring))  # Using matplotlib animation for pouring
+# st.pyplot(animate_reaction(frames_reaction))  # Using matplotlib animation for reaction
+
+# Example usage with moviepy or ffmpeg (more complex setup):
+# clip = VideoFileClip("pouring.mp
