@@ -52,10 +52,9 @@ def main():
 
     # Functions for beaker and cylinder visuals
     def draw_beaker(label, color, pouring=False):
-        # Adjusted beaker position to be above and slightly right
         rotation = "135deg" if pouring else "0deg"
         return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: auto; margin-top: -50px; margin-right: -50px;">
+        <div style="position: relative; width: 100px; height: 150px; margin: auto;">
             <div style="
                 position: absolute;
                 width: 80px;
@@ -122,12 +121,11 @@ def main():
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
             time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 200  # Foam rises completely
+            st.session_state.foam_height = 200  # Foam rises
             st.experimental_rerun()
 
-    # Display chemical equation and note after the reaction finishes
-    if st.session_state.reaction_state == 'pouring' and st.session_state.foam_height == 200:
-        time.sleep(1)  # Allow foam to finish rising before displaying
+    # Display chemical equation and note after reaction
+    if st.session_state.reaction_state == 'pouring':
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
             <h3>Chemical Equation:</h3>
@@ -143,6 +141,7 @@ def main():
         """)
 
         # Reset state for repeat experiment
+        time.sleep(2)
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
 
