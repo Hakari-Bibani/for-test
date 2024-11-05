@@ -10,17 +10,26 @@ def main():
         <style>
         @keyframes rise {
             0% { height: 10%; opacity: 0.7; }
-            50% { height: 180%; opacity: 0.9; }
-            100% { height: 250%; opacity: 1; }
+            50% { height: 300%; opacity: 0.9; }
+            100% { height: 400%; opacity: 1; }
         }
         @keyframes bubble {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.2) translateY(-20px); }
+            100% { transform: scale(1) translateY(0); }
         }
         @keyframes pour {
             0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-40px, 40px) rotate(45deg); }
+            100% { transform: translate(20px, 20px) rotate(25deg); }
+        }
+        @keyframes flowLine {
+            0% { height: 0; opacity: 0; }
+            100% { height: 100%; opacity: 1; }
+        }
+        @keyframes splash {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
         }
         .stButton>button {
             background-color: #4CAF50;
@@ -49,7 +58,14 @@ def main():
         .foam-bubble {
             position: absolute;
             border-radius: 50%;
-            animation: bubble 1s ease-in-out infinite;
+            animation: bubble 2s ease-in-out infinite;
+            z-index: 2;
+        }
+        .splash-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: splash 1s ease-out forwards;
         }
         @keyframes gradient {
             0% { background-position: 0% 50%; }
@@ -59,7 +75,6 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    # Animated title
     st.markdown('<p class="title">Elephant Toothpaste Reaction</p>', unsafe_allow_html=True)
 
     # Initialize session state
@@ -72,8 +87,25 @@ def main():
         base_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA500', '#FF69B4']
         return [random.choice(base_colors) for _ in range(5)]
 
+    def draw_pouring_effect(pouring=False):
+        if pouring:
+            return f"""
+            <div style="
+                position: absolute;
+                left: 80px;
+                top: 60px;
+                width: 3px;
+                height: 60px;
+                background: linear-gradient(to bottom, #ADD8E6, rgba(173, 216, 230, 0.5));
+                transform-origin: top;
+                animation: flowLine 0.5s linear;
+                z-index: 1;">
+            </div>
+            """
+        return ""
+
     def draw_beaker(label, color, pouring=False):
-        transform = "translate(-40px, 40px) rotate(45deg)" if pouring else "translate(0, 0) rotate(0deg)"
+        transform = "translate(20px, 20px) rotate(25deg)" if pouring else "none"
         return f"""
         <div style="position: relative; width: 100px; height: 150px; margin: auto; margin-bottom: 20px;">
             <div style="
@@ -94,6 +126,7 @@ def main():
                     transition: all 1s ease-in-out;">
                 </div>
             </div>
+            {draw_pouring_effect(pouring)}
             <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); text-align: center;">
                 {label}
             </div>
@@ -103,16 +136,32 @@ def main():
     def draw_cylinder(foam_height, foam_colors):
         bubbles = ""
         if foam_height > 50:
-            for i in range(5):
-                left = random.randint(0, 80)
+            for i in range(10):  # Increased number of bubbles
+                left = random.randint(-20, 140)
                 delay = random.random()
+                size = random.randint(15, 40)  # Larger bubbles
                 bubbles += f"""
                 <div class="foam-bubble" style="
                     left: {left}px;
-                    top: {random.randint(20, 150)}px;
-                    width: {random.randint(10, 25)}px;
-                    height: {random.randint(10, 25)}px;
+                    top: {random.randint(0, 200)}px;
+                    width: {size}px;
+                    height: {size}px;
                     background-color: {random.choice(foam_colors)};
+                    animation-delay: {delay}s;">
+                </div>"""
+
+        splash_effects = ""
+        if foam_height > 200:
+            for i in range(5):
+                size = random.randint(40, 80)
+                left = random.randint(-20, 140)
+                delay = random.random() * 0.5
+                splash_effects += f"""
+                <div class="splash-effect" style="
+                    left: {left}px;
+                    top: {random.randint(0, 100)}px;
+                    width: {size}px;
+                    height: {size}px;
                     animation-delay: {delay}s;">
                 </div>"""
 
@@ -127,13 +176,14 @@ def main():
                 background: transparent;
                 overflow: visible;">
                 {bubbles}
+                {splash_effects}
                 <div style="
                     position: absolute;
                     bottom: 0;
                     width: 100%;
                     height: {foam_height}%;
                     background: linear-gradient(45deg, {', '.join(foam_colors)});
-                    animation: rise 2s ease-out;
+                    animation: rise 3s ease-out;
                     transition: height 2s;">
                 </div>
             </div>
@@ -156,11 +206,11 @@ def main():
     # Central button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
+        if st.button("Start Experiment"):
             st.session_state.reaction_state = 'pouring'
             st.session_state.foam_colors = generate_foam_colors()
             time.sleep(0.5)  # Short pause for pour animation
-            st.session_state.foam_height = 250  # Dramatic foam rise
+            st.session_state.foam_height = 400  # More dramatic foam rise
             st.experimental_rerun()
 
     # Display reaction information
@@ -176,7 +226,7 @@ def main():
         """, unsafe_allow_html=True)
 
         st.info("""
-        💡 **Experiment Enhancement Tips:**
+        🌈 **Experiment Enhancement Tips:**
         1. Add a few drops of food coloring for vibrant, colorful foam
         2. Mix in liquid soap to create more voluminous, lasting foam
         3. For best results, use 30% hydrogen peroxide
