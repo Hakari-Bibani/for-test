@@ -23,12 +23,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Render Beaker and Cylinder with Initial State
+# Initial Setup with Beaker and Cylinder
 st.write("### Initial Setup")
 st.markdown(
     """
     <style>
-    .container { display: flex; justify-content: space-around; }
+    .container { display: flex; justify-content: space-around; margin-bottom: 20px; }
     .beaker, .cylinder {
         width: 100px; height: 200px; 
         border: 2px solid #666; 
@@ -45,7 +45,7 @@ st.markdown(
             <div class="h2o2"></div>
             <div class="label">H₂O₂ Solution</div>
         </div>
-        <div class="cylinder">
+        <div class="cylinder" id="reaction-cylinder">
             <div class="ki"></div>
             <div class="label">30% KI Solution</div>
         </div>
@@ -58,19 +58,18 @@ st.markdown(
 if st.button("Start Experiment"):
     st.write("### Reaction In Progress")
 
-    # Pouring and Reaction Animation
+    # CSS for the Foam Rising and Overflowing in the Same Cylinder
     st.markdown(
         """
         <style>
         .reaction-container {
-            width: 150px;
-            height: 250px;
+            width: 100px;
+            height: 200px;
             border: 2px solid #666;
             border-radius: 10px;
             position: relative;
-            margin-top: 20px;
-            overflow: hidden;
-            animation: foam-rise 3s ease-in-out forwards;
+            overflow: visible;
+            margin: 0 auto;
         }
 
         .foam {
@@ -86,19 +85,13 @@ if st.button("Start Experiment"):
             position: absolute;
             bottom: 0;
             transform: translateY(100%);
-            animation: foam-animation 3s ease-in-out forwards;
+            animation: foam-animation 4s ease-in-out forwards;
         }
 
         @keyframes foam-animation {
-            0% { transform: translateY(100%); }
-            50% { transform: translateY(-50%); }
-            100% { transform: translateY(0%); }
-        }
-
-        @keyframes foam-rise {
-            0% { height: 50px; }
-            50% { height: 150px; }
-            100% { height: 250px; }
+            0% { transform: translateY(100%); height: 0%; }
+            50% { transform: translateY(-100%); height: 200%; }
+            100% { transform: translateY(-200%); height: 300%; }
         }
         </style>
         <div class="reaction-container">
@@ -109,7 +102,7 @@ if st.button("Start Experiment"):
     )
 
     # Display Final Reaction Result
-    time.sleep(3)
+    time.sleep(4)  # Delay for the animation to finish
     st.write("### Reaction Complete!")
     st.markdown(
         """
