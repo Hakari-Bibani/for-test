@@ -1,144 +1,127 @@
 import streamlit as st
 import time
+import random
+from streamlit.components.v1 import html
 
-# Custom CSS for animations
+# Title with Wave Animation
 st.markdown(
     """
     <style>
-        /* Title Wave Animation */
-        @keyframes wave {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-        }
-        .title {
-            font-size: 2.5em;
-            color: #2e86c1;
-            animation: wave 1s infinite alternate;
-        }
+    .title-wave {
+        font-size: 3em;
+        font-weight: bold;
+        color: #0066cc;
+        animation: wave 2s infinite alternate;
+    }
 
-        /* Container for the beaker and cylinder */
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            margin-top: 50px;
-        }
-
-        /* Beaker and Cylinder styling */
-        .beaker, .cylinder {
-            width: 100px;
-            height: 200px;
-            position: relative;
-            border: 3px solid #888;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* H2O2 and KI solutions */
-        .h2o2-solution {
-            width: 100%;
-            height: 50%;
-            background-color: #add8e6; /* Light blue color for H2O2 */
-            position: absolute;
-            bottom: 0;
-        }
-
-        .ki-solution {
-            width: 100%;
-            height: 50%;
-            background-color: #d3d3d3; /* Light grey color for KI */
-            position: absolute;
-            bottom: 0;
-        }
-
-        /* Pouring animation */
-        .pour {
-            position: absolute;
-            width: 10px;
-            height: 50px;
-            background-color: #add8e6;
-            animation: pour 2s forwards;
-        }
-
-        @keyframes pour {
-            0% { transform: translateY(-100px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Reaction (Foam rise and fall) animation */
-        .reaction {
-            position: absolute;
-            width: 100%;
-            background: linear-gradient(180deg, #ff4d4d, #ffcc99, #ffff66);
-            bottom: 0;
-            height: 0;
-            animation: foam 2s forwards;
-            animation-delay: 2s;
-        }
-
-        @keyframes foam {
-            0% { height: 0; }
-            50% { height: 300px; }
-            100% { height: 0; }
-        }
-
-        /* Notes text */
-        .notes {
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #333;
-            text-align: center;
-        }
+    @keyframes wave {
+        0% { transform: translateX(-10px); }
+        50% { transform: translateX(10px); }
+        100% { transform: translateX(-10px); }
+    }
     </style>
-    """,
+    <div class="title-wave">Elephant Toothpaste Reaction</div>
+    """, 
     unsafe_allow_html=True
 )
 
-# Page Title
-st.markdown('<h1 class="title">Elephant Toothpaste Reaction</h1>', unsafe_allow_html=True)
-
-# Display beaker and cylinder with solutions
+# Render Beaker and Cylinder with Initial State
+st.write("### Initial Setup")
 st.markdown(
     """
+    <style>
+    .container { display: flex; justify-content: space-around; }
+    .beaker, .cylinder {
+        width: 100px; height: 200px; 
+        border: 2px solid #666; 
+        border-radius: 10px; 
+        position: relative; 
+    }
+    .h2o2 { background-color: lightblue; height: 50%; }
+    .ki { background-color: lightgrey; height: 50%; }
+    .label { position: absolute; bottom: -20px; left: 0; width: 100%; text-align: center; font-weight: bold; }
+    </style>
     <div class="container">
         <div class="beaker">
-            <div class="h2o2-solution"></div>
+            <div class="h2o2"></div>
+            <div class="label">H₂O₂ Solution</div>
         </div>
         <div class="cylinder">
-            <div class="ki-solution"></div>
-            <p style="text-align:center; margin-top: 210px; color: #555;">30% KI Solution</p>
+            <div class="ki"></div>
+            <div class="label">30% KI Solution</div>
         </div>
     </div>
-    """,
+    """, 
     unsafe_allow_html=True
 )
 
-# Button to start experiment
+# Button to Start Experiment
 if st.button("Start Experiment"):
-    st.markdown(
+    st.write("### Reaction In Progress")
+
+    # Pouring Animation
+    html(
         """
-        <div class="container">
-            <div class="beaker">
-                <div class="h2o2-solution"></div>
-                <div class="pour"></div> <!-- Pouring animation -->
-            </div>
-            <div class="cylinder">
-                <div class="reaction"></div> <!-- Reaction animation -->
-                <p style="text-align:center; margin-top: 210px; color: #555;">30% KI Solution</p>
-            </div>
-        </div>
+        <style>
+        @keyframes pour {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(45deg); }
+        }
+        .beaker {
+            animation: pour 1s forwards;
+        }
+        </style>
         """,
         unsafe_allow_html=True
     )
     
-    # Display notes
+    # Delay to simulate pouring time
+    time.sleep(1)
+    
+    # Reaction Animation - Simulate foam rising
+    reaction_height = 50
+    st.write("## Reaction Occurring...")
+    st.markdown(
+        f"""
+        <style>
+        .reaction-container {{
+            width: 150px; 
+            height: 250px; 
+            border: 2px solid #666; 
+            border-radius: 10px; 
+            position: relative; 
+            margin-top: 20px;
+            background: repeating-linear-gradient(
+                180deg,
+                #FFC0CB,
+                #FFC0CB 10px,
+                #FFFFFF 10px,
+                #FFFFFF 20px
+            );
+        }}
+        </style>
+        <div class="reaction-container"></div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    for i in range(0, 15):
+        reaction_height += random.randint(10, 30)
+        st.markdown(
+            f"""
+            <div class="reaction-container" style="height: {reaction_height}px;"></div>
+            """,
+            unsafe_allow_html=True
+        )
+        time.sleep(0.2)
+
+    # Display Final Reaction Result
+    st.write("### Reaction Complete!")
     st.markdown(
         """
-        <div class="notes">
-            <p>2H<sub>2</sub>O<sub>2</sub> (aq) → 2H<sub>2</sub>O (l) + O<sub>2</sub> (g)</p>
-            <p>Food coloring and liquid soap can be added</p>
-        </div>
+        **Reaction:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
+        
+        *Food coloring and liquid soap can be added for extra effect.*
         """,
         unsafe_allow_html=True
     )
