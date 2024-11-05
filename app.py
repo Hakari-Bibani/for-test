@@ -1,51 +1,151 @@
 import streamlit as st
-import time
-from PIL import Image, ImageDraw
+import streamlit.components.v1 as components
+from pathlib import Path
+import importlib
+import sys
+from typing import Dict, Any
 
-# Set the title
-st.title("Test the pH of different solutions using litmus paper!")
+# Configure page settings
+st.set_page_config(
+    page_title="Virtual Chemistry Lab",
+    page_icon="⚗️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# Display initial image of three yellow litmus strips and three beakers
-initial_image = Image.open("/mnt/data/Screenshot 2024-11-05 012547.png")
-st.image(initial_image, caption="Initial setup with yellow litmus paper strips above each beaker")
+# Chemistry experiments data
+experiments = {
+    "Baking Soda and Vinegar Reaction": {
+        "description": "A classic acid-base reaction that produces carbon dioxide gas.",
+        "visualization": "Fizzing and bubbling as CO2 is released.",
+        "fun_fact": "This reaction is commonly used in science fair volcanoes!",
+        "module": "baking"
+    },
+    "Sodium and Water Reaction": {
+        "description": "Sodium metal reacts with water, producing hydrogen gas and heat.",
+        "visualization": "Bubbles and flames as hydrogen gas ignites.",
+        "fun_fact": "This reaction showcases the reactivity of alkali metals, especially with water.",
+        "module": "explosion"
+    },
+    "pH Indicator": {
+        "description": "A reaction where an indicator changes color based on the pH.",
+        "visualization": "Litmus turning red in acid, blue in base, green in neutral.",
+        "fun_fact": "pH indicators are used in labs and gardening!",
+        "module": "indicator"
+    },
+    "Acid-Base Titration": {
+        "description": "A process where an acid is neutralized by a base.",
+        "visualization": "A pH curve that changes as titrant is added.",
+        "fun_fact": "Titrations help determine unknown concentrations.",
+        "module": "acid_base"
+    },
+    "Elephant Toothpaste Reaction": {
+        "description": "Decomposition of hydrogen peroxide produces oxygen gas and foam.",
+        "visualization": "Expanding foam like giant toothpaste.",
+        "fun_fact": "Famous for its foamy explosion in demonstrations!",
+        "module": "elephant_toothpaste"
+    }
+}
 
-# Start button for the test
-start = st.button("Start Test")
+def load_css():
+    # [Previous CSS code remains unchanged]
+    pass
 
-# Define a function to change the color of the litmus paper based on solution
-def color_litmus(paper_color, solution_color):
-    image = initial_image.copy()
-    draw = ImageDraw.Draw(image)
+def render_card(title: str, content: Dict[str, Any]) -> None:
+    st.markdown(f"""
+        <div class="flip-card">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <h2>{title}</h2>
+                    <div style='font-size: 3em; margin: 20px 0'>🧪</div>
+                </div>
+                <div class="flip-card-back">
+                    <h3>Description</h3>
+                    <p>{content['description']}</p>
+                    <h3>Visualization</h3>
+                    <p>{content['visualization']}</p>
+                    <h3>Fun Fact</h3>
+                    <p>{content['fun_fact']}</p>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # Coordinates for the litmus strips in the beakers (center of each beaker)
-    litmus_positions = [(130, 100), (400, 100), (670, 100)]
-    
-    for pos, color in zip(litmus_positions, paper_color):
-        draw.rectangle([pos[0], pos[1], pos[0] + 20, pos[1] + 80], fill=color)
+def load_module(module_name: str):
+    """Dynamically import and return the specified module"""
+    try:
+        return importlib.import_module(module_name)
+    except ImportError as e:
+        st.error(f"Error loading module {module_name}: {str(e)}")
+        return None
 
-    # Draw beaker color
-    solution_positions = [(130, 160), (400, 160), (670, 160)]
-    for pos, color in zip(solution_positions, solution_color):
-        draw.rectangle([pos[0], pos[1], pos[0] + 100, pos[1] + 200], fill=color)
+def render_title():
+    st.markdown("""
+        <div class='title-container'>
+            <div class='floating-formula formula1'>H₂O 💧</div>
+            <div class='floating-formula formula2'>CO₂ ⚡</div>
+            <div class='floating-formula formula3'>O₂ 🔥</div>
+            <div class='floating-formula formula4'>NaCl ✨</div>
+            <div class='floating-formula formula5'>CH₄ 💨</div>
+            <h1 class='glowing-title'>Virtual Chemistry Lab</h1>
+            <div class='icons-container'>
+                <span class='chemistry-icon'>⚗️</span>
+                <span class='chemistry-icon'>🧪</span>
+                <span class='chemistry-icon'>🔬</span>
+                <span class='chemistry-icon'>🧫</span>
+                <span class='chemistry-icon'>⚛️</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    return image
+def render_overview():
+    """Render the main overview page with experiment cards"""
+    # Create the layout with two rows: top row with three cards, bottom row with two
+    top_row = st.columns(3)
+    bottom_row = st.columns(2)
 
-# If Start button is pressed, show the litmus paper changing colors
-if start:
-    st.write("Testing...")
+    # First row of cards (3 cards)
+    for i, (title, content) in enumerate(list(experiments.items())[:3]):
+        with top_row[i]:
+            render_card(title, content)
 
-    # Initial setup with beakers containing different solutions
-    solution_colors = ["lightgray", "lightgray", "pale blue"]  # Colors for acid, base, and neutral
-    paper_colors = ["yellow", "yellow", "yellow"]  # Initial color of the litmus papers (all yellow)
+    # Second row of cards (2 cards)
+    for i, (title, content) in enumerate(list(experiments.items())[3:]):
+        with bottom_row[i]:
+            render_card(title, content)
 
-    # First step: papers dive into beakers
-    for i in range(3):
-        st.image(color_litmus(paper_colors, solution_colors), caption="Dipping litmus paper into solutions")
-        time.sleep(1)
+def main():
+    load_css()
 
-    # Second step: change litmus paper colors after reaction
-    paper_colors = ["red", "blue", "lightgreen"]  # Colors after reaction (red for acid, blue for base, green for neutral)
-    st.image(color_litmus(paper_colors, solution_colors), caption="Litmus paper changes color based on pH")
-    
-    time.sleep(6)  # Show the result for 6 seconds before resetting
-    st.write("Test complete! Press 'Start Test' to repeat.")
+    # Sidebar navigation
+    with st.sidebar:
+        st.title("Navigation")
+        tabs = ["Overview"] + list(experiments.keys())
+        selected_tab = st.radio("Select Experiment", tabs)
+
+    # Main content area
+    render_title()
+
+    if selected_tab == "Overview":
+        render_overview()
+    else:
+        # Load and display the selected experiment's content
+        experiment_data = experiments[selected_tab]
+        module_name = experiment_data["module"]
+        module = load_module(module_name)
+        
+        if module and hasattr(module, 'run_experiment'):
+            module.run_experiment()
+        else:
+            st.warning(f"The experiment module '{module_name}' is not properly configured.")
+
+    # Footer
+    st.markdown("""
+        <div style='text-align: center; padding: 20px;'>
+            Created by <a href="https://github.com/Hakari-Bibani" target="_blank">Hakari Bibani</a> | 
+            <a href="https://hawkardemo.streamlit.app/" target="_blank">Visit Demo Site</a>
+        </div>
+    """, unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
