@@ -149,6 +149,7 @@ def main():
         time.sleep(2)
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
+        st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
