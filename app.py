@@ -1,14 +1,12 @@
 import streamlit as st
 import time
 
-def main():
-    # Title
-    st.markdown("<h1 style='text-align: center;'>Elephant Toothpaste Reaction</h1>", unsafe_allow_html=True)
-
-    # CSS Styling and Animations
+def elephant_toothpaste_experiment():
+    # CSS for animations and beaker design
     st.markdown("""
     <style>
-        /* Title animation */
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
+        
         .title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 2.8em;
@@ -16,113 +14,116 @@ def main():
             text-align: center;
             margin-bottom: 30px;
             padding: 20px;
+            animation: float 3s ease-in-out infinite;
         }
         
-        /* Beaker and Cylinder styling */
-        .beaker {
-            width: 100px;
-            height: 150px;
-            background-color: rgba(176,224,230,0.7);
-            border: 3px solid #2c3e50;
-            border-radius: 5px;
-            display: inline-block;
-            margin-right: 30px;
-            position: relative;
-            top: -20px;
-            transition: transform 2s;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
-        .cylinder {
+        
+        .experiment-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .beaker, .cylinder {
             width: 80px;
-            height: 130px;
-            background-color: rgba(169,169,169,0.7);
-            border: 3px solid #2c3e50;
-            border-radius: 10px;
-            display: inline-block;
+            height: 100px;
             position: relative;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
         }
-
-        /* Pouring animation */
-        .beaker.pour {
-            transform: rotate(45deg);
+        
+        .solution {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            animation: liquidWave 4s infinite ease-in-out;
         }
-
-        /* Foam explosion animation */
-        .foam {
+        
+        .solution-blue { background: rgba(176,224,230,0.7); }
+        .solution-grey { background: rgba(169,169,169,0.7); }
+        
+        @keyframes liquidWave {
+            0%, 100% { transform: scaleY(1.02); }
+            50% { transform: scaleY(0.98); }
+        }
+        
+        .pour-animation {
+            transform: rotate(-45deg) translate(20px, 20px);
+            transition: transform 1.5s;
+        }
+        
+        .reaction-foam {
             position: absolute;
             bottom: 0;
             left: 50%;
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(to top, #ff6347, #ffa07a, #f08080);
-            animation: foamExplosion 2s ease-in-out forwards;
-            opacity: 0;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(to top, #ff6347, #ffa07a, #f5f5dc);
+            animation: foamExpand 2s ease-out forwards;
         }
-        @keyframes foamExplosion {
-            0% { height: 30px; opacity: 1; }
-            50% { height: 200px; opacity: 0.9; }
-            100% { height: 350px; opacity: 0.5; }
-        }
-
-        /* Button styling */
-        .stButton>button {
-            background: #d3d3d3;
-            color: #2c3e50;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .stButton>button:hover {
-            background: #c0c0c0;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(211, 211, 211, 0.4);
+        
+        @keyframes foamExpand {
+            0% { height: 10px; }
+            100% { height: 200px; }
         }
     </style>
     """, unsafe_allow_html=True)
+    
+    # Title with animation
+    st.markdown("<h1 class='title'>Elephant Toothpaste Reaction</h1>", unsafe_allow_html=True)
+    
+    # Beaker and Cylinder setup
+    experiment_container = st.empty()
 
-    # Display beaker and cylinder
-    container = st.container()
-    with container:
-        st.markdown("""
-        <div style="display: flex; align-items: flex-start;">
-            <div class="beaker" id="beaker">H₂O₂</div>
-            <div class="cylinder" id="cylinder">KI</div>
-        </div>
+    def render_initial_state():
+        experiment_container.markdown("""
+            <div class='experiment-container'>
+                <div class='beaker'>
+                    <div class='solution solution-blue'></div>
+                    <div>H₂O₂</div>
+                </div>
+                <div class='cylinder'>
+                    <div class='solution solution-grey'></div>
+                    <div>KI</div>
+                </div>
+            </div>
         """, unsafe_allow_html=True)
-
-    # Start Experiment Button
+    
+    def animate_reaction():
+        # Pouring animation and reaction foam
+        experiment_container.markdown("""
+            <div class='experiment-container'>
+                <div class='beaker pour-animation'>
+                    <div class='solution solution-blue'></div>
+                    <div>H₂O₂</div>
+                </div>
+                <div class='cylinder'>
+                    <div class='reaction-foam'></div>
+                    <div>KI</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        time.sleep(2)
+    
+    render_initial_state()
+    
     if st.button("Start Experiment"):
-        # Animate the beaker tilt and foam explosion
+        animate_reaction()
         st.markdown("""
-        <script>
-            const beaker = document.getElementById('beaker');
-            const cylinder = document.getElementById('cylinder');
-
-            // Tilt beaker to simulate pouring
-            beaker.classList.add('pour');
-
-            // Delay to simulate foam explosion
-            setTimeout(() => {
-                const foam = document.createElement('div');
-                foam.classList.add('foam');
-                cylinder.appendChild(foam);
-            }, 2000);
-        </script>
+            <h3>Chemical Reaction:</h3>
+            <p>2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</p>
+            <p>Note: Add food coloring or liquid soap for enhanced visual effects.</p>
         """, unsafe_allow_html=True)
-
-        # Display chemical reaction equation
-        time.sleep(3)
-        st.markdown("### Reaction Equation")
-        st.markdown("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
-
-        # Optional note
-        st.info("Optional: Add food coloring and liquid soap to enhance the reaction's visual effect.")
-
-    # Repeat Experiment Button
-    if st.button("Repeat Experiment"):
-        st.experimental_rerun()
-
-if __name__ == "__main__":
-    main()
+    
+# Run the experiment
+elephant_toothpaste_experiment()
