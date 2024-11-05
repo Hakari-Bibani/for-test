@@ -1,66 +1,108 @@
 import streamlit as st
 import time
-from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
-# Set page title
-st.set_page_config(page_title="Elephant Toothpaste Reaction")
-
-# Add title
+# Title of the app
 st.title("Elephant Toothpaste Reaction")
 
-# Add static images
+# Display the initial setup of the experiment
 col1, col2 = st.columns(2)
+
+# Create the beaker and cylinder
 with col1:
-    beaker_img = Image.open("beaker.png")
-    st.image(beaker_img, caption="H2O2")
+    st.write("### Beaker (H₂O₂)")
+    st.markdown("""
+    <div style="height: 200px; width: 100px; background-color: #b0c4de; border: 2px solid #000; position: relative; text-align: center;">
+        <div style="position: absolute; top: 70%; width: 100%; font-size: 1.5em;">H₂O₂</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 with col2:
-    cylinder_img = Image.open("cylinder.png")
-    st.image(cylinder_img, caption="KI")
+    st.write("### Cylinder (KI)")
+    st.markdown("""
+    <div style="height: 300px; width: 80px; background-color: #d3d3d3; border: 2px solid #000; position: relative; text-align: center;">
+        <div style="position: absolute; top: 75%; width: 100%; font-size: 1.5em;">KI</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Function to animate the beaker bending
-def animate_beaker_bend(frame):
-    beaker_img = Image.open("beaker.png")
-    beaker_img = beaker_img.rotate(frame * 10)
-    return st.image(beaker_img, caption="H2O2", use_column_width=True)
-
-# Function to animate the foam jumping
-def animate_foam_jump(frame):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
-    ax.axis('off')
-
-    # Generate random foam particles
-    x = np.random.uniform(0, 10, 100)
-    y = np.random.uniform(0, 10, 100)
-    size = np.random.uniform(0.5, 2, 100)
-    color = np.random.uniform(0, 1, (100, 3))
-
-    # Update the foam particles
-    ax.scatter(x, y, s=size * frame, c=color)
-
-    return st.pyplot(fig)
-
-# Add start experiment button
+# Add a button to start the experiment
 if st.button("Start Experiment"):
-    # Animate the pouring of the solution
-    beaker_animation = st.empty()
-    for i in range(18):
-        beaker_animation(animate_beaker_bend(i))
-        time.sleep(0.1)
+    # Simulate the reaction start with a brief delay
+    time.sleep(1)
+    
+    # Use JavaScript and CSS for a beaker pouring effect
+    st.markdown("""
+    <style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .beaker {
+        height: 200px;
+        width: 100px;
+        background-color: #b0c4de;
+        border: 2px solid #000;
+        position: relative;
+        transform: rotate(-45deg);
+        transition: transform 1s;
+    }
+    .beaker-label {
+        position: absolute;
+        top: 70%;
+        width: 100%;
+        font-size: 1.5em;
+    }
+    .cylinder {
+        height: 300px;
+        width: 80px;
+        background-color: #d3d3d3;
+        border: 2px solid #000;
+        position: relative;
+    }
+    .reaction {
+        height: 0;
+        width: 80px;
+        background-color: #ff69b4;
+        border: 2px solid #000;
+        position: relative;
+        transition: height 2s ease-in-out;
+        overflow: hidden;
+    }
+    .reaction.animate {
+        height: 500px;
+    }
+    </style>
 
-    # Animate the reaction
-    foam_animation = st.empty()
-    foam_ani = FuncAnimation(plt.figure(), animate_foam_jump, frames=np.linspace(1, 10, 50), interval=50, blit=False)
-    foam_animation(foam_ani)
-    time.sleep(3)
+    <div class="container">
+        <div class="beaker">
+            <div class="beaker-label">H₂O₂</div>
+        </div>
+        <div class="cylinder">
+            <div class="reaction"></div>
+            <div class="beaker-label">KI</div>
+        </div>
+    </div>
 
-    # Display the chemical equation
-    st.markdown("**Chemical Equation:**")
-    st.latex(r"2H_2O_2 (aq) \to 2H_2O (l) + O_2 (g)")
-    st.write("*Note: The optional addition of food coloring and liquid soap can enhance the visual effect.*")
+    <script>
+    setTimeout(() => {
+        // Start the beaker pour animation
+        document.querySelector('.beaker').style.transform = 'rotate(0deg)';
+        
+        // After a slight delay, animate the foam explosion
+        setTimeout(() => {
+            document.querySelector('.reaction').classList.add('animate');
+        }, 1000);
+    }, 500);
+    </script>
+    """, unsafe_allow_html=True)
 
-st.markdown("Click the 'Start Experiment' button to repeat the reaction!")
+    # Display chemical equation and additional notes after animation
+    time.sleep(2)
+    st.subheader("Chemical Equation")
+    st.write("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
+
+    # Display optional note
+    st.write("**Note:** To enhance the visual effect, you can optionally add food coloring and liquid soap.")
+
+# Allow the experiment to be repeated
+st.button("Repeat Experiment")
