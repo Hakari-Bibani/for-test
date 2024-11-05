@@ -1,26 +1,20 @@
-import streamlit as st
+=import streamlit as st
 import time
 import random
 
 def main():
     st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="wide")
 
-    # Enhanced CSS for animations
+    # CSS for styling and animations
     st.markdown("""
         <style>
         @keyframes rise {
-            0% { height: 10%; opacity: 0.7; }
-            50% { height: 300%; opacity: 0.9; }
-            100% { height: 400%; opacity: 1; }
-        }
-        @keyframes bubble {
-            0% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.2) translateY(-20px); }
-            100% { transform: scale(1) translateY(0); }
+            0% { height: 50%; }
+            100% { height: 200%; }
         }
         @keyframes pour {
             0% { transform: rotate(0deg); }
-            100% { transform: rotate(25deg); }
+            100% { transform: rotate(135deg); }
         }
         .stButton>button {
             background-color: #4CAF50;
@@ -30,11 +24,6 @@ def main():
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        .stButton>button:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
         }
         .title {
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
@@ -43,29 +32,27 @@ def main():
             font-size: 48px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 30px;
+            animation: gradient 3s ease infinite;
         }
-        .foam-bubble {
-            position: absolute;
-            border-radius: 50%;
-            animation: bubble 2s ease-in-out infinite;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         </style>
         """, unsafe_allow_html=True)
 
+    # Animated title
     st.markdown('<p class="title">Elephant Toothpaste Reaction</p>', unsafe_allow_html=True)
 
-    # Initialize session state
+    # Initialize session state for reaction
     if 'reaction_state' not in st.session_state:
         st.session_state.reaction_state = 'ready'
-        st.session_state.foam_height = 10
+        st.session_state.foam_height = 50
 
-    def generate_foam_colors():
-        base_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA500', '#FF69B4']
-        return [random.choice(base_colors) for _ in range(5)]
-
+    # Functions for beaker and cylinder visuals
     def draw_beaker(label, color, pouring=False):
-        rotation = "rotate(25deg)" if pouring else "none"
+        rotation = "135deg" if pouring else "0deg"
         return f"""
         <div style="position: relative; width: 100px; height: 150px; margin: auto;">
             <div style="
@@ -75,15 +62,16 @@ def main():
                 border: 3px solid #333;
                 border-top: none;
                 background: transparent;
-                transform: {rotation};
+                transform: rotate({rotation});
+                transform-origin: bottom right;
                 transition: transform 1s;">
                 <div style="
                     position: absolute;
                     bottom: 0;
                     width: 100%;
-                    height: {50 if not pouring else 20}%;
+                    height: 50%;
                     background-color: {color};
-                    transition: height 1s;">
+                    transition: height 2s;">
                 </div>
             </div>
             <div style="position: absolute; bottom: -25px; width: 100%; text-align: center;">
@@ -92,40 +80,24 @@ def main():
         </div>
         """
 
-    def draw_cylinder(foam_height, foam_colors):
-        bubbles = ""
-        if foam_height > 50:
-            for i in range(5):
-                left = random.randint(0, 120)
-                delay = random.random()
-                size = random.randint(15, 40)
-                bubbles += f"""
-                <div class="foam-bubble" style="
-                    left: {left}px;
-                    bottom: {random.randint(0, 200)}px;
-                    width: {size}px;
-                    height: {size}px;
-                    background-color: {random.choice(foam_colors)};
-                    animation-delay: {delay}s;">
-                </div>"""
-
+    def draw_cylinder(foam_height):
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
+        foam_color = random.choice(colors)
         return f"""
-        <div style="position: relative; width: 150px; height: 250px; margin: auto;">
+        <div style="position: relative; width: 150px; height: 200px; margin: auto;">
             <div style="
                 position: absolute;
                 width: 120px;
-                height: 200px;
+                height: 180px;
                 border: 3px solid #333;
                 border-top: none;
                 background: transparent;">
-                {bubbles}
                 <div style="
                     position: absolute;
                     bottom: 0;
                     width: 100%;
                     height: {foam_height}%;
-                    background: linear-gradient(45deg, {', '.join(foam_colors)});
-                    animation: rise 3s ease-out;
+                    background: linear-gradient(45deg, {foam_color}, white);
                     transition: height 2s;">
                 </div>
             </div>
@@ -135,47 +107,43 @@ def main():
         </div>
         """
 
-    # Display beaker and cylinder
-    col1, col2 = st.columns([1, 1])
-    
+    # Displaying the beaker and cylinder with appropriate state
+    col1, col2 = st.columns(2)
     with col1:
         st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
                     unsafe_allow_html=True)
     with col2:
-        foam_colors = generate_foam_colors()
-        st.markdown(draw_cylinder(st.session_state.foam_height, foam_colors), 
-                    unsafe_allow_html=True)
+        st.markdown(draw_cylinder(st.session_state.foam_height), unsafe_allow_html=True)
 
-    # Central button
+    # Central "Start Experiment" button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
-            st.session_state.foam_height = 400  # Simulate foam rising
+            time.sleep(1)  # Pause for pour animation
+            st.session_state.foam_height = 200  # Foam rises
             st.experimental_rerun()
 
-    # Display reaction information after reaction
+    # Display chemical equation and note after reaction
     if st.session_state.reaction_state == 'pouring':
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
-            <h3 style='color: #2C3E50;'>Chemical Equation:</h3>
-            <p style='font-size: 24px; color: #34495E;'>
-                2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
-            </p>
+            <h3>Chemical Equation:</h3>
+            <p style='font-size: 24px;'>2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</p>
         </div>
         """, unsafe_allow_html=True)
 
         st.info("""
-        **Experiment Enhancement Tips:**
-        - Add food coloring for vibrant foam
-        - Use liquid soap for more foam
-        - Use 30% hydrogen peroxide for best results
+        **Note:** For a more dramatic effect in real experiments:
+        - Add a few drops of food coloring to create colorful foam
+        - Mix in liquid soap to create more voluminous foam
+        - Always perform under proper supervision and safety conditions
         """)
 
         # Reset state for repeat experiment
         time.sleep(2)
         st.session_state.reaction_state = 'ready'
-        st.session_state.foam_height = 10
+        st.session_state.foam_height = 50
 
 if __name__ == "__main__":
     main()
