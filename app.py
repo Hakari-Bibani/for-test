@@ -126,6 +126,18 @@ def main():
 
     # Display chemical equation and note after reaction
     if st.session_state.reaction_state == 'pouring':
+        # Bend the beaker towards the cylinder
+        st.markdown("""
+        <div style='position: relative; width: 100%; height: 150px;'>
+            <div style='position: absolute; left: 50px; bottom: 0; transform: rotate(135deg); transition: transform 2s;'>
+                """ + draw_beaker("H₂O₂", "#ADD8E6", pouring=True) + """
+            </div>
+            <div style='position: absolute; right: 50px; bottom: 0;'>
+                """ + draw_cylinder(st.session_state.foam_height) + """
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
             <h3>Chemical Equation:</h3>
