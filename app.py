@@ -9,7 +9,6 @@ const ElephantToothpasteReaction = () => {
 
   // Functions for beaker and cylinder visuals
   const drawBeaker = () => {
-    const rotation = pouring ? '135deg' : '0deg';
     return (
       <div style={{
         position: 'relative',
@@ -25,7 +24,7 @@ const ElephantToothpasteReaction = () => {
           border: '3px solid #333',
           borderTop: 'none',
           background: 'transparent',
-          transform: `rotate(${rotation})`,
+          transform: `rotate(${pouring ? '135deg' : '0deg'})`,
           transformOrigin: 'bottom right',
           transition: 'transform 1s',
         }}>
@@ -100,8 +99,8 @@ const ElephantToothpasteReaction = () => {
       </CardHeader>
       <CardContent>
         <div className="flex justify-center">
-          {drawBeaker()}
-          {drawCylinder()}
+          <div>{drawBeaker()}</div>
+          <div>{drawCylinder()}</div>
         </div>
         <div className="text-center mt-6">
           <Button onClick={startExperiment}>
