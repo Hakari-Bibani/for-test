@@ -1,151 +1,118 @@
 import streamlit as st
+import time
 import streamlit.components.v1 as components
-from pathlib import Path
-import importlib
-import sys
-from typing import Dict, Any
 
-# Configure page settings
-st.set_page_config(
-    page_title="Virtual Chemistry Lab",
-    page_icon="⚗️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.title("Test the pH of different solutions using litmus paper!")
 
-# Chemistry experiments data
-experiments = {
-    "Baking Soda and Vinegar Reaction": {
-        "description": "A classic acid-base reaction that produces carbon dioxide gas.",
-        "visualization": "Fizzing and bubbling as CO2 is released.",
-        "fun_fact": "This reaction is commonly used in science fair volcanoes!",
-        "module": "baking"
-    },
-    "Sodium and Water Reaction": {
-        "description": "Sodium metal reacts with water, producing hydrogen gas and heat.",
-        "visualization": "Bubbles and flames as hydrogen gas ignites.",
-        "fun_fact": "This reaction showcases the reactivity of alkali metals, especially with water.",
-        "module": "explosion"
-    },
-    "pH Indicator": {
-        "description": "A reaction where an indicator changes color based on the pH.",
-        "visualization": "Litmus turning red in acid, blue in base, green in neutral.",
-        "fun_fact": "pH indicators are used in labs and gardening!",
-        "module": "indicator"
-    },
-    "Acid-Base Titration": {
-        "description": "A process where an acid is neutralized by a base.",
-        "visualization": "A pH curve that changes as titrant is added.",
-        "fun_fact": "Titrations help determine unknown concentrations.",
-        "module": "acid_base"
-    },
-    "Elephant Toothpaste Reaction": {
-        "description": "Decomposition of hydrogen peroxide produces oxygen gas and foam.",
-        "visualization": "Expanding foam like giant toothpaste.",
-        "fun_fact": "Famous for its foamy explosion in demonstrations!",
-        "module": "elephant_toothpaste"
+# Custom CSS for the animation
+st.markdown("""
+<style>
+    .container {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+        position: relative;
+        height: 400px;
     }
+    .beaker {
+        width: 100px;
+        height: 150px;
+        border: 3px solid #333;
+        border-radius: 0 0 20px 20px;
+        position: relative;
+        margin-top: 100px;
+    }
+    .solution {
+        width: 100%;
+        height: 80%;
+        position: absolute;
+        bottom: 0;
+        border-radius: 0 0 17px 17px;
+        animation: bubble 2s infinite;
+    }
+    .litmus {
+        width: 15px;
+        height: 80px;
+        background-color: #f9f9c5;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: all 0.5s;
+    }
+    @keyframes bubble {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    .animate-test {
+        animation: dipTest 6s forwards;
+    }
+    @keyframes dipTest {
+        0% { transform: translateX(-50%) translateY(0); }
+        20% { transform: translateX(-50%) translateY(150px); }
+        80% { transform: translateX(-50%) translateY(150px); }
+        100% { transform: translateX(-50%) translateY(0); }
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# HTML for the beakers and litmus papers
+beakers_html = """
+<div class="container">
+    <div class="beaker" id="acid">
+        <div class="solution" style="background-color: #e0e0e0;"></div>
+        <div class="litmus" id="litmus1"></div>
+    </div>
+    <div class="beaker" id="base">
+        <div class="solution" style="background-color: #e0e0e0;"></div>
+        <div class="litmus" id="litmus2"></div>
+    </div>
+    <div class="beaker" id="neutral">
+        <div class="solution" style="background-color: #e0f7ff;"></div>
+        <div class="litmus" id="litmus3"></div>
+    </div>
+</div>
+"""
+
+# JavaScript for handling the animation
+js_code = """
+<script>
+function startTest() {
+    const litmus1 = document.getElementById('litmus1');
+    const litmus2 = document.getElementById('litmus2');
+    const litmus3 = document.getElementById('litmus3');
+    
+    // Reset colors
+    litmus1.style.backgroundColor = '#f9f9c5';
+    litmus2.style.backgroundColor = '#f9f9c5';
+    litmus3.style.backgroundColor = '#f9f9c5';
+    
+    // Add animation class
+    litmus1.classList.add('animate-test');
+    litmus2.classList.add('animate-test');
+    litmus3.classList.add('animate-test');
+    
+    // Change colors after delay
+    setTimeout(() => {
+        litmus1.style.backgroundColor = '#ff6b6b';  // Red for acid
+        litmus2.style.backgroundColor = '#4dabf7';  // Blue for base
+        litmus3.style.backgroundColor = '#8ce99a';  // Light green for neutral
+    }, 1500);
+    
+    // Remove animation class after completion
+    setTimeout(() => {
+        litmus1.classList.remove('animate-test');
+        litmus2.classList.remove('animate-test');
+        litmus3.classList.remove('animate-test');
+    }, 6000);
 }
+</script>
+"""
 
-def load_css():
-    # [Previous CSS code remains unchanged]
-    pass
+# Combine HTML and JavaScript
+components.html(f"{beakers_html}{js_code}", height=450)
 
-def render_card(title: str, content: Dict[str, Any]) -> None:
-    st.markdown(f"""
-        <div class="flip-card">
-            <div class="flip-card-inner">
-                <div class="flip-card-front">
-                    <h2>{title}</h2>
-                    <div style='font-size: 3em; margin: 20px 0'>🧪</div>
-                </div>
-                <div class="flip-card-back">
-                    <h3>Description</h3>
-                    <p>{content['description']}</p>
-                    <h3>Visualization</h3>
-                    <p>{content['visualization']}</p>
-                    <h3>Fun Fact</h3>
-                    <p>{content['fun_fact']}</p>
-                </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-def load_module(module_name: str):
-    """Dynamically import and return the specified module"""
-    try:
-        return importlib.import_module(module_name)
-    except ImportError as e:
-        st.error(f"Error loading module {module_name}: {str(e)}")
-        return None
-
-def render_title():
-    st.markdown("""
-        <div class='title-container'>
-            <div class='floating-formula formula1'>H₂O 💧</div>
-            <div class='floating-formula formula2'>CO₂ ⚡</div>
-            <div class='floating-formula formula3'>O₂ 🔥</div>
-            <div class='floating-formula formula4'>NaCl ✨</div>
-            <div class='floating-formula formula5'>CH₄ 💨</div>
-            <h1 class='glowing-title'>Virtual Chemistry Lab</h1>
-            <div class='icons-container'>
-                <span class='chemistry-icon'>⚗️</span>
-                <span class='chemistry-icon'>🧪</span>
-                <span class='chemistry-icon'>🔬</span>
-                <span class='chemistry-icon'>🧫</span>
-                <span class='chemistry-icon'>⚛️</span>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-def render_overview():
-    """Render the main overview page with experiment cards"""
-    # Create the layout with two rows: top row with three cards, bottom row with two
-    top_row = st.columns(3)
-    bottom_row = st.columns(2)
-
-    # First row of cards (3 cards)
-    for i, (title, content) in enumerate(list(experiments.items())[:3]):
-        with top_row[i]:
-            render_card(title, content)
-
-    # Second row of cards (2 cards)
-    for i, (title, content) in enumerate(list(experiments.items())[3:]):
-        with bottom_row[i]:
-            render_card(title, content)
-
-def main():
-    load_css()
-
-    # Sidebar navigation
-    with st.sidebar:
-        st.title("Navigation")
-        tabs = ["Overview"] + list(experiments.keys())
-        selected_tab = st.radio("Select Experiment", tabs)
-
-    # Main content area
-    render_title()
-
-    if selected_tab == "Overview":
-        render_overview()
-    else:
-        # Load and display the selected experiment's content
-        experiment_data = experiments[selected_tab]
-        module_name = experiment_data["module"]
-        module = load_module(module_name)
-        
-        if module and hasattr(module, 'run_experiment'):
-            module.run_experiment()
-        else:
-            st.warning(f"The experiment module '{module_name}' is not properly configured.")
-
-    # Footer
-    st.markdown("""
-        <div style='text-align: center; padding: 20px;'>
-            Created by <a href="https://github.com/Hakari-Bibani" target="_blank">Hakari Bibani</a> | 
-            <a href="https://hawkardemo.streamlit.app/" target="_blank">Visit Demo Site</a>
-        </div>
-    """, unsafe_allow_html=True)
-
-if __name__ == "__main__":
-    main()
+# Create the start button
+if st.button("Start Test", key="start_test"):
+    js_code = f"<script>startTest()</script>"
+    components.html(js_code, height=0)
