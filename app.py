@@ -1,60 +1,85 @@
 import streamlit as st
 import time
+from indicator import run_experiment
 
-# Title for the experiment
-st.title("Elephant Toothpaste Reaction")
+def main():
+    st.markdown("<h1 style='text-align: center;'>Elephant Toothpaste Reaction</h1>", unsafe_allow_html=True)
 
-# Introduction and placeholders for beaker and cylinder
-st.write("## Experiment Setup:")
-beaker_placeholder = st.empty()
-cylinder_placeholder = st.empty()
-reaction_placeholder = st.empty()
-equation_placeholder = st.empty()
-note_placeholder = st.empty()
-
-# Draw initial setup with beaker and cylinder
-def setup_experiment():
-    with beaker_placeholder.container():
-        st.write("### Beaker (H₂O₂ Solution)")
-        st.markdown("<div style='text-align: center;'>🧪 H₂O₂ (Pale Blue Solution)</div>", unsafe_allow_html=True)
-    with cylinder_placeholder.container():
-        st.write("### Cylinder (KI Solution)")
-        st.markdown("<div style='text-align: center;'>🥛 KI (Light Grey Solution)</div>", unsafe_allow_html=True)
-
-# Animation to mimic pouring reaction
-def pouring_animation():
-    beaker_placeholder.empty()  # Clear initial setup
-    reaction_placeholder.empty()
-    cylinder_placeholder.empty()
-
-    # Display a tilted beaker to simulate pouring
-    with beaker_placeholder.container():
-        st.markdown("<div style='text-align: center; transform: rotate(-45deg);'>🧪➡️</div>", unsafe_allow_html=True)
-    time.sleep(1)
-
-    # Show foam explosion effect
-    reaction_placeholder.markdown("<div style='font-size: 80px; text-align: center;'>🌋💥🎉</div>", unsafe_allow_html=True)
-    time.sleep(2)
-
-# Reset experiment for another run
-def reset_experiment():
-    reaction_placeholder.empty()
-    equation_placeholder.empty()
-    note_placeholder.empty()
-    setup_experiment()
-
-# Display initial setup
-setup_experiment()
-
-# Start Experiment Button
-if st.button("Start Experiment"):
-    pouring_animation()
+    # Container for the beaker and cylinder visuals
+    container = st.container()
     
-    # Show chemical equation after reaction
-    equation_placeholder.write("**Chemical Equation:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
-    
-    # Note about optional additions
-    note_placeholder.info("Optional: Add food coloring or liquid soap for a more colorful foam effect!")
+    with container:
+        # Display the initial beaker and cylinder setup
+        st.markdown("""
+        <style>
+            .beaker {
+                width: 100px;
+                height: 150px;
+                position: relative;
+                background-color: rgba(176,224,230,0.7);
+                border: 3px solid #2c3e50;
+                border-radius: 5px;
+                display: inline-block;
+                margin-right: 30px;
+                transform: translateY(-20px);
+            }
+            .cylinder {
+                width: 80px;
+                height: 130px;
+                background-color: rgba(169,169,169,0.7);
+                border: 3px solid #2c3e50;
+                border-radius: 10px;
+                display: inline-block;
+            }
+        </style>
+        <div class="beaker">H₂O₂</div>
+        <div class="cylinder">KI</div>
+        """, unsafe_allow_html=True)
 
-# Reset for repeatable experiment
-st.button("Repeat Experiment", on_click=reset_experiment)
+    # Add "Start Experiment" button
+    if st.button("Start Experiment"):
+        # Animate beaker tilting and pouring
+        st.markdown("""
+        <style>
+            @keyframes tiltPour {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(45deg); }
+            }
+            .beaker-tilt {
+                animation: tiltPour 2s forwards;
+            }
+            .foam {
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 30px;
+                height: 200px;
+                background: linear-gradient(to top, #ff6347, #ffa07a, #f08080);
+                animation: foamExplosion 3s ease-in-out forwards;
+            }
+            @keyframes foamExplosion {
+                0% { height: 30px; opacity: 1; }
+                50% { height: 200px; opacity: 0.9; }
+                100% { height: 350px; opacity: 0.5; }
+            }
+        </style>
+        <div class="beaker beaker-tilt"></div>
+        <div class="cylinder">
+            <div class="foam"></div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Chemical equation after the reaction
+        time.sleep(3)
+        st.markdown("### Reaction Equation")
+        st.markdown("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
+
+        # Note about food coloring and liquid soap
+        st.info("Optional: Add food coloring and liquid soap to enhance the reaction's visual effect.")
+
+    # Button to repeat the experiment
+    if st.button("Repeat Experiment"):
+        st.experimental_rerun()
+
+if __name__ == "__main__":
+    main()
