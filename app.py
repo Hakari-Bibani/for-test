@@ -10,7 +10,7 @@ def main():
         <style>
         @keyframes rise {
             0% { height: 50%; }
-            100% { height: 200%; }
+            100% { height: 300%; }
         }
         @keyframes pour {
             0% { transform: rotate(0deg); }
@@ -49,14 +49,12 @@ def main():
     if 'reaction_state' not in st.session_state:
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
-        st.session_state.show_equation = False
 
     # Functions for beaker and cylinder visuals
     def draw_beaker(label, color, pouring=False):
-        # Adjusted beaker position for pouring animation above cylinder mouth
         rotation = "135deg" if pouring else "0deg"
         return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: auto; transform: translate(30px, -20px);">
+        <div style="position: relative; width: 100px; height: 150px; margin: 0 20px 0 0; float: right;">
             <div style="
                 position: absolute;
                 width: 80px;
@@ -100,6 +98,7 @@ def main():
                     width: 100%;
                     height: {foam_height}%;
                     background: linear-gradient(45deg, {foam_color}, white);
+                    animation: rise 2s ease-in-out;
                     transition: height 2s;">
                 </div>
             </div>
@@ -123,14 +122,11 @@ def main():
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
             time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 200  # Foam rises dramatically
-            time.sleep(2)  # Pause for foam animation
-            st.session_state.show_equation = True  # Show equation after foam animation
-            st.session_state.reaction_state = 'complete'
+            st.session_state.foam_height = 300  # Foam rises rapidly
             st.experimental_rerun()
 
     # Display chemical equation and note after reaction
-    if st.session_state.show_equation:
+    if st.session_state.reaction_state == 'pouring':
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
             <h3>Chemical Equation:</h3>
@@ -146,10 +142,9 @@ def main():
         """)
 
         # Reset state for repeat experiment
-        if st.session_state.reaction_state == 'complete':
-            st.session_state.reaction_state = 'ready'
-            st.session_state.foam_height = 50
-            st.session_state.show_equation = False
+        time.sleep(2)
+        st.session_state.reaction_state = 'ready'
+        st.session_state.foam_height = 50
 
 if __name__ == "__main__":
     main()
