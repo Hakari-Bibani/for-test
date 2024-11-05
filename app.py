@@ -10,7 +10,7 @@ def main():
         <style>
         @keyframes rise {
             0% { height: 50%; }
-            100% { height: 300%; }
+            100% { height: 200%; }
         }
         @keyframes pour {
             0% { transform: rotate(0deg); }
@@ -54,7 +54,7 @@ def main():
     def draw_beaker(label, color, pouring=False):
         rotation = "135deg" if pouring else "0deg"
         return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: 0 20px 0 0; float: right;">
+        <div style="position: relative; width: 100px; height: 150px; margin-left: 50px;">
             <div style="
                 position: absolute;
                 width: 80px;
@@ -84,7 +84,7 @@ def main():
         colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
         foam_color = random.choice(colors)
         return f"""
-        <div style="position: relative; width: 150px; height: 200px; margin: auto;">
+        <div style="position: relative; width: 150px; height: 200px; margin-left: -20px;">
             <div style="
                 position: absolute;
                 width: 120px;
@@ -98,7 +98,6 @@ def main():
                     width: 100%;
                     height: {foam_height}%;
                     background: linear-gradient(45deg, {foam_color}, white);
-                    animation: rise 2s ease-in-out;
                     transition: height 2s;">
                 </div>
             </div>
@@ -109,7 +108,7 @@ def main():
         """
 
     # Displaying the beaker and cylinder with appropriate state
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])
     with col1:
         st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
                     unsafe_allow_html=True)
@@ -122,7 +121,7 @@ def main():
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
             time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 300  # Foam rises rapidly
+            st.session_state.foam_height = 200  # Foam rises
             st.experimental_rerun()
 
     # Display chemical equation and note after reaction
@@ -134,6 +133,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
+        # Display note about food coloring and soap after reaction
         st.info("""
         **Note:** For a more dramatic effect in real experiments:
         - Add a few drops of food coloring to create colorful foam
