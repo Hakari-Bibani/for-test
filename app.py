@@ -1,85 +1,66 @@
 import streamlit as st
 import time
-import math
+from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-def app():
-    st.set_page_config(page_title="Elephant Toothpaste Reaction")
-    st.title("Elephant Toothpaste Reaction")
+# Set page title
+st.set_page_config(page_title="Elephant Toothpaste Reaction")
 
-    # Create the initial scene
-    beaker_x, beaker_y = 300, 200
-    beaker_width, beaker_height = 100, 200
-    cylinder_x, cylinder_y = 500, 200 
-    cylinder_width, cylinder_height = 80, 160
+# Add title
+st.title("Elephant Toothpaste Reaction")
 
-    st.markdown(
-        f"""
-        <div style="display: flex; justify-content: center;">
-            <div style="position: relative;">
-                <div style="position: absolute; top: {beaker_y}px; left: {beaker_x}px; width: {beaker_width}px; height: {beaker_height}px; background-color: #ADD8E6; border: 2px solid black;"></div>
-                <div style="position: absolute; top: {cylinder_y}px; left: {cylinder_x}px; width: {cylinder_width}px; height: {cylinder_height}px; background-color: #D3D3D3; border: 2px solid black;"></div>
-                <div style="position: absolute; top: {beaker_y + beaker_height//2}px; left: {beaker_x + beaker_width//2}px; font-weight: bold;">H2O2</div>
-                <div style="position: absolute; top: {cylinder_y + cylinder_height//2}px; left: {cylinder_x + cylinder_width//2}px; font-weight: bold;">KI</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+# Add static images
+col1, col2 = st.columns(2)
+with col1:
+    beaker_img = Image.open("beaker.png")
+    st.image(beaker_img, caption="H2O2")
+with col2:
+    cylinder_img = Image.open("cylinder.png")
+    st.image(cylinder_img, caption="KI")
 
-    if st.button("Start Experiment"):
-        # Animation of pouring solution
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.set_xlim(0, 800)
-        ax.set_ylim(0, 400)
-        ax.set_axis_off()
+# Function to animate the beaker bending
+def animate_beaker_bend(frame):
+    beaker_img = Image.open("beaker.png")
+    beaker_img = beaker_img.rotate(frame * 10)
+    return st.image(beaker_img, caption="H2O2", use_column_width=True)
 
-        beaker_liquid_height = beaker_height // 2
-        cylinder_liquid_height = cylinder_height // 2
+# Function to animate the foam jumping
+def animate_foam_jump(frame):
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.axis('off')
 
-        def animate(frame):
-            ax.clear()
+    # Generate random foam particles
+    x = np.random.uniform(0, 10, 100)
+    y = np.random.uniform(0, 10, 100)
+    size = np.random.uniform(0.5, 2, 100)
+    color = np.random.uniform(0, 1, (100, 3))
 
-            # Draw beaker
-            ax.add_patch(plt.Rectangle((beaker_x, beaker_y), beaker_width, beaker_height, fill=False, color='black'))
+    # Update the foam particles
+    ax.scatter(x, y, s=size * frame, c=color)
 
-            # Draw beaker liquid
-            ax.add_patch(plt.Rectangle((beaker_x, beaker_y + beaker_height - beaker_liquid_height), beaker_width, beaker_liquid_height, color='#ADD8E6'))
+    return st.pyplot(fig)
 
-            # Draw cylinder
-            ax.add_patch(plt.Rectangle((cylinder_x, cylinder_y), cylinder_width, cylinder_height, fill=False, color='black'))
+# Add start experiment button
+if st.button("Start Experiment"):
+    # Animate the pouring of the solution
+    beaker_animation = st.empty()
+    for i in range(18):
+        beaker_animation(animate_beaker_bend(i))
+        time.sleep(0.1)
 
-            # Draw cylinder liquid
-            ax.add_patch(plt.Rectangle((cylinder_x, cylinder_y + cylinder_height - cylinder_liquid_height), cylinder_width, cylinder_liquid_height, color='#D3D3D3'))
+    # Animate the reaction
+    foam_animation = st.empty()
+    foam_ani = FuncAnimation(plt.figure(), animate_foam_jump, frames=np.linspace(1, 10, 50), interval=50, blit=False)
+    foam_animation(foam_ani)
+    time.sleep(3)
 
-            # Animate the pouring
-            if frame < 50:
-                beaker_liquid_height -= 4
-                cylinder_liquid_height += 4
-            else:
-                # Dramatic reaction
-                cylinder_liquid_height = 0
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 80, color='#FFA500'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 70, color='#FF4500'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 60, color='#8B4513'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 50, color='#FFD700'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 40, color='#00FF00'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 30, color='#00BFFF'))
-                ax.add_patch(plt.Circle((cylinder_x + cylinder_width // 2, cylinder_y + cylinder_height // 2), 20, color='#9370DB'))
+    # Display the chemical equation
+    st.markdown("**Chemical Equation:**")
+    st.latex(r"2H_2O_2 (aq) \to 2H_2O (l) + O_2 (g)")
+    st.write("*Note: The optional addition of food coloring and liquid soap can enhance the visual effect.*")
 
-            return ax.get_images() + ax.patches
-
-        ani = FuncAnimation(fig, animate, frames=100, interval=50, blit=True)
-        st.pyplot(fig)
-
-        # Show chemical equation
-        st.markdown(
-            """
-            Chemical Equation:
-            2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
-
-            *Note: Food coloring and liquid soap can be added for a more dramatic effect, but should not be added before the animation.*
-            """
-        )
+st.markdown("Click the 'Start Experiment' button to repeat the reaction!")
