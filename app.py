@@ -1,108 +1,60 @@
 import streamlit as st
 import time
 
-# Title of the app
+# Title for the experiment
 st.title("Elephant Toothpaste Reaction")
 
-# Display the initial setup of the experiment
-col1, col2 = st.columns(2)
+# Introduction and placeholders for beaker and cylinder
+st.write("## Experiment Setup:")
+beaker_placeholder = st.empty()
+cylinder_placeholder = st.empty()
+reaction_placeholder = st.empty()
+equation_placeholder = st.empty()
+note_placeholder = st.empty()
 
-# Create the beaker and cylinder
-with col1:
-    st.write("### Beaker (H₂O₂)")
-    st.markdown("""
-    <div style="height: 200px; width: 100px; background-color: #b0c4de; border: 2px solid #000; position: relative; text-align: center;">
-        <div style="position: absolute; top: 70%; width: 100%; font-size: 1.5em;">H₂O₂</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Draw initial setup with beaker and cylinder
+def setup_experiment():
+    with beaker_placeholder.container():
+        st.write("### Beaker (H₂O₂ Solution)")
+        st.markdown("<div style='text-align: center;'>🧪 H₂O₂ (Pale Blue Solution)</div>", unsafe_allow_html=True)
+    with cylinder_placeholder.container():
+        st.write("### Cylinder (KI Solution)")
+        st.markdown("<div style='text-align: center;'>🥛 KI (Light Grey Solution)</div>", unsafe_allow_html=True)
 
-with col2:
-    st.write("### Cylinder (KI)")
-    st.markdown("""
-    <div style="height: 300px; width: 80px; background-color: #d3d3d3; border: 2px solid #000; position: relative; text-align: center;">
-        <div style="position: absolute; top: 75%; width: 100%; font-size: 1.5em;">KI</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Animation to mimic pouring reaction
+def pouring_animation():
+    beaker_placeholder.empty()  # Clear initial setup
+    reaction_placeholder.empty()
+    cylinder_placeholder.empty()
 
-# Add a button to start the experiment
-if st.button("Start Experiment"):
-    # Simulate the reaction start with a brief delay
+    # Display a tilted beaker to simulate pouring
+    with beaker_placeholder.container():
+        st.markdown("<div style='text-align: center; transform: rotate(-45deg);'>🧪➡️</div>", unsafe_allow_html=True)
     time.sleep(1)
-    
-    # Use JavaScript and CSS for a beaker pouring effect
-    st.markdown("""
-    <style>
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .beaker {
-        height: 200px;
-        width: 100px;
-        background-color: #b0c4de;
-        border: 2px solid #000;
-        position: relative;
-        transform: rotate(-45deg);
-        transition: transform 1s;
-    }
-    .beaker-label {
-        position: absolute;
-        top: 70%;
-        width: 100%;
-        font-size: 1.5em;
-    }
-    .cylinder {
-        height: 300px;
-        width: 80px;
-        background-color: #d3d3d3;
-        border: 2px solid #000;
-        position: relative;
-    }
-    .reaction {
-        height: 0;
-        width: 80px;
-        background-color: #ff69b4;
-        border: 2px solid #000;
-        position: relative;
-        transition: height 2s ease-in-out;
-        overflow: hidden;
-    }
-    .reaction.animate {
-        height: 500px;
-    }
-    </style>
 
-    <div class="container">
-        <div class="beaker">
-            <div class="beaker-label">H₂O₂</div>
-        </div>
-        <div class="cylinder">
-            <div class="reaction"></div>
-            <div class="beaker-label">KI</div>
-        </div>
-    </div>
-
-    <script>
-    setTimeout(() => {
-        // Start the beaker pour animation
-        document.querySelector('.beaker').style.transform = 'rotate(0deg)';
-        
-        // After a slight delay, animate the foam explosion
-        setTimeout(() => {
-            document.querySelector('.reaction').classList.add('animate');
-        }, 1000);
-    }, 500);
-    </script>
-    """, unsafe_allow_html=True)
-
-    # Display chemical equation and additional notes after animation
+    # Show foam explosion effect
+    reaction_placeholder.markdown("<div style='font-size: 80px; text-align: center;'>🌋💥🎉</div>", unsafe_allow_html=True)
     time.sleep(2)
-    st.subheader("Chemical Equation")
-    st.write("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
 
-    # Display optional note
-    st.write("**Note:** To enhance the visual effect, you can optionally add food coloring and liquid soap.")
+# Reset experiment for another run
+def reset_experiment():
+    reaction_placeholder.empty()
+    equation_placeholder.empty()
+    note_placeholder.empty()
+    setup_experiment()
 
-# Allow the experiment to be repeated
-st.button("Repeat Experiment")
+# Display initial setup
+setup_experiment()
+
+# Start Experiment Button
+if st.button("Start Experiment"):
+    pouring_animation()
+    
+    # Show chemical equation after reaction
+    equation_placeholder.write("**Chemical Equation:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
+    
+    # Note about optional additions
+    note_placeholder.info("Optional: Add food coloring or liquid soap for a more colorful foam effect!")
+
+# Reset for repeatable experiment
+st.button("Repeat Experiment", on_click=reset_experiment)
