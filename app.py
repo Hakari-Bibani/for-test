@@ -1,114 +1,53 @@
 import streamlit as st
 import time
 
-# Title with Wave Animation
-st.markdown(
-    """
-    <style>
-    .title-wave {
-        font-size: 3em;
-        font-weight: bold;
-        color: #0066cc;
-        animation: wave 2s infinite alternate;
-    }
-    @keyframes wave {
-        0% { transform: translateX(-10px); }
-        50% { transform: translateX(10px); }
-        100% { transform: translateX(-10px); }
-    }
-    </style>
-    <div class="title-wave">Elephant Toothpaste Reaction</div>
-    """,
-    unsafe_allow_html=True
-)
+def main():
+    # Title with animation
+    st.title("🐘🪥 Elephant Toothpaste Reaction 🧪")
 
-# Initial Setup with Beaker and Cylinder
-st.write("### Initial Setup")
-st.markdown(
-    """
-    <style>
-    .container { display: flex; justify-content: space-around; margin-bottom: 20px; }
-    .beaker, .cylinder {
-        width: 100px; height: 200px; 
-        border: 2px solid #666; 
-        border-radius: 10px; 
-        position: relative; 
-        overflow: hidden;
-    }
-    .h2o2 { background-color: lightblue; height: 50%; }
-    .ki { background-color: lightgrey; height: 50%; animation: move-solution 4s infinite alternate; }
-    .label { position: absolute; bottom: -20px; left: 0; width: 100%; text-align: center; font-weight: bold; }
-    @keyframes move-solution {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(-50%); }
-        100% { transform: translateY(0); }
-    }
-    </style>
-    <div class="container">
-        <div class="beaker">
-            <div class="h2o2"></div>
-            <div class="label">H₂O₂</div>
-        </div>
-        <div class="cylinder" id="reaction-cylinder">
-            <div class="ki"></div>
-            <div class="label">30% KI Solution</div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    # Display containers for beaker and cylinder
+    h2o2_container, ki_container = st.columns(2)
+    
+    with h2o2_container:
+        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Hydrogen_peroxide_concentration.png/1280px-Hydrogen_peroxide_concentration.png",
+                 caption="H₂O₂ Solution", width=200)
+    
+    with ki_container:
+        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Large_graduated_cylinder.jpg/800px-Large_graduated_cylinder.jpg",
+                 caption="30% KI Solution", width=200)
 
-# Button to Start Experiment
-if st.button("Start Experiment"):
-    st.write("### Reaction In Progress")
-    # CSS for the Foam Rising and Overflowing in the Same Cylinder
-    st.markdown(
-        """
-        <style>
-        .reaction-container {
-            width: 100px;
-            height: 200px;
-            border: 2px solid #666;
-            border-radius: 10px;
-            position: relative;
-            overflow: visible;
-            margin: 0 auto;
-        }
-        .foam {
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                180deg,
-                #FFC0CB,
-                #FFC0CB 10px,
-                #FFFFFF 10px,
-                #FFFFFF 20px
-            );
-            position: absolute;
-            bottom: 0;
-            transform: translateY(100%);
-            animation: foam-animation 4s ease-in-out forwards;
-        }
-        @keyframes foam-animation {
-            0% { transform: translateY(100%); height: 0%; }
-            50% { transform: translateY(-100%); height: 200%; }
-            100% { transform: translateY(-200%); height: 300%; }
-        }
-        </style>
-        <div class="reaction-container">
-            <div class="foam"></div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    # Display Final Reaction Result
-    time.sleep(4)  # Delay for the animation to finish
-    st.write("### Reaction Complete!")
-    st.markdown(
-        """
-        **Reaction:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)
-        
-        *Food coloring and liquid soap can be added for extra effect.*
-        """,
-        unsafe_allow_html=True
-    )
+    # Button to start the experiment
+    if st.button("Start Experiment"):
+        st.write("🔄 Mixing H₂O₂ and KI...")
+
+        # Simulate pouring and reaction steps
+        with st.spinner("Pouring H₂O₂ into KI solution..."):
+            time.sleep(2)
+
+        # Reaction animation simulation (Text update for dramatic effect)
+        st.write("💥 The reaction begins! Foam starts to rise...")
+
+        # Simulated eruption (replace with more frames for better animation)
+        for i in range(1, 6):
+            st.write("🌊" * i + " Foam Erupting!" + " 🌊" * i)
+            time.sleep(0.5)
+
+        # Chemical equation
+        st.markdown("""
+        ### Chemical Reaction:
+        **2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)**
+
+        - This is an exothermic decomposition reaction.
+        - The potassium iodide acts as a catalyst, breaking down the hydrogen peroxide rapidly.
+
+        **Optional Enhancements:**
+        - Add a few drops of food coloring for color.
+        - Add liquid soap to trap oxygen bubbles, creating foam.
+        """)
+
+        # Option to restart the experiment
+        st.button("Restart Experiment", on_click=lambda: st.experimental_rerun())
+
+# Run the app
+if __name__ == "__main__":
+    main()
