@@ -1,150 +1,81 @@
 import streamlit as st
-import time
-import random
+import streamlit.components.v1 as components
 
-def main():
-    st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="wide")
+# Define title
+st.title("Elephant Toothpaste Reaction")
 
-    # CSS for styling and animations
-    st.markdown("""
-        <style>
-        @keyframes rise {
-            0% { height: 50%; }
-            100% { height: 200%; }
-        }
-        @keyframes pour {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(135deg); }
-        }
-        .stButton>button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 32px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .title {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-            animation: gradient 3s ease infinite;
-        }
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        </style>
-        """, unsafe_allow_html=True)
+# Display initial setup with beaker and cylinder
+st.write("**Reaction Setup:**")
+st.image("beaker_h2o2.png", caption="Beaker with H₂O₂", width=200)  # Placeholder for beaker image
+st.image("cylinder_ki.png", caption="Cylinder with KI", width=200)   # Placeholder for cylinder image
 
-    # Animated title
-    st.markdown('<p class="title">Elephant Toothpaste Reaction</p>', unsafe_allow_html=True)
+# Add the start button for the experiment
+start_experiment = st.button("Start Experiment")
 
-    # Initialize session state for reaction
-    if 'reaction_state' not in st.session_state:
-        st.session_state.reaction_state = 'ready'
-        st.session_state.foam_height = 50
+# JavaScript for the animation (simple placeholder animation using HTML/JS)
+animation_script = """
+<script>
+function startAnimation() {
+    let beaker = document.getElementById("beaker");
+    let cylinder = document.getElementById("cylinder");
+    let foam = document.getElementById("foam");
+    
+    // Pouring animation
+    beaker.style.transform = "rotate(45deg)";
+    setTimeout(() => {
+        beaker.style.opacity = "0"; // Hide beaker after pouring
+        
+        // Foam eruption animation
+        foam.style.height = "200px";
+        foam.style.transition = "height 1s";
+        
+        // Reveal chemical equation and note
+        document.getElementById("equation").style.display = "block";
+        document.getElementById("note").style.display = "block";
+    }, 1000);
+}
 
-    # Functions for beaker and cylinder visuals
-    def draw_beaker(label, color, pouring=False):
-        rotation = "120deg" if pouring else "0deg"  # Adjusted rotation for pouring effect
-        return f"""
-        <div style="position: relative; width: 100px; height: 150px; margin: auto;">
-            <div style="
-                position: absolute;
-                right: -20px;
-                width: 80px;
-                height: 120px;
-                border: 3px solid #333;
-                border-top: none;
-                background: transparent;
-                transform: rotate({rotation});
-                transform-origin: bottom right;
-                transition: transform 1s;">
-                <div style="
-                    position: absolute;
-                    bottom: 0;
-                    width: 100%;
-                    height: 50%;
-                    background-color: {color};
-                    transition: height 2s;">
-                </div>
-            </div>
-            <div style="position: absolute; bottom: -25px; width: 100%; text-align: center;">
-                {label}
-            </div>
-        </div>
-        """
+// Run the animation on button click
+if (window.startExperiment) {
+    startAnimation();
+}
+</script>
+"""
 
-    def draw_cylinder(foam_height):
-        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
-        foam_color = random.choice(colors)
-        return f"""
-        <div style="position: relative; width: 150px; height: 200px; margin: auto;">
-            <div style="
-                position: absolute;
-                width: 120px;
-                height: 180px;
-                border: 3px solid #333;
-                border-top: none;
-                background: transparent;">
-                <div style="
-                    position: absolute;
-                    bottom: 0;
-                    width: 100%;
-                    height: {foam_height}%;
-                    background: linear-gradient(45deg, {foam_color}, white);
-                    transition: height 2s;">
-                </div>
-            </div>
-            <div style="position: absolute; bottom: -25px; width: 100%; text-align: center;">
-                30% KI solution
-            </div>
-        </div>
-        """
+# Add CSS for foam and beaker positioning
+css_style = """
+<style>
+#beaker, #cylinder {
+    display: inline-block;
+    margin-right: 20px;
+}
+#foam {
+    width: 80px;
+    height: 0px;
+    background-color: lightblue;
+    border-radius: 10px;
+    margin-top: -40px;
+    transition: height 0.5s ease;
+}
+#equation, #note {
+    display: none;
+}
+</style>
+"""
 
-    # Displaying the beaker and cylinder with appropriate state
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
-                    unsafe_allow_html=True)
-    with col2:
-        st.markdown(draw_cylinder(st.session_state.foam_height), unsafe_allow_html=True)
+# Display the experiment setup as HTML with inline CSS for styling
+html_content = f"""
+<div id="beaker" style="display: inline-block;">
+    <img src="https://via.placeholder.com/80x120.png?text=H2O2" alt="Beaker with H2O2">
+</div>
+<div id="cylinder" style="display: inline-block;">
+    <img src="https://via.placeholder.com/80x120.png?text=KI" alt="Cylinder with KI">
+</div>
+<div id="foam"></div>
+<div id="equation"><strong>Chemical Equation:</strong> 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</div>
+<div id="note"><em>Note:</em> You can add food coloring and liquid soap to make the reaction even more dramatic!</div>
+"""
 
-    # Central "Start Experiment" button
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
-            st.session_state.reaction_state = 'pouring'
-            time.sleep(1)  # Pause for pour animation
-            st.session_state.foam_height = 200  # Foam rises to top
-            st.experimental_rerun()
-
-    # Display chemical equation and note after reaction
-    if st.session_state.reaction_state == 'pouring':
-        st.markdown("""
-        <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
-            <h3>Chemical Equation:</h3>
-            <p style='font-size: 24px;'>2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.info("""
-        **Note:** For a more dramatic effect in real experiments:
-        - Add a few drops of food coloring to create colorful foam
-        - Mix in liquid soap to create more voluminous foam
-        - Always perform under proper supervision and safety conditions
-        """)
-
-        # Reset state for repeat experiment
-        time.sleep(2)
-        st.session_state.reaction_state = 'ready'
-        st.session_state.foam_height = 50
-
-if __name__ == "__main__":
-    main()
+# Run the animation script if the button is clicked
+if start_experiment:
+    components.html(css_style + html_content + animation_script, height=400, width=500)
