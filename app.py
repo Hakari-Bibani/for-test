@@ -1,53 +1,39 @@
 import streamlit as st
 import time
 
-def main():
-    # Title with animation
-    st.title("🐘🪥 Elephant Toothpaste Reaction 🧪")
+# Streamlit page configuration
+st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="centered")
 
-    # Display containers for beaker and cylinder
-    h2o2_container, ki_container = st.columns(2)
-    
-    with h2o2_container:
-        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Hydrogen_peroxide_concentration.png/1280px-Hydrogen_peroxide_concentration.png",
-                 caption="H₂O₂ Solution", width=200)
-    
-    with ki_container:
-        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Large_graduated_cylinder.jpg/800px-Large_graduated_cylinder.jpg",
-                 caption="30% KI Solution", width=200)
+# Dynamic title with animation
+st.title("🧪 Elephant Toothpaste Reaction")
+st.write("A fun and colorful chemistry experiment simulation!")
 
-    # Button to start the experiment
-    if st.button("Start Experiment"):
-        st.write("🔄 Mixing H₂O₂ and KI...")
+# Beaker and Cylinder Setup
+col1, col2 = st.columns(2)
 
-        # Simulate pouring and reaction steps
-        with st.spinner("Pouring H₂O₂ into KI solution..."):
-            time.sleep(2)
+# Display the setup: H₂O₂ and KI solution
+col1.image("beaker_h2o2.png", caption="H₂O₂ Solution", width=150)  # Placeholder for H₂O₂ beaker image
+col2.image("cylinder_ki.png", caption="30% KI Solution", width=150)  # Placeholder for KI cylinder image
 
-        # Reaction animation simulation (Text update for dramatic effect)
-        st.write("💥 The reaction begins! Foam starts to rise...")
+# Button to Start Experiment
+start_button = st.button("Start Experiment")
 
-        # Simulated eruption (replace with more frames for better animation)
-        for i in range(1, 6):
-            st.write("🌊" * i + " Foam Erupting!" + " 🌊" * i)
-            time.sleep(0.5)
+if start_button:
+    # Step 1: Display Pouring Effect
+    st.write("Pouring H₂O₂ into the KI solution...")
+    time.sleep(1)  # Pause to simulate pouring
 
-        # Chemical equation
-        st.markdown("""
-        ### Chemical Reaction:
-        **2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)**
+    # Step 2: Show Reaction and Foam Animation
+    st.write("🎉 The reaction begins!")
+    st.image("foam_sequence_1.png", width=250)  # Start of foam sequence image
+    time.sleep(1)
+    st.image("foam_sequence_2.png", width=300)  # Mid foam sequence image
+    time.sleep(1)
+    st.image("foam_sequence_3.png", width=350)  # Full eruption foam image
 
-        - This is an exothermic decomposition reaction.
-        - The potassium iodide acts as a catalyst, breaking down the hydrogen peroxide rapidly.
+    # Display the Chemical Equation
+    st.write("**Chemical Equation:** 2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
 
-        **Optional Enhancements:**
-        - Add a few drops of food coloring for color.
-        - Add liquid soap to trap oxygen bubbles, creating foam.
-        """)
-
-        # Option to restart the experiment
-        st.button("Restart Experiment", on_click=lambda: st.experimental_rerun())
-
-# Run the app
-if __name__ == "__main__":
-    main()
+    # Optional Ingredients Note
+    st.write("📝 **Note:** For a more colorful reaction, you can add food coloring to the H₂O₂. "
+             "Adding liquid soap will help trap the oxygen, creating even more foam!")
