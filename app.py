@@ -1,12 +1,11 @@
 import streamlit as st
 import time
 import random
-import numpy as np
 
 def main():
     st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="wide")
-    
-    # Custom CSS for animations and styling
+
+    # CSS for styling and animations
     st.markdown("""
         <style>
         @keyframes rise {
@@ -46,15 +45,14 @@ def main():
     # Animated title
     st.markdown('<p class="title">Elephant Toothpaste Reaction</p>', unsafe_allow_html=True)
 
-    # Create two columns for the beakers
-    col1, col2 = st.columns(2)
-
-    # Initial state
+    # Initialize session state for reaction
     if 'reaction_state' not in st.session_state:
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
 
-    def draw_beaker(label, color, rotation=0):
+    # Functions for beaker and cylinder visuals
+    def draw_beaker(label, color, pouring=False):
+        rotation = "135deg" if pouring else "0deg"
         return f"""
         <div style="position: relative; width: 100px; height: 150px; margin: auto;">
             <div style="
@@ -64,7 +62,7 @@ def main():
                 border: 3px solid #333;
                 border-top: none;
                 background: transparent;
-                transform: rotate({rotation}deg);
+                transform: rotate({rotation});
                 transform-origin: bottom right;
                 transition: transform 1s;">
                 <div style="
@@ -109,27 +107,24 @@ def main():
         </div>
         """
 
-    # Display beakers and cylinder
+    # Displaying the beaker and cylinder with appropriate state
+    col1, col2 = st.columns(2)
     with col1:
-        st.markdown(draw_beaker("H₂O₂", "#ADD8E6", 
-                              135 if st.session_state.reaction_state == 'pouring' else 0), 
-                   unsafe_allow_html=True)
-
+        st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
+                    unsafe_allow_html=True)
     with col2:
         st.markdown(draw_cylinder(st.session_state.foam_height), unsafe_allow_html=True)
 
-    # Center the button
+    # Central "Start Experiment" button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("Start Experiment"):
+        if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
-            
-            # Simulate pouring and reaction
-            time.sleep(1)  # Pour animation
+            time.sleep(1)  # Pause for pour animation
             st.session_state.foam_height = 200  # Foam rises
             st.experimental_rerun()
 
-    # Display chemical equation
+    # Display chemical equation and note after reaction
     if st.session_state.reaction_state == 'pouring':
         st.markdown("""
         <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
@@ -145,7 +140,7 @@ def main():
         - Always perform under proper supervision and safety conditions
         """)
 
-        # Reset button state for next experiment
+        # Reset state for repeat experiment
         time.sleep(2)
         st.session_state.reaction_state = 'ready'
         st.session_state.foam_height = 50
