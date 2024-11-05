@@ -11,7 +11,6 @@ st.markdown(
         color: #0066cc;
         animation: wave 2s infinite alternate;
     }
-
     @keyframes wave {
         0% { transform: translateX(-10px); }
         50% { transform: translateX(10px); }
@@ -19,7 +18,7 @@ st.markdown(
     }
     </style>
     <div class="title-wave">Elephant Toothpaste Reaction</div>
-    """, 
+    """,
     unsafe_allow_html=True
 )
 
@@ -37,27 +36,31 @@ st.markdown(
         overflow: hidden;
     }
     .h2o2 { background-color: lightblue; height: 50%; }
-    .ki { background-color: lightgrey; height: 50%; }
+    .ki { background-color: lightgrey; height: 50%; animation: move-solution 4s infinite alternate; }
     .label { position: absolute; bottom: -20px; left: 0; width: 100%; text-align: center; font-weight: bold; }
+    @keyframes move-solution {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-50%); }
+        100% { transform: translateY(0); }
+    }
     </style>
     <div class="container">
         <div class="beaker">
             <div class="h2o2"></div>
-            <div class="label">H₂O₂ Solution</div>
+            <div class="label">H₂O₂</div>
         </div>
         <div class="cylinder" id="reaction-cylinder">
             <div class="ki"></div>
             <div class="label">30% KI Solution</div>
         </div>
     </div>
-    """, 
+    """,
     unsafe_allow_html=True
 )
 
 # Button to Start Experiment
 if st.button("Start Experiment"):
     st.write("### Reaction In Progress")
-
     # CSS for the Foam Rising and Overflowing in the Same Cylinder
     st.markdown(
         """
@@ -71,7 +74,6 @@ if st.button("Start Experiment"):
             overflow: visible;
             margin: 0 auto;
         }
-
         .foam {
             width: 100%;
             height: 100%;
@@ -87,7 +89,6 @@ if st.button("Start Experiment"):
             transform: translateY(100%);
             animation: foam-animation 4s ease-in-out forwards;
         }
-
         @keyframes foam-animation {
             0% { transform: translateY(100%); height: 0%; }
             50% { transform: translateY(-100%); height: 200%; }
@@ -100,7 +101,6 @@ if st.button("Start Experiment"):
         """,
         unsafe_allow_html=True
     )
-
     # Display Final Reaction Result
     time.sleep(4)  # Delay for the animation to finish
     st.write("### Reaction Complete!")
