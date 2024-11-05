@@ -1,159 +1,85 @@
 import streamlit as st
 import time
 
-# Set page config
-st.set_page_config(page_title="pH Test Simulation")
+st.title("Test the pH of different solutions using litmus paper!")
 
-# Custom CSS with keyframe animations
-st.markdown("""
-<style>
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .title {
-        font-size: 24px;
-        margin-bottom: 40px;
-        text-align: center;
-    }
-    
-    .experiment-area {
-        position: relative;
-        height: 800px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
-    
-    .paper {
-        width: 30px;
-        height: 100px;
-        background-color: #FFE135;
-        position: relative;
-        transition: background-color 0.5s ease;
-    }
-    
-    .beaker {
-        width: 120px;
-        height: 140px;
-        border: 4px solid #e6e6e6;
-        border-top: none;
-        position: relative;
-        margin: 20px 0;
-    }
-    
-    .solution {
-        width: 100%;
-        height: 80%;
-        position: absolute;
-        bottom: 0;
-    }
-    
-    .acid-solution {
-        background-color: rgba(211,211,211,0.7);
-    }
-    
-    .base-solution {
-        background-color: rgba(211,211,211,0.7);
-    }
-    
-    .neutral-solution {
-        background-color: rgba(176,224,230,0.7);
-    }
-    
-    @keyframes dipPaper {
-        0% { transform: translateY(0); }
-        40% { transform: translateY(120px); }
-        60% { transform: translateY(120px); }
-        100% { transform: translateY(0); }
-    }
-    
-    .animate-dip {
-        animation: dipPaper 3s forwards;
-    }
-    
-    .red { background-color: #ff6666 !important; }
-    .blue { background-color: #6666ff !important; }
-    .green { background-color: #90EE90 !important; }
-    
-    .button-container {
-        margin-top: 20px;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Placeholders for litmus paper and beakers display
+litmus_placeholder = st.empty()
+beakers_placeholder = st.empty()
 
-# Session state initialization
-if 'animation_counter' not in st.session_state:
-    st.session_state.animation_counter = 0
+# Function to render the initial setup with pale yellow litmus strips and glass-like beakers
+def render_initial_state():
+    with litmus_placeholder.container():
+        st.write("### Litmus Papers")
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around;'>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
-# Layout
-st.markdown("<div class='container'>", unsafe_allow_html=True)
+    with beakers_placeholder.container():
+        st.write("### Beakers with Solutions")
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:20px;'>
+                <div style='background: linear-gradient(to bottom, rgba(211, 211, 211, 0.4), rgba(169, 169, 169, 0.8)); width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px; border: 1px solid #A9A9A9;'>HCl</div>
+                <div style='background: linear-gradient(to bottom, rgba(173, 216, 230, 0.4), rgba(135, 206, 235, 0.8)); width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px; border: 1px solid #87CEEB;'>H₂O</div>
+                <div style='background: linear-gradient(to bottom, rgba(211, 211, 211, 0.4), rgba(169, 169, 169, 0.8)); width:80px; height:150px; border-radius:50% 50% 20% 20%; text-align:center; padding-top:10px; border: 1px solid #A9A9A9;'>NaOH</div>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
-# Title
-st.markdown("<h1 class='title'>Test the pH of different solutions using litmus paper!</h1>", unsafe_allow_html=True)
+# Function to animate litmus paper diving into beakers, changing colors, and returning
+def start_experiment():
+    # Step 1: Move litmus papers closer to the beakers, simulating diving
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:80px;'>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+                <div style='background-color: #FFFACD; width:30px; height:80px; border-radius:5px;'></div>
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(1)
 
-# Experiment area
-st.markdown("""
-    <div class='experiment-area'>
-        <div id='paper1' class='paper'></div>
-        <div class='beaker'>
-            <div class='solution acid-solution'></div>
-        </div>
-        
-        <div id='paper2' class='paper'></div>
-        <div class='beaker'>
-            <div class='solution base-solution'></div>
-        </div>
-        
-        <div id='paper3' class='paper'></div>
-        <div class='beaker'>
-            <div class='solution neutral-solution'></div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+    # Step 2: Show litmus papers inside the solutions with initial color change
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around; margin-top:0px;'>
+                <div style='background-color: #FF6347; width:30px; height:80px; border-radius:5px;'></div>  <!-- Acid turns red -->
+                <div style='background-color: #90EE90; width:30px; height:80px; border-radius:5px;'></div>  <!-- Neutral turns light green -->
+                <div style='background-color: #4682B4; width:30px; height:80px; border-radius:5px;'></div>  <!-- Base turns blue -->
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(3)  # Pause to show color change
 
-# Button
-if st.button("Start Experiment", key="start_button"):
-    st.session_state.animation_counter += 1
-    
-    # Animation script
-    st.markdown(f"""
-    <script>
-        function runAnimation() {{
-            const papers = document.querySelectorAll('.paper');
-            
-            // Reset papers to initial state
-            papers.forEach(paper => {{
-                paper.style.backgroundColor = '#FFE135';
-                paper.classList.remove('animate-dip', 'red', 'blue', 'green');
-            }});
-            
-            // Start animation sequence
-            setTimeout(() => {{
-                papers.forEach(paper => paper.classList.add('animate-dip'));
-                
-                // Change colors after dipping
-                setTimeout(() => {{
-                    papers[0].classList.add('red');
-                    papers[1].classList.add('blue');
-                    papers[2].classList.add('green');
-                }}, 1200);
-            }}, 100);
-        }}
-        
-        // Run animation when document is ready
-        document.addEventListener('DOMContentLoaded', runAnimation);
-        // Also run immediately in case document is already loaded
-        runAnimation();
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Force rerun after animation
-    time.sleep(3)
-    st.experimental_rerun()
+    # Step 3: Lift the litmus papers back to their original positions with new colors
+    with litmus_placeholder.container():
+        st.markdown(
+            """
+            <div style='display:flex; justify-content:space-around;'>
+                <div style='background-color: #FF6347; width:30px; height:80px; border-radius:5px;'></div>  <!-- Acid stays red -->
+                <div style='background-color: #90EE90; width:30px; height:80px; border-radius:5px;'></div>  <!-- Neutral stays light green -->
+                <div style='background-color: #4682B4; width:30px; height:80px; border-radius:5px;'></div>  <!-- Base stays blue -->
+            </div>
+            """, unsafe_allow_html=True
+        )
+    time.sleep(3)  # Show final state before resetting
 
-st.markdown("</div>", unsafe_allow_html=True)
+    # Reset to the initial state
+    render_initial_state()
+
+# Display the initial setup
+render_initial_state()
+
+# Button to start the experiment
+if st.button("Start Experiment"):
+    start_experiment()
