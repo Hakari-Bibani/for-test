@@ -1,132 +1,149 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import streamlit as st
+import time
+import random
 
-const ElephantToothpasteReaction = () => {
-  const [reactionState, setReactionState] = useState('ready');
-  const [foamHeight, setFoamHeight] = useState(50);
-  const [pouring, setPouring] = useState(false);
+def main():
+    st.set_page_config(page_title="Elephant Toothpaste Reaction", layout="wide")
 
-  // Functions for beaker and cylinder visuals
-  const drawBeaker = () => {
-    return (
-      <div style={{
-        position: 'relative',
-        width: '100px',
-        height: '150px',
-        margin: 'auto',
-        marginTop: '20px',
-      }}>
-        <div style={{
-          position: 'absolute',
-          width: '80px',
-          height: '120px',
-          border: '3px solid #333',
-          borderTop: 'none',
-          background: 'transparent',
-          transform: `rotate(${pouring ? '135deg' : '0deg'})`,
-          transformOrigin: 'bottom right',
-          transition: 'transform 1s',
-        }}>
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            height: '50%',
-            backgroundColor: '#ADD8E6',
-            transition: 'height 2s',
-          }} />
-        </div>
-      </div>
-    );
-  };
+    # CSS for styling and animations
+    st.markdown("""
+        <style>
+        @keyframes rise {
+            0% { height: 50%; }
+            100% { height: 200%; }
+        }
+        @keyframes pour {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(135deg); }
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .title {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            animation: gradient 3s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-  const drawCylinder = () => {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1'];
-    const foamColor = colors[Math.floor(Math.random() * colors.length)];
-    return (
-      <div style={{
-        position: 'relative',
-        width: '150px',
-        height: '200px',
-        margin: 'auto',
-        marginTop: '20px',
-      }}>
-        <div style={{
-          position: 'absolute',
-          width: '120px',
-          height: '180px',
-          border: '3px solid #333',
-          borderTop: 'none',
-          background: 'transparent',
-        }}>
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            height: `${foamHeight}%`,
-            background: `linear-gradient(45deg, ${foamColor}, white)`,
-            transition: 'height 2s',
-          }} />
-        </div>
-        <div style={{
-          position: 'absolute',
-          bottom: '-25px',
-          width: '100%',
-          textAlign: 'center',
-        }}>
-          30% KI solution
-        </div>
-      </div>
-    );
-  };
+    # Animated title
+    st.markdown('<p class="title">Elephant Toothpaste Reaction</p>', unsafe_allow_html=True)
 
-  const startExperiment = () => {
-    if (reactionState === 'ready') {
-      setReactionState('pouring');
-      setPouring(true);
-      setTimeout(() => {
-        setPouring(false);
-        setFoamHeight(200);
-      }, 1000);
-    }
-  };
+    # Initialize session state for reaction
+    if 'reaction_state' not in st.session_state:
+        st.session_state.reaction_state = 'ready'
+        st.session_state.foam_height = 50
 
-  return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle>Elephant Toothpaste Reaction</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-center">
-          <div>{drawBeaker()}</div>
-          <div>{drawCylinder()}</div>
-        </div>
-        <div className="text-center mt-6">
-          <Button onClick={startExperiment}>
-            Start Experiment
-          </Button>
-        </div>
-        {reactionState === 'pouring' && (
-          <div className="bg-gray-100 p-4 rounded-md mt-6">
-            <h3 className="text-center">Chemical Equation:</h3>
-            <p className="text-center text-2xl">2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</p>
-            <div className="text-center mt-4">
-              <p>
-                <b>Note:</b> For a more dramatic effect in real experiments:
-                <br />
-                - Add a few drops of food coloring to create colorful foam
-                <br />
-                - Mix in liquid soap to create more voluminous foam
-                <br />
-                - Always perform under proper supervision and safety conditions
-              </p>
+    # Functions for beaker and cylinder visuals
+    def draw_beaker(label, color, pouring=False):
+        rotation = "135deg" if pouring else "0deg"
+        return f"""
+        <div style="position: relative; width: 100px; height: 150px; margin: auto; transform: translateY(-30px);">
+            <div style="
+                position: absolute;
+                width: 80px;
+                height: 120px;
+                border: 3px solid #333;
+                border-top: none;
+                background: transparent;
+                transform: rotate({rotation});
+                transform-origin: bottom right;
+                transition: transform 1s;">
+                <div style="
+                    position: absolute;
+                    bottom: 0;
+                    width: 100%;
+                    height: 50%;
+                    background-color: {color};
+                    transition: height 2s;">
+                </div>
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
+            <div style="position: absolute; bottom: -25px; width: 100%; text-align: center;">
+                {label}
+            </div>
+        </div>
+        """
 
-export default ElephantToothpasteReaction;
+    def draw_cylinder(foam_height):
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1']
+        foam_color = random.choice(colors)
+        return f"""
+        <div style="position: relative; width: 150px; height: 200px; margin: auto;">
+            <div style="
+                position: absolute;
+                width: 120px;
+                height: 180px;
+                border: 3px solid #333;
+                border-top: none;
+                background: transparent;">
+                <div style="
+                    position: absolute;
+                    bottom: 0;
+                    width: 100%;
+                    height: {foam_height}%;
+                    background: linear-gradient(45deg, {foam_color}, white);
+                    transition: height 2s;">
+                </div>
+            </div>
+            <div style="position: absolute; bottom: -25px; width: 100%; text-align: center;">
+                30% KI solution
+            </div>
+        </div>
+        """
+
+    # Displaying the beaker and cylinder side by side with the beaker slightly above
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown(draw_beaker("H₂O₂", "#ADD8E6", pouring=(st.session_state.reaction_state == 'pouring')), 
+                    unsafe_allow_html=True)
+    with col2:
+        st.markdown(draw_cylinder(st.session_state.foam_height), unsafe_allow_html=True)
+
+    # Central "Start Experiment" button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
+            st.session_state.reaction_state = 'pouring'
+            time.sleep(1)  # Pause for pour animation
+            st.session_state.foam_height = 200  # Foam rises
+            st.experimental_rerun()
+
+    # Display chemical equation and note after reaction
+    if st.session_state.reaction_state == 'pouring' and st.session_state.foam_height == 200:
+        time.sleep(2)  # Wait for foam animation to complete
+        st.markdown("""
+        <div style='text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 10px;'>
+            <h3>Chemical Equation:</h3>
+            <p style='font-size: 24px;'>2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.info("""
+        **Note:** For a more dramatic effect in real experiments:
+        - Add a few drops of food coloring to create colorful foam
+        - Mix in liquid soap to create more voluminous foam
+        - Always perform under proper supervision and safety conditions
+        """)
+
+        # Reset state for repeat experiment
+        st.session_state.reaction_state = 'ready'
+        st.session_state.foam_height = 50
+
+if __name__ == "__main__":
+    main()
