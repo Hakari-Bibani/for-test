@@ -1,72 +1,77 @@
 import streamlit as st
 import time
 from PIL import Image, ImageDraw
+import imageio
 
-# Set up the title
 st.title("🧪 Elephant Toothpaste Reaction 🧪")
 
-# Instructions
-st.markdown("## Instructions:")
-st.write("Observe the setup below, and press the 'Start Experiment' button to see the reaction take place!")
-
-# Drawing the initial setup with H2O2 in a beaker and KI in a cylinder
-def draw_initial_setup():
-    # Create an image with a half-filled beaker and cylinder
-    img = Image.new('RGB', (400, 300), color='white')
+# Drawing the initial setup with a larger cylinder containing KI solution
+def draw_initial_cylinder():
+    img = Image.new('RGB', (400, 400), color='white')
     draw = ImageDraw.Draw(img)
     
-    # Draw beaker with H2O2
-    draw.rectangle([(50, 50), (150, 250)], outline="black", width=3)
-    draw.rectangle([(50, 150), (150, 250)], fill="lightblue")
-    draw.text((60, 260), "H2O2 (Hydrogen Peroxide)", fill="black")
-    
-    # Draw cylinder with KI
-    draw.rectangle([(250, 100), (350, 250)], outline="black", width=3)
-    draw.rectangle([(250, 175), (350, 250)], fill="lightgrey")
-    draw.text((260, 260), "30% KI Solution", fill="black")
+    # Draw the larger cylinder with KI solution (30% KI solution)
+    draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
+    draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
+    draw.text((130, 360), "30% KI Solution", fill="black")
     
     return img
 
-st.image(draw_initial_setup(), caption="Initial Setup: H2O2 & KI")
+st.image(draw_initial_cylinder(), caption="Cylinder with KI Solution (30%)")
 
-# Start experiment button
+# Button to start the experiment
 start_experiment = st.button("Start Experiment")
 
-# Function to create the reaction animation
+# Function to create pouring and reaction animation frames
 def create_reaction_animation():
     frames = []
-    for i in range(15):
-        # Create base image
-        img = Image.new('RGB', (400, 300), color='white')
+    
+    # Pouring H2O2 into the cylinder
+    for i in range(10):
+        img = Image.new('RGB', (400, 400), color='white')
         draw = ImageDraw.Draw(img)
-
-        # Beaker with H2O2
-        draw.rectangle([(50, 50), (150, 250)], outline="black", width=3)
-        if i < 7:  # Pouring animation
-            draw.rectangle([(50, 150 - i * 10), (150, 250)], fill="lightblue")
-        else:
-            draw.rectangle([(50, 150), (150, 250)], fill="lightblue")
-
-        # Cylinder with foaming reaction
-        draw.rectangle([(250, 100), (350, 250)], outline="black", width=3)
-        if i >= 7:  # Foam rising
-            draw.ellipse([(250, 100 - i * 10), (350, 100)], fill="yellow")
-            for j in range(i - 6):
-                draw.ellipse([(250, 70 - j * 20), (350, 100 - j * 20)], fill="orange")
+        
+        # Draw cylinder with KI solution
+        draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
+        draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
+        draw.text((130, 360), "30% KI Solution", fill="black")
+        
+        # Simulate pouring H2O2
+        draw.ellipse([(150 - i * 5, 100 - i * 10), (175 - i * 5, 125 - i * 10)], fill="lightblue")
+        frames.append(img)
+    
+    # Foaming reaction animation
+    for i in range(15):
+        img = Image.new('RGB', (400, 400), color='white')
+        draw = ImageDraw.Draw(img)
+        
+        # Draw cylinder
+        draw.rectangle([(125, 100), (275, 350)], outline="black", width=3)
+        draw.rectangle([(125, 250), (275, 350)], fill="lightgrey")
+        draw.text((130, 360), "30% KI Solution", fill="black")
+        
+        # Draw foam rising
+        draw.rectangle([(125, 250 - i * 10), (275, 250)], fill="orange")
+        for j in range(i):
+            draw.ellipse([(125, 240 - j * 10), (275, 250 - j * 10)], fill="yellow")
         
         frames.append(img)
 
-    return frames
-
-if start_experiment:
-    st.write("Pouring H2O2 into KI solution...")
+    # Save as GIF
+    gif_path = "/mnt/data/elephant_toothpaste_reaction.gif"
+    frames[0].save(gif_path, save_all=True, append_images=frames[1:], duration=100, loop=0)
     
-    # Display pouring animation
-    for frame in create_reaction_animation():
-        st.image(frame)
-        time.sleep(0.2)  # Delay to animate reaction
+    return gif_path
 
-    # Display reaction notes
+# Display animation when button is pressed
+if start_experiment:
+    st.write("Pouring H₂O₂ into KI solution...")
+
+    # Create and display GIF animation
+    gif_path = create_reaction_animation()
+    st.image(gif_path, caption="Elephant Toothpaste Reaction Animation", use_column_width=True)
+
+    # Display reaction formula
     st.markdown("### Reaction Formula")
-    st.write("2H2O2 (aq) → 2H2O (l) + O2 (g)")
+    st.write("2H₂O₂ (aq) → 2H₂O (l) + O₂ (g)")
     st.write("Note: The food coloring and liquid soap enhance the reaction for dramatic effect.")
