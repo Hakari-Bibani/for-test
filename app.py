@@ -121,7 +121,9 @@ def main():
     with col2:
         if st.button("Start Experiment") and st.session_state.reaction_state == 'ready':
             st.session_state.reaction_state = 'pouring'
+            time.sleep(1)  # Pause for pour animation
             st.session_state.foam_height = 200  # Foam rises to top
+            st.experimental_rerun()
 
     # Display chemical equation and note after reaction
     if st.session_state.reaction_state == 'pouring':
