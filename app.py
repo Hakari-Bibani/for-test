@@ -60,8 +60,8 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            left: 10px; /* Centered above the beaker */
-            top: 80px; /* Adjusted position */
+            right: 30px;
+            top: 120px;
             transform-origin: right center;
             transition: transform 1s;
         }
@@ -81,18 +81,6 @@ def run_experiment():
         }
         .pouring {
             transform: rotate(-45deg);
-        }
-        .small-ball {
-            width: 5px;
-            height: 5px;
-            background-color: #d3d3d3;
-            border-radius: 50%;
-            position: absolute;
-            animation: drop 1s ease-in forwards;
-        }
-        @keyframes drop {
-            0% { top: 10px; opacity: 1; }
-            100% { top: 130px; opacity: 0; }
         }
         .reaction {
             width: 100px;
@@ -154,11 +142,6 @@ def run_experiment():
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
-                <!-- Small balls simulating NaHCO₃ being poured -->
-                <div class="small-ball" style="left: 30px;"></div>
-                <div class="small-ball" style="left: 40px; animation-delay: 0.2s;"></div>
-                <div class="small-ball" style="left: 50px; animation-delay: 0.4s;"></div>
-                <div class="small-ball" style="left: 60px; animation-delay: 0.6s;"></div>
             </div>
         """, unsafe_allow_html=True)
         time.sleep(1)  # Pause before showing the reaction
