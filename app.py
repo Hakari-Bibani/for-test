@@ -61,16 +61,16 @@ def run_experiment():
             border-radius: 10px;
             position: absolute;
             left: 50%;
-            top: 100px;
+            top: 0;
             transform: translateX(-50%);
-            transform-origin: center bottom;
+            transform-origin: center top;
             transition: transform 1s;
         }
         .spoon-content {
             font-size: 14px;
             color: #555;
             position: absolute;
-            bottom: -40px;
+            top: -40px;
             left: 50%;
             transform: translateX(-50%);
             width: 50px;
@@ -82,7 +82,7 @@ def run_experiment():
             align-items: center;
         }
         .pouring {
-            transform: rotate(-45deg);
+            transform: rotate(45deg);
         }
         .reaction {
             position: absolute;
@@ -136,13 +136,6 @@ def run_experiment():
             <div class="experiment-container">
                 <div class="beaker">
                     <div class="label">CH₃COOH</div>
-                    <div class="reaction">
-                        <div class="bubble"></div>
-                        <div class="bubble"></div>
-                        <div class="bubble"></div>
-                        <div class="bubble"></div>
-                        <div class="bubble"></div>
-                    </div>
                 </div>
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
