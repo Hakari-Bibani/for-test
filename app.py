@@ -14,13 +14,32 @@ st.title("Acid Base Titration Simulation")
 with open("animation.html", "r") as file:
     html_content = file.read()
 
-# Display the HTML component
-html_container = components.html(html_content, height=600)
+# Display the HTML component and set up communication
+html_container = components.html(
+    html_content,
+    height=600,
+    scrolling=False
+)
+
+# JavaScript to send message from Streamlit to HTML
+st.write("""
+    <script>
+        function sendMessage() {
+            const iframe = window.parent.document.querySelector('iframe');
+            if (iframe) {
+                iframe.contentWindow.postMessage({ type: 'start_experiment' }, '*');
+            }
+        }
+    </script>
+""", unsafe_allow_html=True)
 
 # Start experiment button
 if st.button("Start Experiment"):
     # Send message to start animation
     st.write("Starting titration...")
+    
+    # Trigger the JavaScript function to start the experiment
+    st.write('<script>sendMessage();</script>', unsafe_allow_html=True)
     
     # Progress indication
     progress_bar = st.progress(0)
@@ -44,11 +63,11 @@ if st.button("Start Experiment"):
     
     def calculate_ph(v):
         if v < equivalence_point:
-            return -np.log10(abs(0.1 - (0.1 * v/equivalence_point)))
+            return -np.log10(abs(0.1 - (0.1 * v / equivalence_point)))
         elif abs(v - equivalence_point) < 0.1:
             return 7
         else:
-            return 14 + np.log10(abs((0.1 * (v-equivalence_point))/v))
+            return 14 + np.log10(abs((0.1 * (v - equivalence_point)) / v))
     
     ph = [calculate_ph(v) for v in volume]
     
