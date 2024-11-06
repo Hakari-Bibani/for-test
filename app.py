@@ -41,6 +41,16 @@ def run_experiment():
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
             bottom: 0;
+            overflow: hidden;
+        }
+
+        .liquid {
+            width: 100%;
+            height: 50%; /* Half-filled */
+            background: rgba(255, 99, 132, 0.6);
+            position: absolute;
+            bottom: 0;
+            border-radius: 0 0 5px 5px;
         }
 
         .label {
@@ -69,8 +79,8 @@ def run_experiment():
             position: absolute;
             right: -30px;
             top: -10px;
-            width: 50px;
-            height: 50px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background-color: #d3d3d3;
             display: flex;
@@ -80,6 +90,21 @@ def run_experiment():
 
         .pouring {
             transform: rotate(-45deg);
+        }
+
+        .ball {
+            width: 20px;
+            height: 20px;
+            background: #d3d3d3;
+            border-radius: 50%;
+            position: absolute;
+            top: 50px;
+            right: 60px;
+            transition: top 1s ease-in;
+        }
+
+        .falling {
+            top: 250px; /* Position the ball into the beaker */
         }
 
         .reaction {
@@ -125,24 +150,28 @@ def run_experiment():
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
+                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
                 </div>
                 <div class="spoon">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
+                <div class="ball"></div>
             </div>
         """, unsafe_allow_html=True)
 
     def animate_experiment():
-        # Step 1: Animate the spoon bending and pouring
+        # Step 1: Animate the spoon bending and ball falling
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
+                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
                 </div>
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
+                <div class="ball falling"></div> <!-- Ball falls into the beaker -->
             </div>
         """, unsafe_allow_html=True)
         
@@ -152,6 +181,7 @@ def run_experiment():
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
+                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
                     <div class="reaction">
                         <div class="bubble"></div>
