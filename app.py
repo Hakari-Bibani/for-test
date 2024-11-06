@@ -1,79 +1,46 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import numpy as np
 import plotly.graph_objects as go
-from PIL import Image
 import time
 
 # Set page configuration
 st.set_page_config(page_title="Acid Base Titration", layout="wide")
 
-# Custom CSS for animation
-st.markdown("""
-    <style>
-    @keyframes moveText {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-    .moving-text {
-        animation: moveText 10s linear infinite;
-        white-space: nowrap;
-        overflow: hidden;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Title
+st.title("Acid Base Titration Simulation")
 
-# Animated title
-st.markdown('<h1 class="moving-text">Acid Base Titration</h1>', unsafe_allow_html=True)
+# Load the HTML component
+with open("animation.html", "r") as file:
+    html_content = file.read()
 
-# Create two columns for the setup
-col1, col2 = st.columns(2)
-
-# Initial setup visualization
-with col1:
-    st.markdown("""
-    ```
-       NaOH
-    ┌─────────┐
-    │         │
-    │         │ Burette
-    │         │
-    └────┬────┘
-         │
-         V
-    
-    """)
-
-with col2:
-    st.markdown("""
-    ```
-         HCl
-    ┌─────────┐
-    │         │
-    │         │ Flask
-    │         │
-    └─────────┘
-    """)
+# Display the HTML component
+html_container = components.html(html_content, height=600)
 
 # Start experiment button
-start_experiment = st.button("Start Experiment")
-
-if start_experiment:
-    # Animation of titration
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+if st.button("Start Experiment"):
+    # Send message to start animation
+    st.write("Starting titration...")
     
+    # Progress indication
+    progress_bar = st.progress(0)
+    status = st.empty()
+    
+    # Simulate titration progress
     for i in range(101):
         progress_bar.progress(i)
         if i < 80:
-            status_text.text(f"Adding NaOH... ({i}%)")
+            status.text(f"Adding NaOH... ({i}%)")
+        elif i < 90:
+            status.text("Color changing to pink!")
         else:
-            status_text.text("Color changing to pink!")
-        time.sleep(0.1)
+            status.text("Titration complete!")
+        time.sleep(0.2)
     
-    # Generate titration curve data
+    # Generate and display pH curve
     volume = np.linspace(0, 50, 100)
-    initial_ph = 1  # Initial pH of strong acid
-    equivalence_point = 25  # Volume at equivalence point
+    initial_ph = 1
+    equivalence_point = 25
     
     def calculate_ph(v):
         if v < equivalence_point:
@@ -85,7 +52,6 @@ if start_experiment:
     
     ph = [calculate_ph(v) for v in volume]
     
-    # Create titration curve
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=volume,
@@ -94,7 +60,6 @@ if start_experiment:
         name='pH curve'
     ))
     
-    # Add equivalence point marker
     fig.add_trace(go.Scatter(
         x=[equivalence_point],
         y=[calculate_ph(equivalence_point)],
@@ -103,7 +68,6 @@ if start_experiment:
         name='Equivalence Point'
     ))
     
-    # Update layout
     fig.update_layout(
         title='Titration Curve: HCl vs NaOH',
         xaxis_title='Volume of NaOH added (mL)',
@@ -111,22 +75,26 @@ if start_experiment:
         showlegend=True
     )
     
-    # Display the plot
     st.plotly_chart(fig, use_container_width=True)
     
-    # Show equivalence point details
     st.success(f"""
         Titration Complete!
         - Equivalence Point reached at {equivalence_point} mL
         - pH at equivalence point: 7.0
-        """)
+        - Final color: Pink (phenolphthalein indicator)
+    """)
 
 # Add explanation
 st.markdown("""
-### How it works:
-1. The burette contains NaOH (strong base)
-2. The conical flask contains HCl (strong acid)
-3. As NaOH is added, the pH gradually increases
-4. At the equivalence point, the solution turns pink due to phenolphthalein indicator
-5. The curve shows the pH change throughout the titration
+### What's happening in this titration?
+1. The burette contains NaOH (0.1M strong base)
+2. The conical flask contains HCl (0.1M strong acid)
+3. As NaOH is added dropwise:
+   - It neutralizes the HCl
+   - The pH gradually increases
+   - The phenolphthalein indicator remains colorless until pH ≈ 8.2
+4. At the endpoint:
+   - The solution turns pink
+   - The pH curve shows a sharp increase
+   - All acid has been neutralized
 """)
