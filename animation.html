@@ -16,7 +16,8 @@
     
     #drop {
       opacity: 0;
-      animation: dropFall 1s infinite;
+      animation: dropFall 1s linear;
+      animation-iteration-count: 3; /* Only three drops */
       animation-play-state: paused;
     }
     
@@ -37,13 +38,13 @@
     }
     
     #burette-solution {
-      animation: decreaseLevel 20s linear;
+      animation: decreaseLevel 3s linear;
       animation-play-state: paused;
     }
     
     @keyframes decreaseLevel {
       from { height: 200px; }
-      to { height: 20px; }
+      to { height: 180px; } /* Only decrease a small amount */
     }
   </style>
 </head>
@@ -101,38 +102,31 @@
 
   <script>
     let isExperimentRunning = false;
-    let dropCount = 0;
-    
+
     function startExperiment() {
       if (isExperimentRunning) return;
       isExperimentRunning = true;
       
       const drop = document.getElementById('drop');
       const solution = document.getElementById('solution');
+      const buretteSolution = document.getElementById('burette-solution');
       
-      // Start dropping animation
+      // Start burette solution and drop animations
+      buretteSolution.style.animationPlayState = 'running';
       drop.style.animationPlayState = 'running';
       
-      // Drop 3 times and then stop
-      const dropInterval = setInterval(() => {
-        dropCount++;
-        if (dropCount >= 3) {
-          clearInterval(dropInterval);
-          drop.style.animationPlayState = 'paused';
-          
-          // Change color of the solution
-          solution.style.animationPlayState = 'running';
-        }
-      }, 1000); // Drops every second
+      // Change color after the drops finish
+      setTimeout(() => {
+        solution.style.animationPlayState = 'running';
+      }, 3000); // Wait for 3 seconds (3 drops)
     }
-    
-    // Add this function to your Streamlit component
+
+    // Listen for messages from the Streamlit component
     window.addEventListener('message', function(event) {
       if (event.data.type === 'start_experiment') {
         startExperiment();
       }
     });
   </script>
-</div>
 </body>
 </html>
