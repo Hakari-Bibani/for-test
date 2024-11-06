@@ -83,24 +83,26 @@ def run_experiment():
             align-items: center;
         }
         .pouring {
-            transform: translateX(-50%) rotate(45deg);
+            transform: translateX(-50%) rotate(-45deg);
         }
         .powder-particle {
-            width: 4px;
-            height: 4px;
-            background-color: #white;
+            width: 3px;
+            height: 3px;
+            background-color: #f5f5f5;
             border: 1px solid #d3d3d3;
             border-radius: 50%;
             position: absolute;
             opacity: 0;
+            left: 50%;
+            top: 110px;
         }
         @keyframes fall {
             0% {
-                transform: translate(0, 0);
+                transform: translate(-50%, 0);
                 opacity: 1;
             }
             100% {
-                transform: translate(0, 100px);
+                transform: translate(-50%, 60px);
                 opacity: 0;
             }
         }
@@ -156,8 +158,8 @@ def run_experiment():
     def animate_experiment():
         # Step 1: Animate the spoon bending and show falling particles
         particles_html = "".join([
-            f'<div class="powder-particle" style="left: {45 + i * 5}%; top: 120px; animation: fall 1s ease-in-out {i * 0.1}s forwards;"></div>'
-            for i in range(10)
+            f'<div class="powder-particle" style="animation: fall 1s ease-in-out {i * 0.1}s forwards;"></div>'
+            for i in range(15)
         ])
         
         container.markdown(f"""
@@ -172,7 +174,7 @@ def run_experiment():
                 {particles_html}
             </div>
         """, unsafe_allow_html=True)
-        time.sleep(1)  # Pause before showing the reaction
+        time.sleep(1.5)  # Longer pause to show the falling particles
 
         # Step 2: Show the reaction with bubbles
         container.markdown("""
