@@ -6,7 +6,7 @@ def run_experiment():
     st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-
+        
         .title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 3em;
@@ -44,13 +44,12 @@ def run_experiment():
             overflow: hidden;
         }
 
-        .liquid {
+        .half-fill {
             width: 100%;
-            height: 50%; /* Half-filled */
-            background: rgba(255, 99, 132, 0.6);
+            height: 50%;
+            background: rgba(255, 182, 193, 0.8);
             position: absolute;
             bottom: 0;
-            border-radius: 0 0 5px 5px;
         }
 
         .label {
@@ -67,7 +66,7 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            right: 30px;
+            left: 40px;  /* Shifted slightly to the left */
             top: 50px;
             transform-origin: right center;
             transition: transform 1s;
@@ -77,10 +76,10 @@ def run_experiment():
             font-size: 14px;
             color: #555;
             position: absolute;
-            right: -30px;
+            left: 30px;  /* Adjusted to ensure the ball falls centrally */
             top: -10px;
-            width: 20px;
-            height: 20px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background-color: #d3d3d3;
             display: flex;
@@ -92,38 +91,21 @@ def run_experiment():
             transform: rotate(-45deg);
         }
 
-        .ball {
-            width: 20px;
-            height: 20px;
-            background: #d3d3d3;
-            border-radius: 50%;
-            position: absolute;
-            top: 50px;
-            right: 60px;
-            transition: top 1s ease-in;
-        }
-
-        .falling {
-            top: 250px; /* Position the ball into the beaker */
-        }
-
         .reaction {
+            width: 100px;
+            height: 75px; /* Adjusted height for half-fill */
             position: absolute;
             bottom: 0;
-            width: 100px;
-            height: 150px;
-            overflow: hidden;
         }
 
         .bubble {
-            position: absolute;
-            bottom: 0;
             width: 10px;
             height: 10px;
-            background: #2ed573;
+            background: #ffffff;
             border-radius: 50%;
-            opacity: 0.8;
+            position: absolute;
             animation: rise 3s infinite ease-in;
+            opacity: 0.8;
         }
 
         @keyframes rise {
@@ -131,12 +113,18 @@ def run_experiment():
             100% { transform: translateY(-150px); opacity: 0; }
         }
 
-        /* Randomize bubble positions and animation durations */
-        .bubble:nth-child(1) { left: 10px; animation-duration: 2s; }
-        .bubble:nth-child(2) { left: 30px; animation-duration: 2.5s; }
-        .bubble:nth-child(3) { left: 50px; animation-duration: 3s; }
-        .bubble:nth-child(4) { left: 70px; animation-duration: 2.2s; }
-        .bubble:nth-child(5) { left: 90px; animation-duration: 2.8s; }
+        .bubbles-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bubble:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .bubble:nth-child(2) { left: 30%; animation-delay: 0.5s; }
+        .bubble:nth-child(3) { left: 50%; animation-delay: 1s; }
+        .bubble:nth-child(4) { left: 70%; animation-delay: 1.5s; }
+        .bubble:nth-child(5) { left: 90%; animation-delay: 2s; }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -150,28 +138,26 @@ def run_experiment():
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
-                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
+                    <div class="half-fill"></div>  <!-- Half-filled beaker -->
                 </div>
                 <div class="spoon">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
-                <div class="ball"></div>
             </div>
         """, unsafe_allow_html=True)
 
     def animate_experiment():
-        # Step 1: Animate the spoon bending and ball falling
+        # Step 1: Animate the spoon bending and pouring
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
-                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
+                    <div class="half-fill"></div>
                 </div>
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
-                <div class="ball falling"></div> <!-- Ball falls into the beaker -->
             </div>
         """, unsafe_allow_html=True)
         
@@ -181,14 +167,14 @@ def run_experiment():
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
-                    <div class="liquid"></div>
                     <div class="label">CH₃COOH</div>
-                    <div class="reaction">
+                    <div class="half-fill"></div>
+                    <div class="bubbles-container">
                         <div class="bubble"></div>
                         <div class="bubble"></div>
                         <div class="bubble"></div>
                         <div class="bubble"></div>
-                        <div class="bubble"></div>
+                        <div class="bubble"></div> <!-- Multiple bubbles -->
                     </div>
                 </div>
             </div>
