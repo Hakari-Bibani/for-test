@@ -1,65 +1,163 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import numpy as np
+import time
+import streamlit.components.v1 as components
 
-# App title
-st.title("Baking Soda and Vinegar Reaction 🌋")
+def app():
+    # Set page config
+    st.set_page_config(page_title="Chemical Reaction Simulation")
 
-# Initial setup
-st.subheader("Initial Setup:")
-st.write("Below, you see a beaker filled with a pale red solution, which represents vinegar (CH₃COOH), and a spoon holding baking soda (NaHCO₃).")
+    # Custom CSS for animations and styling
+    st.markdown("""
+        <style>
+        @keyframes titleMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes bubbleEffect {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-200px); opacity: 0; }
+        }
+        
+        @keyframes pourAnimation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(135deg); }
+        }
 
-# Displaying the initial setup (use placeholders for animations)
-fig, ax = plt.subplots()
+        .moving-title {
+            animation: titleMove 5s linear infinite;
+            white-space: nowrap;
+            font-size: 2em;
+            color: #1f77b4;
+        }
 
-# Setting up the beaker and spoon representation
-ax.set_xlim(0, 10)
-ax.set_ylim(0, 10)
-ax.axis("off")
+        .container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
 
-# Drawing the beaker
-beaker = plt.Rectangle((3, 1), 4, 5, fill=None, edgecolor='black', linewidth=2)
-ax.add_patch(beaker)
+        .beaker {
+            position: absolute;
+            right: 50%;
+            top: 50%;
+            width: 150px;
+            height: 200px;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(255, 200, 200, 0.7) 50%
+            );
+            border: 5px solid #666;
+            border-radius: 10px;
+        }
 
-# Vinegar solution in the beaker
-vinegar = plt.Rectangle((3, 1), 4, 2.5, color='lightcoral')
-ax.add_patch(vinegar)
+        .spoon {
+            position: absolute;
+            right: 60%;
+            top: 30%;
+            width: 100px;
+            height: 30px;
+            background: #ddd;
+            border: 2px solid #666;
+            transform-origin: right center;
+        }
 
-# Spoon with baking soda
-spoon, = ax.plot([4, 6], [7, 7], 'lightgray', linewidth=3)  # Spoon handle
-baking_soda, = ax.plot(5, 7, 'o', color='lightgray', markersize=10)  # Baking soda blob
+        .powder {
+            position: absolute;
+            right: 65%;
+            top: 25%;
+            font-size: 1.2em;
+            color: #666;
+        }
 
-# Animation function
-def animate(frame):
-    if frame < 20:
-        spoon.set_ydata([7 - frame * 0.1, 7 - frame * 0.1])  # Bend spoon downwards
-        baking_soda.set_ydata(7 - frame * 0.1)  # Move baking soda
-    elif frame == 20:
-        ax.add_patch(plt.Circle((5, 3.5), 0.1, color='white'))  # Small initial bubble
-    elif frame > 20:
-        # Simulate bubbles rising and expanding
-        for _ in range(5):
-            x = np.random.uniform(3.5, 6.5)
-            y = np.random.uniform(3, 5.5)
-            size = np.random.uniform(0.05, 0.2)
-            ax.add_patch(plt.Circle((x, y), size, color='white', alpha=0.6))
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: bubbleEffect 1s ease-out;
+        }
 
-# Run animation
-anim = FuncAnimation(fig, animate, frames=40, interval=100)
+        .equation {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-# Show animation
-st.pyplot(fig)
+    # Moving title
+    st.markdown('<div class="moving-title">Baking Soda and Vinegar Reaction</div>', unsafe_allow_html=True)
 
-# Button to start experiment
-if st.button("Start Experiment"):
-    st.write("Watch the reaction unfold!")
+    # Create container for experiment
+    st.markdown('<div class="container" id="experiment-container">', unsafe_allow_html=True)
+    
+    # Add beaker and spoon
+    st.markdown('''
+        <div class="beaker"></div>
+        <div class="spoon" id="spoon"></div>
+        <div class="powder">NaHCO₃</div>
+    ''', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# Reaction output and equation
-st.subheader("Reaction:")
-st.write("As the baking soda falls into the vinegar, a vigorous reaction occurs, creating carbon dioxide gas, water, and sodium acetate.")
-st.latex(r"NaHCO_3 (s) + CH_3COOH (aq) \rightarrow CO_2 (g) + H_2O (l) + NaCH_3COO (aq)")
+    # Add equation (initially hidden)
+    st.markdown('<div class="equation" id="equation">NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO</div>', unsafe_allow_html=True)
 
-# Ending message
-st.write("Enjoy the fascinating chemistry behind this classic experiment!")
+    # JavaScript for animations
+    js_code = """
+    <script>
+    function startExperiment() {
+        const spoon = document.getElementById('spoon');
+        const equation = document.getElementById('equation');
+        const container = document.getElementById('experiment-container');
+        
+        // Pour animation
+        spoon.style.animation = 'pourAnimation 1s forwards';
+        
+        // Create bubbles after slight delay
+        setTimeout(() => {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    bubble.style.width = Math.random() * 20 + 10 + 'px';
+                    bubble.style.height = bubble.style.width;
+                    bubble.style.right = '50%';
+                    bubble.style.top = '50%';
+                    container.appendChild(bubble);
+                    
+                    // Remove bubble after animation
+                    setTimeout(() => bubble.remove(), 1000);
+                }, i * 100);
+            }
+        }, 1000);
 
+        // Show equation after reaction
+        setTimeout(() => {
+            equation.style.opacity = '1';
+        }, 2500);
+
+        // Reset spoon animation after completion
+        setTimeout(() => {
+            spoon.style.animation = 'none';
+            spoon.offsetHeight; // Trigger reflow
+        }, 3000);
+    }
+    </script>
+    """
+    
+    components.html(js_code, height=0)
+
+    # Start experiment button
+    if st.button('Start Experiment', on_click=None):
+        components.html("""
+            <script>
+            startExperiment();
+            </script>
+        """, height=0)
+
+if __name__ == "__main__":
+    app()
