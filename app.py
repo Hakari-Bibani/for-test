@@ -37,8 +37,8 @@ def run_experiment():
             border: 3px solid #ddd;
             border-radius: 5px 5px 10px 10px;
             position: absolute;
-            left: 28%;
-            top: -5%;  /* Moved even higher up (was 5%) */
+            left: 22%;  /* Moved further left from 28% */
+            top: 5%;
             transform-origin: bottom right;
             transition: transform 1s ease;
             z-index: 2;
