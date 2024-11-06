@@ -26,9 +26,9 @@ def run_experiment():
             justify-content: center;
             align-items: flex-end;
             position: relative;
-            height: 500px;  /* Increased height to accommodate overflow */
+            height: 500px;
             margin-bottom: 20px;
-            overflow: visible;  /* Allow overflow for foam effect */
+            overflow: visible;
         }
         
         .beaker {
@@ -37,7 +37,7 @@ def run_experiment():
             border: 3px solid #ddd;
             border-radius: 5px 5px 10px 10px;
             position: absolute;
-            left: 42%;  /* Adjusted position more to the left */
+            left: 35%;  /* Moved more to the left */
             top: 15%;
             transform-origin: bottom right;
             transition: transform 1s ease;
@@ -50,7 +50,7 @@ def run_experiment():
             border: 4px solid #ddd;
             border-radius: 10px 10px 20px 20px;
             position: relative;
-            overflow: visible;  /* Allow overflow for foam */
+            overflow: visible;
             margin-top: 120px;
         }
         
@@ -70,23 +70,24 @@ def run_experiment():
             background: rgba(169, 169, 169, 0.7);
         }
         
-        .label {
+        .beaker .label {
             position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 14px;
             font-weight: bold;
             color: #2c3e50;
         }
         
-        .beaker .label {
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
         .cylinder .label {
-            top: -25px;
+            position: absolute;
+            bottom: -30px;  /* Moved label below cylinder */
             left: 50%;
             transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
         }
         
         @keyframes pour {
@@ -98,28 +99,31 @@ def run_experiment():
         @keyframes reaction {
             0% {
                 height: 50%;
-                transform: scale(1);
-                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+                background: linear-gradient(to top, #000000, #ff0000);
+            }
+            20% {
+                height: 140%;
+                background: linear-gradient(to top, #000000, #ff0000);
             }
             40% {
-                height: 400%;
-                transform: scale(1.2);
-                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+                height: 180%;
+                background: linear-gradient(to top, #000000, #ff0000);
+                transform: scaleX(1.1);
             }
             60% {
-                height: 450%;
-                transform: scale(1.4) translateY(-20px);
-                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+                height: 220%;
+                background: linear-gradient(to top, #000000, #ff0000);
+                transform: scaleX(1);
             }
             80% {
-                height: 500%;
-                transform: scale(1.3) translateY(-40px);
-                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+                height: 200%;
+                background: linear-gradient(to top, #000000, #ff0000);
+                transform: scaleX(1.1);
             }
             100% {
-                height: 550%;
-                transform: scale(1.2) translateY(-60px);
-                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+                height: 190%;
+                background: linear-gradient(to top, #000000, #ff0000);
+                transform: scaleX(1);
             }
         }
         
@@ -128,14 +132,13 @@ def run_experiment():
             bottom: 0;
             width: 100%;
             height: 0;
-            background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+            background: linear-gradient(to top, #000000, #ff0000);
             animation: none;
-            border-radius: 10px;
-            filter: drop-shadow(0 0 10px rgba(255, 75, 43, 0.5));
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
         }
         
         .pouring {
-            transform: rotate(45deg) translateY(-20px) translateX(20px);  /* Adjusted transform for better pouring angle */
+            transform: rotate(55deg) translateY(-20px) translateX(40px);  /* Adjusted angle for better pouring */
         }
         
         .pouring .solution {
@@ -143,32 +146,32 @@ def run_experiment():
         }
         
         .reacting .foam {
-            animation: reaction 2s ease-out forwards;
+            animation: reaction 1.5s ease-out forwards;
         }
         
-        /* Add splashing effect particles */
-        .splash {
+        /* Foam particles effect */
+        .particle {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ff416c;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            background: #ff0000;
             opacity: 0;
         }
         
-        @keyframes splash {
+        @keyframes particle {
             0% {
-                transform: translate(0, 0) scale(1);
+                transform: translate(0, 0);
                 opacity: 1;
             }
             100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
+                transform: translate(var(--tx), var(--ty));
                 opacity: 0;
             }
         }
         
-        .reacting .splash {
-            animation: splash 1s ease-out forwards;
+        .reacting .particle {
+            animation: particle 0.8s ease-out forwards;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -187,9 +190,9 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder">
-                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
+                    <div class="label">30% KI</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -203,9 +206,9 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder">
-                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
+                    <div class="label">30% KI</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -220,13 +223,13 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder reacting">
-                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
-                    <!-- Add splash particles -->
-                    <div class="splash" style="--tx: 20px; --ty: -30px;"></div>
-                    <div class="splash" style="--tx: -20px; --ty: -40px;"></div>
-                    <div class="splash" style="--tx: 30px; --ty: -20px;"></div>
+                    <div class="label">30% KI</div>
+                    <!-- Add foam particles -->
+                    <div class="particle" style="--tx: 20px; --ty: -40px;"></div>
+                    <div class="particle" style="--tx: -15px; --ty: -35px;"></div>
+                    <div class="particle" style="--tx: 10px; --ty: -45px;"></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
