@@ -37,10 +37,12 @@ def run_experiment():
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
             bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             overflow: hidden;
         }
         .beaker-fill {
-            width: 100px;
+            width: 100%;
             height: 75px;
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
@@ -60,9 +62,10 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            right: 30px;
-            top: 120px;
-            transform-origin: right center;
+            left: 50%;
+            top: 80px;
+            transform-origin: center right;
+            transform: translateX(-50%);
             transition: transform 1s;
         }
         .spoon-content {
@@ -80,10 +83,29 @@ def run_experiment():
             align-items: center;
         }
         .pouring {
-            transform: rotate(-45deg);
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .powder-particle {
+            width: 4px;
+            height: 4px;
+            background-color: #white;
+            border: 1px solid #d3d3d3;
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+        }
+        @keyframes fall {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(0, 100px);
+                opacity: 0;
+            }
         }
         .reaction {
-            width: 100px;
+            width: 100%;
             height: 0;
             background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
             border-radius: 50% 50% 0 0;
@@ -132,8 +154,13 @@ def run_experiment():
         """, unsafe_allow_html=True)
 
     def animate_experiment():
-        # Step 1: Animate the spoon bending and pouring
-        container.markdown("""
+        # Step 1: Animate the spoon bending and show falling particles
+        particles_html = "".join([
+            f'<div class="powder-particle" style="left: {45 + i * 5}%; top: 120px; animation: fall 1s ease-in-out {i * 0.1}s forwards;"></div>'
+            for i in range(10)
+        ])
+        
+        container.markdown(f"""
             <div class="experiment-container">
                 <div class="beaker">
                     <div class="beaker-fill"></div>
@@ -142,6 +169,7 @@ def run_experiment():
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
+                {particles_html}
             </div>
         """, unsafe_allow_html=True)
         time.sleep(1)  # Pause before showing the reaction
@@ -153,7 +181,6 @@ def run_experiment():
                     <div class="beaker-fill"></div>
                     <div class="label">CH₃COOH</div>
                     <div class="reaction"></div>
-                    <!-- Add small bubbles -->
                     <div class="small-bubble" style="left: 20px; animation-delay: 0.2s;"></div>
                     <div class="small-bubble" style="left: 40px; animation-delay: 0.5s;"></div>
                     <div class="small-bubble" style="left: 60px; animation-delay: 0.8s;"></div>
