@@ -37,8 +37,8 @@ def run_experiment():
             border: 3px solid #ddd;
             border-radius: 5px 5px 10px 10px;
             position: absolute;
-            left: 28%;  /* Moved even more to the left */
-            top: 15%;
+            left: 28%;
+            top: 5%;  /* Moved higher up */
             transform-origin: bottom right;
             transition: transform 1s ease;
             z-index: 2;
@@ -103,13 +103,13 @@ def run_experiment():
             height: 0;
             background: repeating-linear-gradient(
                 0deg,
-                #000000 0px,
-                #000000 20px,
-                #ff0000 20px,
-                #ff0000 40px
+                rgba(0, 0, 0, 0.3) 0px,   /* Made black more transparent */
+                rgba(0, 0, 0, 0.3) 20px,
+                rgba(255, 0, 0, 0.3) 20px, /* Made red more transparent */
+                rgba(255, 0, 0, 0.3) 40px
             );
             animation: none;
-            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.2));
         }
         
         @keyframes reaction {
@@ -142,7 +142,7 @@ def run_experiment():
         }
         
         .pouring {
-            transform: rotate(65deg) translateY(-20px) translateX(60px);  /* Adjusted angle for better pouring */
+            transform: rotate(65deg) translateY(-20px) translateX(60px);
         }
         
         .pouring .solution {
@@ -162,17 +162,16 @@ def run_experiment():
             100% { height: 0%; }
         }
         
-        /* Foam particles effect */
         .particle {
             position: absolute;
             width: 12px;
             height: 12px;
             background: repeating-linear-gradient(
                 45deg,
-                #000000 0px,
-                #000000 6px,
-                #ff0000 6px,
-                #ff0000 12px
+                rgba(0, 0, 0, 0.3) 0px,    /* Made particles more transparent */
+                rgba(0, 0, 0, 0.3) 6px,
+                rgba(255, 0, 0, 0.3) 6px,
+                rgba(255, 0, 0, 0.3) 12px
             );
             border-radius: 50%;
             opacity: 0;
