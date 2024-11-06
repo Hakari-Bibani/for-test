@@ -1,58 +1,189 @@
 import streamlit as st
 import time
-import numpy as np
-from math import pi, sin, cos
+import math
+import random
 
-def app():
-    st.set_page_config(page_title="Baking Soda and Vinegar Reaction")
+def run_experiment():
+    # Custom CSS for styling and animations
+    st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        .title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 3em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff4757, #2ed573, #1e90ff, #ffa502);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .experiment-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            height: 400px;
+        }
+        .beaker {
+            width: 150px;
+            height: 200px;
+            border: 3px solid #555;
+            border-radius: 10px 10px 20px 20px;
+            background: rgba(255, 182, 193, 0.6);
+            position: absolute;
+            bottom: 0;
+            overflow: hidden; /* Added to hide the full beaker */
+        }
+        .beaker-fill {
+            width: 150px;
+            height: 100px; /* Half the beaker height */
+            background: rgba(255, 182, 193, 0.6);
+            position: absolute;
+            bottom: 0;
+            animation: fill 2s ease-in-out forwards;
+        }
+        @keyframes fill {
+            0% { height: 0; }
+            100% { height: 100px; }
+        }
+        .label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .spoon {
+            width: 100px;
+            height: 30px;
+            background: #d3d3d3;
+            border-radius: 15px;
+            position: absolute;
+            right: 50px;
+            top: 150px; /* Adjusted position */
+            transform-origin: right center;
+            transition: transform 1s;
+        }
+        .spoon-content {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            color: #555;
+            position: absolute;
+            right: -40px;
+            top: -15px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #d3d3d3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .pouring {
+            transform: rotate(-45deg);
+        }
+        .reaction {
+            width: 150px;
+            height: 0;
+            background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            bottom: 0;
+            animation: bubbles 2s ease forwards;
+        }
+        @keyframes bubbles {
+            0% { height: 0; }
+            50% { height: 300px; }
+            100% { height: 400px; opacity: 0; }
+        }
+        .small-bubble {
+            width: 10px;
+            height: 10px;
+            background-color: #2ed573;
+            border-radius: 50%;
+            position: absolute;
+            animation: smallBubbles 1s ease-in-out infinite;
+        }
+        @keyframes smallBubbles {
+            0% { bottom: 0; opacity: 0; }
+            50% { bottom: 200px; opacity: 1; }
+            100% { bottom: 400px; opacity: 0; }
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    # Show the title with moving effect
-    st.title("Baking Soda and Vinegar Reaction")
-    st.markdown("<style>@keyframes moveTitle { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); }}</style>", unsafe_allow_html=True)
-    st.markdown("<h1 style='animation: moveTitle 5s linear infinite;'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
+    # Display the title
+    st.markdown("<h1 class='title'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
 
-    # Display the beaker and spoon
-    col1, col2 = st.columns(2)
-    with col1:
-        # Display the beaker
-        st.markdown("""
-        <div style='width: 200px; height: 300px; border: 1px solid black; position: relative;'>
-        <div style='width: 100px; height: 150px; background-color: #FFD1DC; position: absolute; top: 50px; left: 50px;'>CH3COOH</div>
-        </div>
+    # Container for the experiment setup
+    container = st.empty()
+
+    def render_initial_state():
+        container.markdown("""
+            <div class="experiment-container">
+                <div class="beaker">
+                    <div class="beaker-fill"></div>
+                    <div class="label">CH₃COOH</div>
+                </div>
+                <div class="spoon">
+                    <div class="spoon-content">NaHCO₃</div>
+                </div>
+            </div>
         """, unsafe_allow_html=True)
 
-    with col2:
-        # Display the spoon and NaHCO3 text
-        st.markdown("""
-        <div style='display: flex; align-items: center;'>
-        <div style='width: 100px; height: 50px;'></div>
-        <div>NaHCO₃</div>
-        </div>
+    def animate_experiment():
+        # Step 1: Animate the spoon bending and pouring
+        container.markdown("""
+            <div class="experiment-container">
+                <div class="beaker">
+                    <div class="beaker-fill"></div>
+                    <div class="label">CH₃COOH</div>
+                </div>
+                <div class="spoon pouring">
+                    <div class="spoon-content">NaHCO₃</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        time.sleep(1)  # Pause before showing the reaction
+
+        # Step 2: Show the reaction with bubbles
+        container.markdown("""
+            <div class="experiment-container">
+                <div class="beaker">
+                    <div class="beaker-fill"></div>
+                    <div class="label">CH₃COOH</div>
+                    <div class="reaction"></div>
+                    <!-- Add small bubbles -->
+                    <div class="small-bubble" style="left: 20px; animation-delay: 0.2s;"></div>
+                    <div class="small-bubble" style="left: 40px; animation-delay: 0.5s;"></div>
+                    <div class="small-bubble" style="left: 60px; animation-delay: 0.8s;"></div>
+                    <div class="small-bubble" style="left: 80px; animation-delay: 1.2s;"></div>
+                    <div class="small-bubble" style="left: 100px; animation-delay: 1.5s;"></div>
+                    <div class="small-bubble" style="left: 120px; animation-delay: 1.8s;"></div>
+                </div>
+            </div>
         """, unsafe_allow_html=True)
 
-    # Add a button to start the experiment
+    # Initial render
+    render_initial_state()
+
+    # Button to start the experiment
     if st.button("Start Experiment"):
-        # Animate the spoon pouring into the beaker
-        for i in range(50):
-            spoon_x = 100 + 50 * sin(i * pi / 50)
-            spoon_y = 200 + 50 * cos(i * pi / 50)
-            st.markdown(f"<div style='width: 100px; height: 50px; position: absolute; left: {int(spoon_x)}px; top: {int(spoon_y)}px;'></div>", unsafe_allow_html=True)
-            time.sleep(0.02)
-        
-        # Simulate the reaction
-        for i in range(50):
-            bubble_x = np.random.randint(50, 350)
-            bubble_y = np.random.randint(250, 450)
-            bubble_size = np.random.randint(10, 30)
-            st.markdown(f"<div style='position: absolute; background-color: white; width: {bubble_size}px; height: {bubble_size}px; border-radius: 50%; left: {bubble_x}px; top: {bubble_y}px;'></div>", unsafe_allow_html=True)
-            time.sleep(0.02)
-
+        animate_experiment()
         # Display the chemical equation
         st.markdown("""
-        <div style='font-size: 24px; font-weight: bold;'>
-        NaHCO₃  + CH₃COOH  → CO₂ + H₂O + NaCH₃COO
-        </div>
-        """, unsafe_allow_html=True)
+            **Chemical Equation:**
+            NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO
+        """)
 
 if __name__ == "__main__":
-    app()
+    run_experiment()
