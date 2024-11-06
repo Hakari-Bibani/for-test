@@ -13,10 +13,6 @@ st.write(
     "Above the beaker, there is a spoon filled with white powder labeled **NaHCO₃** (baking soda)."
 )
 
-# Visual Representation (static images or placeholders)
-st.image("path_to_beaker_image.jpg", caption="Beaker with CH₃COOH (Vinegar)", use_column_width=True)
-st.image("path_to_spoon_image.jpg", caption="Spoon with NaHCO₃ (Baking Soda)", use_column_width=True)
-
 # Button to Start the Experiment
 if st.button("Start Experiment"):
     st.write("Pouring the baking soda into the vinegar...")
@@ -27,7 +23,7 @@ if st.button("Start Experiment"):
 
     st.success("Reaction Complete!")
     
-    # Show Reaction Animation (you can add more complex animations if needed)
+    # Reaction Description
     st.write("A dramatic reaction occurs, with bubbles overflowing the beaker!")
     st.balloons()  # Simple celebratory animation
     
