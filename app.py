@@ -1,197 +1,128 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        .container {
-            text-align: center;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-        
-        .title {
-            font-size: 2.5em;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            animation: bounce 2s infinite;
-        }
-        
-        .experiment-area {
-            position: relative;
-            height: 400px;
-            margin: 20px auto;
-            width: 300px;
-        }
-        
-        .beaker {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 160px;
-            height: 200px;
-            background: transparent;
-            border: 4px solid #666;
-            border-radius: 0 0 20px 20px;
-            overflow: hidden;
-        }
-        
-        .liquid {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50%;
-            background: rgba(255, 200, 200, 0.8);
-            transition: all 0.5s;
-        }
-        
-        .spoon {
-            position: absolute;
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 20px;
-            background: #999;
-            border-radius: 10px;
-            transform-origin: right center;
-            transition: transform 1s;
-        }
-        
-        .powder {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 40px;
-            height: 10px;
-            background: #ddd;
-            border-radius: 5px;
-            transform: translateX(-50%);
-        }
-        
-        .bubbles {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 0;
-            transition: height 1s;
-            background: repeating-radial-gradient(
-                circle,
-                rgba(255,255,255,0.8),
-                rgba(255,255,255,0.3) 10px,
-                rgba(255,255,255,0.8) 20px
-            );
-            opacity: 0;
-        }
-        
-        .equation {
-            margin-top: 20px;
-            font-size: 1.2em;
-            opacity: 0;
-            transition: opacity 1s;
-        }
-        
-        .chemical-text {
-            position: absolute;
-            font-family: monospace;
-            font-size: 1.2em;
-        }
-        
-        .vinegar-text {
-            left: 55%;
-            bottom: 120px;
-        }
-        
-        .soda-text {
-            right: 55%;
-            top: 40px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            font-size: 1.2em;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: #2980b9;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes bubble {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="title">Baking Soda and Vinegar Reaction</h1>
-        
-        <div class="experiment-area">
-            <div class="beaker">
-                <div class="liquid"></div>
-                <div class="bubbles"></div>
-            </div>
-            <div class="spoon">
-                <div class="powder"></div>
-            </div>
-            <div class="chemical-text vinegar-text">CH₃COOH</div>
-            <div class="chemical-text soda-text">NaHCO₃</div>
-        </div>
-        
-        <button onclick="startExperiment()">Start Experiment</button>
-        
-        <div class="equation">
-            NaHCO₃ (s) + CH₃COOH (aq) → CO₂ (g) + H₂O (l) + NaCH₃COO (aq)
-        </div>
-    </div>
+import streamlit as st
+import time
+from PIL import Image
+import numpy as np
+import io
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle, Rectangle, Polygon
 
-    <script>
-        function startExperiment() {
-            const spoon = document.querySelector('.spoon');
-            const bubbles = document.querySelector('.bubbles');
-            const equation = document.querySelector('.equation');
-            const button = document.querySelector('button');
-            
-            // Disable button during animation
-            button.disabled = true;
-            
-            // Rotate spoon
-            spoon.style.transform = 'translateX(-50%) rotate(135deg)';
-            
-            // After spoon rotation, start reaction
-            setTimeout(() => {
-                // Hide powder
-                document.querySelector('.powder').style.opacity = '0';
-                
-                // Show bubbles
-                bubbles.style.opacity = '1';
-                bubbles.style.height = '150%';
-                
-                // Animate bubbles
-                setInterval(() => {
-                    bubbles.style.animation = 'bubble 1s infinite';
-                }, 100);
-                
-                // Show equation
-                equation.style.opacity = '1';
-                
-                // Re-enable button after animation
-                setTimeout(() => {
-                    button.disabled = false;
-                }, 2000);
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
+def create_scene(stage=0):
+    """Create the reaction scene at different stages"""
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-5, 5)
+    
+    # Draw beaker
+    beaker = Rectangle((-2, -3), 4, 4, fill=False, color='black')
+    ax.add_patch(beaker)
+    
+    # Draw liquid (vinegar)
+    vinegar = Rectangle((-2, -3), 4, 2, color='lightcoral', alpha=0.3)
+    ax.add_patch(vinegar)
+    
+    if stage >= 1:  # Draw spoon position based on stage
+        spoon_y = 2 - (stage * 0.5)  # Move spoon down as stage increases
+        spoon = Rectangle((-1, spoon_y), 2, 0.3, color='gray', angle=-stage*15)
+        ax.add_patch(spoon)
+        
+        # Draw baking soda on spoon
+        if stage < 3:
+            baking_soda = Circle((0, spoon_y + 0.2), 0.3, color='lightgray')
+            ax.add_patch(baking_soda)
+    
+    if stage >= 3:  # Show reaction
+        # Add bubbles
+        for _ in range(20):
+            x = np.random.uniform(-1.8, 1.8)
+            y = np.random.uniform(-1, 2)
+            size = np.random.uniform(0.1, 0.4)
+            bubble = Circle((x, y), size, color='white', alpha=0.6)
+            ax.add_patch(bubble)
+    
+    ax.axis('off')
+    return fig
+
+# Set page config
+st.set_page_config(page_title="Baking Soda and Vinegar Reaction", layout="wide")
+
+# Custom CSS
+st.markdown("""
+    <style>
+    .title {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .chemical-equation {
+        text-align: center;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-size: 1.2rem;
+    }
+    
+    .stButton>button {
+        display: block;
+        margin: 0 auto;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Title with animation
+st.markdown('<h1 class="title">Baking Soda and Vinegar Reaction</h1>', unsafe_allow_html=True)
+
+# Initialize session state
+if 'stage' not in st.session_state:
+    st.session_state.stage = 0
+if 'reaction_complete' not in st.session_state:
+    st.session_state.reaction_complete = False
+
+# Chemical formulas
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("### Vinegar")
+    st.latex("CH_3COOH")
+with col2:
+    st.markdown("### Baking Soda")
+    st.latex("NaHCO_3")
+
+# Main reaction display
+reaction_container = st.empty()
+
+# Button and animation logic
+if st.button("Start Experiment", disabled=st.session_state.stage > 0):
+    for i in range(5):
+        st.session_state.stage = i
+        fig = create_scene(i)
+        reaction_container.pyplot(fig)
+        plt.close(fig)
+        time.sleep(0.5)
+    st.session_state.reaction_complete = True
+
+# Default display if no animation is running
+if st.session_state.stage == 0:
+    fig = create_scene(0)
+    reaction_container.pyplot(fig)
+    plt.close(fig)
+
+# Show chemical equation after reaction
+if st.session_state.reaction_complete:
+    st.markdown('<div class="chemical-equation">', unsafe_allow_html=True)
+    st.latex(r"NaHCO_3 (s) + CH_3COOH (aq) \rightarrow CO_2 (g) + H_2O (l) + NaCH_3COO (aq)")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Reset button
+if st.session_state.reaction_complete:
+    if st.button("Reset Experiment"):
+        st.session_state.stage = 0
+        st.session_state.reaction_complete = False
+        st.experimental_rerun()
