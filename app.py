@@ -26,8 +26,9 @@ def run_experiment():
             justify-content: center;
             align-items: flex-end;
             position: relative;
-            height: 400px;
+            height: 500px;  /* Increased height to accommodate overflow */
             margin-bottom: 20px;
+            overflow: visible;  /* Allow overflow for foam effect */
         }
         
         .beaker {
@@ -36,8 +37,8 @@ def run_experiment():
             border: 3px solid #ddd;
             border-radius: 5px 5px 10px 10px;
             position: absolute;
-            right: 45%;
-            top: 20%;
+            left: 42%;  /* Adjusted position more to the left */
+            top: 15%;
             transform-origin: bottom right;
             transition: transform 1s ease;
             z-index: 2;
@@ -49,7 +50,7 @@ def run_experiment():
             border: 4px solid #ddd;
             border-radius: 10px 10px 20px 20px;
             position: relative;
-            overflow: hidden;
+            overflow: visible;  /* Allow overflow for foam */
             margin-top: 120px;
         }
         
@@ -97,18 +98,27 @@ def run_experiment():
         @keyframes reaction {
             0% {
                 height: 50%;
+                transform: scale(1);
                 background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
             }
-            50% {
-                height: 300%;
+            40% {
+                height: 400%;
+                transform: scale(1.2);
                 background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
             }
-            75% {
-                height: 350%;
+            60% {
+                height: 450%;
+                transform: scale(1.4) translateY(-20px);
+                background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
+            }
+            80% {
+                height: 500%;
+                transform: scale(1.3) translateY(-40px);
                 background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
             }
             100% {
-                height: 400%;
+                height: 550%;
+                transform: scale(1.2) translateY(-60px);
                 background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
             }
         }
@@ -120,10 +130,12 @@ def run_experiment():
             height: 0;
             background: linear-gradient(to top, #ff4b2b, #ff416c, #f7b733);
             animation: none;
+            border-radius: 10px;
+            filter: drop-shadow(0 0 10px rgba(255, 75, 43, 0.5));
         }
         
         .pouring {
-            transform: rotate(45deg) translateY(-20px);
+            transform: rotate(45deg) translateY(-20px) translateX(20px);  /* Adjusted transform for better pouring angle */
         }
         
         .pouring .solution {
@@ -134,16 +146,29 @@ def run_experiment():
             animation: reaction 2s ease-out forwards;
         }
         
-        .bubble {
+        /* Add splashing effect particles */
+        .splash {
             position: absolute;
-            background: rgba(255, 255, 255, 0.6);
+            width: 10px;
+            height: 10px;
+            background: #ff416c;
             border-radius: 50%;
-            animation: float 2s infinite ease-in-out;
+            opacity: 0;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.1); }
+        @keyframes splash {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .reacting .splash {
+            animation: splash 1s ease-out forwards;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -162,7 +187,7 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder">
-                    <div class="label">KI</div>
+                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
                 </div>
@@ -178,7 +203,7 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder">
-                    <div class="label">KI</div>
+                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
                 </div>
@@ -195,9 +220,13 @@ def run_experiment():
                     <div class="solution"></div>
                 </div>
                 <div class="cylinder reacting">
-                    <div class="label">KI</div>
+                    <div class="label">30% KI</div>
                     <div class="solution"></div>
                     <div class="foam"></div>
+                    <!-- Add splash particles -->
+                    <div class="splash" style="--tx: 20px; --ty: -30px;"></div>
+                    <div class="splash" style="--tx: -20px; --ty: -40px;"></div>
+                    <div class="splash" style="--tx: 30px; --ty: -20px;"></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -208,7 +237,7 @@ def run_experiment():
         animate_reaction()
         st.markdown("""
             **Chemical Reaction:**
-            2 H₂O₂ (aq) + KI (aq) → 2 H₂O (l) + O₂ (g) + KI (aq)
+            2 H₂O₂ (aq) + 30% KI (aq) → 2 H₂O (l) + O₂ (g) + KI (aq)
             
             **Note:** The rapid decomposition of hydrogen peroxide is catalyzed by potassium iodide, 
             producing water and oxygen gas. The dramatic foam effect is created by the rapid release of oxygen gas.
