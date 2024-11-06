@@ -10,21 +10,22 @@ st.set_page_config(page_title="Acid Base Titration", layout="wide")
 # Title
 st.title("Acid Base Titration Simulation")
 
-# Load the HTML component
+# Load the HTML content
 with open("animation.html", "r") as file:
     html_content = file.read()
 
-# Display the HTML component and set up communication
+# Embed the HTML content in Streamlit
 html_container = components.html(
     html_content,
     height=600,
     scrolling=False
 )
 
-# JavaScript to send message from Streamlit to HTML
+# JavaScript code to communicate with the HTML
 st.write("""
     <script>
-        function sendMessage() {
+        // Function to send a message to the HTML animation
+        function startTitrationAnimation() {
             const iframe = window.parent.document.querySelector('iframe');
             if (iframe) {
                 iframe.contentWindow.postMessage({ type: 'start_experiment' }, '*');
@@ -33,15 +34,13 @@ st.write("""
     </script>
 """, unsafe_allow_html=True)
 
-# Start experiment button
+# Button to start the experiment
 if st.button("Start Experiment"):
-    # Send message to start animation
-    st.write("Starting titration...")
-    
-    # Trigger the JavaScript function to start the experiment
-    st.write('<script>sendMessage();</script>', unsafe_allow_html=True)
+    # Trigger the JavaScript function to start the animation
+    st.write('<script>startTitrationAnimation();</script>', unsafe_allow_html=True)
     
     # Progress indication
+    st.write("Starting titration...")
     progress_bar = st.progress(0)
     status = st.empty()
     
@@ -56,9 +55,8 @@ if st.button("Start Experiment"):
             status.text("Titration complete!")
         time.sleep(0.2)
     
-    # Generate and display pH curve
+    # Generate and display the pH curve
     volume = np.linspace(0, 50, 100)
-    initial_ph = 1
     equivalence_point = 25
     
     def calculate_ph(v):
@@ -78,7 +76,6 @@ if st.button("Start Experiment"):
         mode='lines',
         name='pH curve'
     ))
-    
     fig.add_trace(go.Scatter(
         x=[equivalence_point],
         y=[calculate_ph(equivalence_point)],
@@ -86,14 +83,12 @@ if st.button("Start Experiment"):
         marker=dict(size=10, color='red'),
         name='Equivalence Point'
     ))
-    
     fig.update_layout(
         title='Titration Curve: HCl vs NaOH',
         xaxis_title='Volume of NaOH added (mL)',
         yaxis_title='pH',
         showlegend=True
     )
-    
     st.plotly_chart(fig, use_container_width=True)
     
     st.success(f"""
