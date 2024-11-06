@@ -16,8 +16,7 @@
     
     #drop {
       opacity: 0;
-      animation: dropFall 1s linear;
-      animation-iteration-count: 3; /* Only three drops */
+      animation: dropFall 0.8s ease-in-out infinite;
       animation-play-state: paused;
     }
     
@@ -38,13 +37,13 @@
     }
     
     #burette-solution {
-      animation: decreaseLevel 3s linear;
+      animation: decreaseLevel 10s linear;
       animation-play-state: paused;
     }
     
     @keyframes decreaseLevel {
       from { height: 200px; }
-      to { height: 180px; } /* Only decrease a small amount */
+      to { height: 20px; }
     }
   </style>
 </head>
@@ -102,7 +101,9 @@
 
   <script>
     let isExperimentRunning = false;
-
+    let dropCount = 0;
+    let colorChangeTimeout;
+    
     function startExperiment() {
       if (isExperimentRunning) return;
       isExperimentRunning = true;
@@ -111,17 +112,23 @@
       const solution = document.getElementById('solution');
       const buretteSolution = document.getElementById('burette-solution');
       
-      // Start burette solution and drop animations
+      // Start burette solution animation
       buretteSolution.style.animationPlayState = 'running';
+      
+      // Start drop animation
       drop.style.animationPlayState = 'running';
       
-      // Change color after the drops finish
-      setTimeout(() => {
-        solution.style.animationPlayState = 'running';
-      }, 3000); // Wait for 3 seconds (3 drops)
+      // Simulate adding drops and change color after a few drops
+      colorChangeTimeout = setInterval(() => {
+        dropCount++;
+        if (dropCount === 5) {  // Change color after 5 drops
+          solution.style.animationPlayState = 'running';
+          clearInterval(colorChangeTimeout);
+        }
+      }, 800);  // Adjust the interval to control the speed of drops
     }
-
-    // Listen for messages from the Streamlit component
+    
+    // Add this function to your Streamlit component
     window.addEventListener('message', function(event) {
       if (event.data.type === 'start_experiment') {
         startExperiment();
