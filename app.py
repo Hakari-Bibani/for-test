@@ -1,11 +1,11 @@
 import streamlit as st
 import time
+from PIL import Image
 
 # Custom CSS for styling and animations
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-
     .title {
         font-family: 'Rajdhani', sans-serif;
         font-size: 2.8em;
@@ -16,12 +16,10 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         animation: float 3s ease-in-out infinite;
     }
-
     @keyframes float {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-10px); }
     }
-
     .beaker {
         width: 120px;
         height: 150px;
@@ -32,7 +30,6 @@ st.markdown("""
         margin: 20px auto;
         overflow: hidden;
     }
-
     .solution {
         position: absolute;
         bottom: 0;
@@ -41,7 +38,6 @@ st.markdown("""
         background: palevioletred;
         border-radius: 0 0 10px 10px;
     }
-
     .spoon {
         position: absolute;
         top: -50px;
@@ -53,7 +49,6 @@ st.markdown("""
         transform-origin: right;
         transition: transform 1s ease-in-out;
     }
-
     .bubbles {
         position: absolute;
         bottom: 10px;
@@ -61,12 +56,10 @@ st.markdown("""
         height: 200px;
         animation: bubblesRise 2s forwards;
     }
-
     @keyframes bubblesRise {
         0% { opacity: 0; transform: translateY(0); }
         100% { opacity: 1; transform: translateY(-200px); }
     }
-
     .equation {
         font-family: 'Rajdhani', sans-serif;
         text-align: center;
@@ -77,27 +70,32 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Title with animation
+# Title with moving animation
 st.markdown("<h1 class='title'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
 
-# Create placeholders for the beaker, spoon, and animation
+# Beaker and spoon
 beaker_placeholder = st.empty()
 spoon_placeholder = st.empty()
 bubbles_placeholder = st.empty()
 equation_placeholder = st.empty()
 
 def render_initial_state():
-    # Initial beaker and spoon setup
+    # Beaker with CH3COOH solution
     beaker_placeholder.markdown("""
         <div class='beaker'>
             <div class='solution'></div>
         </div>
     """, unsafe_allow_html=True)
 
+    # Spoon with NaHCO3
     spoon_placeholder.markdown("""
         <div class='spoon' style='transform: rotate(0deg);'></div>
         <div style='text-align: center; margin-top: -30px; font-weight: bold;'>NaHCO₃</div>
     """, unsafe_allow_html=True)
+
+    # Add the NaHCO3 image
+    st.image(Image.open('NaHCO3.png'), width=50)
+    st.write("NaHCO₃")
 
 def animate_experiment():
     # Animate the spoon bending
