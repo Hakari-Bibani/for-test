@@ -1,113 +1,197 @@
-import streamlit as st
-import time
-import base64
-from io import BytesIO
-
-def get_svg_content(step):
-    svg = f'''
-    <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-        <!-- Beaker -->
-        <path d="M100 150 L100 350 L300 350 L300 150 L280 150 L280 180 L120 180 L120 150 Z" 
-              fill="none" stroke="black" stroke-width="2"/>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
         
-        <!-- Vinegar solution -->
-        <path d="M120 180 L120 350 L280 350 L280 180 Z" 
-              fill="#ffcdd2" fill-opacity="0.7"/>
+        .title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
         
-        <!-- Spoon -->
-        <g transform="rotate({45 if step >= 2 else 0} 250 100)">
-            <path d="M200 100 L300 100 L310 90 L300 80 L200 80 Z" 
-                  fill="#d3d3d3" stroke="black"/>
-            <circle cx="200" cy="90" r="15" fill="#d3d3d3" stroke="black"/>
-            {'' if step >= 2 else '<circle cx="250" cy="90" r="10" fill="white" stroke="#d3d3d3"/>'}
-        </g>
+        .experiment-area {
+            position: relative;
+            height: 400px;
+            margin: 20px auto;
+            width: 300px;
+        }
         
-        <!-- Labels -->
-        <text x="320" y="95" font-family="sans-serif" font-size="14">NaHCO3</text>
-        <text x="320" y="250" font-family="sans-serif" font-size="14">CH3COOH</text>
+        .beaker {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 200px;
+            background: transparent;
+            border: 4px solid #666;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+        }
         
-        {'''
-        <!-- Falling powder -->
-        <path d="M250 120 Q250 200 250 280" stroke="white" stroke-width="4" stroke-dasharray="4,4">
-            <animate attributeName="stroke-dashoffset" from="0" to="32" dur="1s" repeatCount="indefinite"/>
-        </path>
-        ''' if step == 2 else ''}
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255, 200, 200, 0.8);
+            transition: all 0.5s;
+        }
         
-        {'''
-        <!-- Bubbles -->
-        <g>
-            <circle cx="220" cy="300" r="8" fill="white" opacity="0.6">
-                <animate attributeName="cy" from="350" to="100" dur="1.5s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="240" cy="320" r="6" fill="white" opacity="0.6">
-                <animate attributeName="cy" from="350" to="100" dur="1.2s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" from="0.6" to="0" dur="1.2s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="200" cy="310" r="7" fill="white" opacity="0.6">
-                <animate attributeName="cy" from="350" to="100" dur="1.8s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" from="0.6" to="0" dur="1.8s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="180" cy="330" r="5" fill="white" opacity="0.6">
-                <animate attributeName="cy" from="350" to="100" dur="1.3s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" from="0.6" to="0" dur="1.3s" repeatCount="indefinite"/>
-            </circle>
-        </g>
-        ''' if step >= 3 else ''}
-    </svg>
-    '''
-    return svg
-
-def main():
-    st.set_page_config(page_title="Baking Soda and Vinegar Reaction")
-    
-    # Title
-    st.title("Baking Soda and Vinegar Reaction")
-    
-    # Initialize session state
-    if 'step' not in st.session_state:
-        st.session_state.step = 0
-        st.session_state.animation_complete = False
-    
-    # Create columns for layout
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        # Display SVG
-        svg = get_svg_content(st.session_state.step)
-        st.components.v1.html(svg, height=400)
+        .spoon {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            background: #999;
+            border-radius: 10px;
+            transform-origin: right center;
+            transition: transform 1s;
+        }
         
-        # Start button
-        if not st.session_state.animation_complete:
-            if st.button("Start Experiment"):
-                st.session_state.step = 1
-                
-                # Use empty containers for updating content
-                progress_placeholder = st.empty()
-                
-                # Animation sequence
-                for i in range(2, 5):
-                    time.sleep(1)  # Delay between steps
-                    st.session_state.step = i
-                    svg = get_svg_content(st.session_state.step)
-                    st.components.v1.html(svg, height=400)
-                    
-                st.session_state.animation_complete = True
-                st.experimental_rerun()
+        .powder {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 40px;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            transform: translateX(-50%);
+        }
         
-        # Show equation after animation
-        if st.session_state.animation_complete:
-            st.markdown("""
-            <div style='text-align: center; padding: 20px; background-color: #f0f2f6; border-radius: 5px;'>
-                <code>NaHCO3 (s) + CH3COOH (aq) → CO2 (g) + H2O (l) + NaCH3COO (aq)</code>
+        .bubbles {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0;
+            transition: height 1s;
+            background: repeating-radial-gradient(
+                circle,
+                rgba(255,255,255,0.8),
+                rgba(255,255,255,0.3) 10px,
+                rgba(255,255,255,0.8) 20px
+            );
+            opacity: 0;
+        }
+        
+        .equation {
+            margin-top: 20px;
+            font-size: 1.2em;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        
+        .chemical-text {
+            position: absolute;
+            font-family: monospace;
+            font-size: 1.2em;
+        }
+        
+        .vinegar-text {
+            left: 55%;
+            bottom: 120px;
+        }
+        
+        .soda-text {
+            right: 55%;
+            top: 40px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes bubble {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Baking Soda and Vinegar Reaction</h1>
+        
+        <div class="experiment-area">
+            <div class="beaker">
+                <div class="liquid"></div>
+                <div class="bubbles"></div>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # Reset button
-            if st.button("Reset Experiment"):
-                st.session_state.step = 0
-                st.session_state.animation_complete = False
-                st.experimental_rerun()
+            <div class="spoon">
+                <div class="powder"></div>
+            </div>
+            <div class="chemical-text vinegar-text">CH₃COOH</div>
+            <div class="chemical-text soda-text">NaHCO₃</div>
+        </div>
+        
+        <button onclick="startExperiment()">Start Experiment</button>
+        
+        <div class="equation">
+            NaHCO₃ (s) + CH₃COOH (aq) → CO₂ (g) + H₂O (l) + NaCH₃COO (aq)
+        </div>
+    </div>
 
-if __name__ == "__main__":
-    main()
+    <script>
+        function startExperiment() {
+            const spoon = document.querySelector('.spoon');
+            const bubbles = document.querySelector('.bubbles');
+            const equation = document.querySelector('.equation');
+            const button = document.querySelector('button');
+            
+            // Disable button during animation
+            button.disabled = true;
+            
+            // Rotate spoon
+            spoon.style.transform = 'translateX(-50%) rotate(135deg)';
+            
+            // After spoon rotation, start reaction
+            setTimeout(() => {
+                // Hide powder
+                document.querySelector('.powder').style.opacity = '0';
+                
+                // Show bubbles
+                bubbles.style.opacity = '1';
+                bubbles.style.height = '150%';
+                
+                // Animate bubbles
+                setInterval(() => {
+                    bubbles.style.animation = 'bubble 1s infinite';
+                }, 100);
+                
+                // Show equation
+                equation.style.opacity = '1';
+                
+                // Re-enable button after animation
+                setTimeout(() => {
+                    button.disabled = false;
+                }, 2000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
