@@ -60,8 +60,8 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            left: 10px; /* Adjusted to position the spoon above the beaker */
-            top: 80px; /* Adjusted position to be above the beaker */
+            left: 10px; /* Centered above the beaker */
+            top: 80px; /* Adjusted position */
             transform-origin: right center;
             transition: transform 1s;
         }
@@ -69,7 +69,7 @@ def run_experiment():
             font-size: 14px;
             color: #555;
             position: absolute;
-            left: 70px; /* Adjusted to position the content inside the spoon */
+            right: -30px;
             top: -10px;
             width: 50px;
             height: 50px;
@@ -83,16 +83,16 @@ def run_experiment():
             transform: rotate(-45deg);
         }
         .small-ball {
-            width: 8px;
-            height: 8px;
+            width: 5px;
+            height: 5px;
             background-color: #d3d3d3;
             border-radius: 50%;
             position: absolute;
-            animation: dropBalls 1s ease forwards;
+            animation: drop 1s ease-in forwards;
         }
-        @keyframes dropBalls {
-            0% { top: 0; opacity: 1; }
-            100% { top: 100px; opacity: 0; } /* Balls fall into the beaker */
+        @keyframes drop {
+            0% { top: 10px; opacity: 1; }
+            100% { top: 130px; opacity: 0; }
         }
         .reaction {
             width: 100px;
@@ -154,10 +154,11 @@ def run_experiment():
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
                 </div>
-                <!-- Adding small balls pouring into the beaker -->
-                <div class="small-ball" style="left: 40px; animation-delay: 0.1s;"></div>
-                <div class="small-ball" style="left: 50px; animation-delay: 0.3s;"></div>
-                <div class="small-ball" style="left: 60px; animation-delay: 0.5s;"></div>
+                <!-- Small balls simulating NaHCO₃ being poured -->
+                <div class="small-ball" style="left: 30px;"></div>
+                <div class="small-ball" style="left: 40px; animation-delay: 0.2s;"></div>
+                <div class="small-ball" style="left: 50px; animation-delay: 0.4s;"></div>
+                <div class="small-ball" style="left: 60px; animation-delay: 0.6s;"></div>
             </div>
         """, unsafe_allow_html=True)
         time.sleep(1)  # Pause before showing the reaction
