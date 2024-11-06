@@ -37,6 +37,15 @@ def run_experiment():
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
             bottom: 0;
+            overflow: hidden;
+        }
+        .beaker::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%; /* Half-filled beaker */
+            background: rgba(255, 182, 193, 0.8);
         }
         .label {
             font-size: 14px;
@@ -51,17 +60,19 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            right: 30px;
-            top: 50px;
-            transform-origin: right center;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            transform-origin: center top;
             transition: transform 1s;
         }
         .spoon-content {
             font-size: 14px;
             color: #555;
             position: absolute;
-            right: -30px;
-            top: -10px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -71,21 +82,32 @@ def run_experiment():
             align-items: center;
         }
         .pouring {
-            transform: rotate(-45deg);
+            transform: rotate(45deg);
         }
         .reaction {
-            width: 100px;
-            height: 0;
-            background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
-            border-radius: 50% 50% 0 0;
             position: absolute;
             bottom: 0;
-            animation: bubbles 2s ease forwards;
+            width: 100px;
+            height: 0;
+            overflow: hidden;
+            animation: bubble-rise 2s ease forwards;
         }
-        @keyframes bubbles {
-            0% { height: 0; }
-            50% { height: 200px; }
-            100% { height: 300px; opacity: 0; }
+        .bubble {
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: bubble 2s infinite ease-in;
+        }
+        .bubble:nth-child(2) { left: 20px; animation-delay: 0.2s; }
+        .bubble:nth-child(3) { left: 40px; animation-delay: 0.4s; }
+        .bubble:nth-child(4) { left: 60px; animation-delay: 0.6s; }
+        .bubble:nth-child(5) { left: 80px; animation-delay: 0.8s; }
+        @keyframes bubble {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-150px); opacity: 0; }
         }
     </style>
     """, unsafe_allow_html=True)
@@ -109,7 +131,7 @@ def run_experiment():
         """, unsafe_allow_html=True)
 
     def animate_experiment():
-        # Step 1: Animate the spoon bending and pouring
+        # Step 1: Animate the spoon tilting and the ball falling
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
@@ -127,7 +149,13 @@ def run_experiment():
             <div class="experiment-container">
                 <div class="beaker">
                     <div class="label">CH₃COOH</div>
-                    <div class="reaction"></div>
+                    <div class="reaction">
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
