@@ -1,17 +1,14 @@
 import streamlit as st
 import time
-import math
-import random
 
 def run_experiment():
     # Custom CSS for styling and animations
     st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
         .title {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             font-size: 3em;
-            font-weight: bold;
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
@@ -33,18 +30,18 @@ def run_experiment():
             height: 400px;
         }
         .beaker {
-            width: 150px;
-            height: 200px;
+            width: 100px;
+            height: 150px;
             border: 3px solid #555;
-            border-radius: 10px 10px 20px 20px;
+            border-radius: 5px 5px 10px 10px;
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
             bottom: 0;
             overflow: hidden; /* Added to hide the full beaker */
         }
         .beaker-fill {
-            width: 150px;
-            height: 100px; /* Half the beaker height */
+            width: 100px;
+            height: 75px; /* Half the beaker height */
             background: rgba(255, 182, 193, 0.6);
             position: absolute;
             bottom: 0;
@@ -52,36 +49,34 @@ def run_experiment():
         }
         @keyframes fill {
             0% { height: 0; }
-            100% { height: 100px; }
+            100% { height: 75px; }
         }
         .label {
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: #555;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         .spoon {
-            width: 100px;
-            height: 30px;
+            width: 80px;
+            height: 20px;
             background: #d3d3d3;
-            border-radius: 15px;
+            border-radius: 10px;
             position: absolute;
-            right: 50px;
-            top: 150px; /* Adjusted position */
+            right: 30px;
+            top: 120px; /* Adjusted position */
             transform-origin: right center;
             transition: transform 1s;
         }
         .spoon-content {
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             color: #555;
             position: absolute;
-            right: -40px;
-            top: -15px;
-            width: 80px;
-            height: 80px;
+            right: -30px;
+            top: -10px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background-color: #d3d3d3;
             display: flex;
@@ -92,7 +87,7 @@ def run_experiment():
             transform: rotate(-45deg);
         }
         .reaction {
-            width: 150px;
+            width: 100px;
             height: 0;
             background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
             border-radius: 50% 50% 0 0;
@@ -102,8 +97,8 @@ def run_experiment():
         }
         @keyframes bubbles {
             0% { height: 0; }
-            50% { height: 300px; }
-            100% { height: 400px; opacity: 0; }
+            50% { height: 200px; }
+            100% { height: 300px; opacity: 0; }
         }
         .small-bubble {
             width: 10px;
@@ -115,8 +110,8 @@ def run_experiment():
         }
         @keyframes smallBubbles {
             0% { bottom: 0; opacity: 0; }
-            50% { bottom: 200px; opacity: 1; }
-            100% { bottom: 400px; opacity: 0; }
+            50% { bottom: 150px; opacity: 1; }
+            100% { bottom: 300px; opacity: 0; }
         }
     </style>
     """, unsafe_allow_html=True)
@@ -167,8 +162,6 @@ def run_experiment():
                     <div class="small-bubble" style="left: 40px; animation-delay: 0.5s;"></div>
                     <div class="small-bubble" style="left: 60px; animation-delay: 0.8s;"></div>
                     <div class="small-bubble" style="left: 80px; animation-delay: 1.2s;"></div>
-                    <div class="small-bubble" style="left: 100px; animation-delay: 1.5s;"></div>
-                    <div class="small-bubble" style="left: 120px; animation-delay: 1.8s;"></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
