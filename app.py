@@ -9,19 +9,14 @@ def run_experiment():
         .title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 3em;
-            color: #1e90ff;
+            color: #007BFF;
             text-align: center;
             margin-bottom: 30px;
-            background: linear-gradient(45deg, #ff6347, #32cd32, #1e90ff, #ff8c00);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient 3s ease infinite;
+            animation: wave 2s infinite;
         }
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes wave {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
         }
         .experiment-container {
             position: relative;
@@ -30,63 +25,74 @@ def run_experiment():
             height: 400px;
         }
         .beaker {
-            width: 100px;
-            height: 150px;
-            border: 3px solid #555;
+            width: 120px;
+            height: 180px;
+            border: 3px solid #000;
             border-radius: 5px 5px 10px 10px;
-            background: rgba(173, 216, 230, 0.7); /* Pale blue water */
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            background-color: rgba(173, 216, 230, 0.6); /* Pale blue water */
             overflow: hidden;
         }
-        .label {
+        .water {
+            width: 100%;
+            height: 50%;
+            background-color: rgba(173, 216, 230, 0.6);
+            position: absolute;
+            bottom: 0;
+        }
+        .label-h2o {
             font-size: 14px;
             font-weight: bold;
-            color: #555;
+            color: #007BFF;
             text-align: center;
             margin-top: 5px;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .spoon {
             width: 80px;
             height: 20px;
-            background: #696969;
+            background: #aaa;
             border-radius: 10px;
             position: absolute;
+            top: 60px;
             left: 50%;
-            top: 80px;
-            transform-origin: center right;
             transform: translateX(-50%);
+            transform-origin: center right;
             transition: transform 1s;
         }
         .spoon-content {
-            font-size: 14px;
-            color: #fff;
-            background-color: #000;
-            padding: 5px;
-            border-radius: 50%;
+            font-size: 12px;
+            color: #333;
             position: absolute;
-            right: -30px;
+            right: -20px;
             top: -10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
         }
         .pouring {
             transform: translateX(-50%) rotate(-45deg);
         }
-        .spark {
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, #ff4500, transparent);
+        .reaction {
+            width: 100%;
+            height: 0;
+            background: radial-gradient(circle, red, orange, yellow, white);
             position: absolute;
-            left: 50%;
-            top: 80px;
-            transform: translateX(-50%);
-            opacity: 0;
-            animation: explosion 0.5s ease-out forwards;
+            bottom: 0;
+            animation: explode 1s ease-out forwards;
         }
-        @keyframes explosion {
-            0% { opacity: 1; transform: translateX(-50%) scale(0.5); }
-            100% { opacity: 0; transform: translateX(-50%) scale(1.5); }
+        @keyframes explode {
+            0% { height: 0; opacity: 1; }
+            50% { height: 150px; opacity: 0.8; }
+            100% { height: 200px; opacity: 0; }
         }
         .boom-text {
             font-size: 2.5em;
@@ -94,17 +100,17 @@ def run_experiment():
             color: red;
             text-align: center;
             opacity: 0;
-            animation: boom 1s ease-out forwards;
+            animation: boom 1s ease-out 1s forwards;
         }
         @keyframes boom {
-            0% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 1; transform: scale(1.5); }
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1.5); opacity: 1; }
         }
     </style>
     """, unsafe_allow_html=True)
 
     # Display the title
-    st.markdown("<h1 class='title'>Sodium and Water Reaction</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='title'>Sodium And Water Reaction</h1>", unsafe_allow_html=True)
 
     # Container for the experiment setup
     container = st.empty()
@@ -113,7 +119,8 @@ def run_experiment():
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
-                    <div class="label">H₂O</div>
+                    <div class="water"></div>
+                    <div class="label-h2o">H₂O</div>
                 </div>
                 <div class="spoon">
                     <div class="spoon-content">Na</div>
@@ -122,29 +129,21 @@ def run_experiment():
         """, unsafe_allow_html=True)
 
     def animate_experiment():
-        # Step 1: Animate the spoon bending and pouring Na into the beaker
+        # Step 1: Animate the spoon tilting and dropping particles
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
-                    <div class="label">H₂O</div>
+                    <div class="water"></div>
+                    <div class="label-h2o">H₂O</div>
+                    <div class="reaction"></div>
                 </div>
                 <div class="spoon pouring">
                     <div class="spoon-content">Na</div>
                 </div>
-                <div class="spark"></div>
             </div>
+            <div class="boom-text">BOOM!</div>
         """, unsafe_allow_html=True)
-        time.sleep(1)  # Pause to show the bending and reaction
-
-        # Step 2: Show the dramatic reaction and "BOOM" text
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="label">H₂O</div>
-                </div>
-                <div class="boom-text">BOOM!</div>
-            </div>
-        """, unsafe_allow_html=True)
+        time.sleep(2)  # Pause to display the reaction
 
     # Initial render
     render_initial_state()
