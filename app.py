@@ -35,7 +35,7 @@ const BakingSodaVinegarReaction = () => {
       <CardContent>
         <div className="experiment-container">
           <div className="beaker">
-            <div className="label">CH₃COOH</div>
+            <div className="label">CH<sub>3</sub>COOH</div>
             {showReaction && (
               <motion.div
                 className="reaction"
@@ -46,7 +46,7 @@ const BakingSodaVinegarReaction = () => {
             )}
           </div>
           <div className="spoon">
-            <div className="spoon-content">NaHCO₃</div>
+            <div className="spoon-content">NaHCO<sub>3</sub></div>
             <div className="powder"></div>
           </div>
         </div>
@@ -57,7 +57,7 @@ const BakingSodaVinegarReaction = () => {
           Start Experiment
         </button>
         <p className="mt-4">
-          <strong>Chemical Equation:</strong> NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO
+          <strong>Chemical Equation:</strong> NaHCO<sub>3</sub> + CH<sub>3</sub>COOH → CO<sub>2</sub> + H<sub>2</sub>O + NaCH<sub>3</sub>COO
         </p>
       </CardContent>
     </Card>
