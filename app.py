@@ -1,6 +1,5 @@
 import streamlit as st
 import time
-from PIL import Image
 
 # Custom CSS for styling and animations
 st.markdown("""
@@ -40,9 +39,9 @@ st.markdown("""
     }
     .spoon {
         position: absolute;
-        top: -50px;
-        left: 70px;
-        width: 100px;
+        top: -30px;
+        left: 80px;
+        width: 70px;
         height: 20px;
         background: lightgray;
         border-radius: 10px;
@@ -51,9 +50,8 @@ st.markdown("""
     }
     .bubbles {
         position: absolute;
-        bottom: 10px;
         width: 100%;
-        height: 200px;
+        height: 100px;
         animation: bubblesRise 2s forwards;
     }
     @keyframes bubblesRise {
@@ -70,32 +68,26 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Title with moving animation
+# Title with animation
 st.markdown("<h1 class='title'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
 
-# Beaker and spoon
+# Create placeholders for the beaker, spoon, and animation
 beaker_placeholder = st.empty()
 spoon_placeholder = st.empty()
 bubbles_placeholder = st.empty()
 equation_placeholder = st.empty()
 
 def render_initial_state():
-    # Beaker with CH3COOH solution
+    # Initial beaker and spoon setup
     beaker_placeholder.markdown("""
         <div class='beaker'>
             <div class='solution'></div>
         </div>
     """, unsafe_allow_html=True)
-
-    # Spoon with NaHCO3
     spoon_placeholder.markdown("""
         <div class='spoon' style='transform: rotate(0deg);'></div>
         <div style='text-align: center; margin-top: -30px; font-weight: bold;'>NaHCO₃</div>
     """, unsafe_allow_html=True)
-
-    # Add the NaHCO3 image
-    st.image(Image.open('NaHCO3.png'), width=50)
-    st.write("NaHCO₃")
 
 def animate_experiment():
     # Animate the spoon bending
@@ -104,20 +96,20 @@ def animate_experiment():
         <div style='text-align: center; margin-top: -30px; font-weight: bold;'>NaHCO₃</div>
     """, unsafe_allow_html=True)
     time.sleep(1)
-
-    # Display the bubbles rising from the beaker
+    
+    # Display bubbles rising from the beaker
     bubbles_placeholder.markdown("""
         <div class='bubbles'>
             <img src='https://i.ibb.co/6ZtYZx2/bubbles.png' style='width:100%;'>
         </div>
     """, unsafe_allow_html=True)
     time.sleep(2)
-
+    
     # Show the chemical equation
     equation_placeholder.markdown("""
         <div class='equation'>NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO</div>
     """, unsafe_allow_html=True)
-
+    
     # Reset after a pause
     time.sleep(2)
     bubbles_placeholder.empty()
