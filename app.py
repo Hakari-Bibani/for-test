@@ -1,207 +1,224 @@
-import streamlit as st
+def main():
+    st.title("Virtual Chemistry Lab 🧪")
+    # Reaction selection
+    reaction_type = st.selectbox("Choose a reaction:", ["Select a reaction", "Acid-Base (baking soda & vinegar)"])
+    if reaction_type == "Acid-Base (baking soda & vinegar)":
+        st.markdown('<h2 style="text-align: center;">Baking Soda and Vinegar Reaction Simulator</h2>', unsafe_allow_html=True)
+        st.markdown("""
+            <style>
+                .beaker {
+                    position: relative;
+                    width: 100px;
+                    height: 200px;
+                    background: #ccc;
+                    border-radius: 10px 10px 0 0;
+                    overflow: hidden;
+                    margin: 0 auto;
+                }
+                .liquid {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 50%; /* Adjust this to fill more or less */
+                    background: rgba(255, 99, 71, 0.5); /* Translucent light red */
+                    animation: swirl 5s infinite;
+                }
+                @keyframes swirl {
+                    0% { transform: rotate(0deg); }
+                    50% { transform: rotate(3deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                .spoon {
+                    position: absolute;
+                    right: 50px;
+                    top: 40%;
+                    transform: translateY(-50%);
+                }
+                .powder-stream {
+                    position: absolute;
+                    top: 40px;
+                    left: 50%;
+                    width: 6px;
+                    height: 0;
+                    background: rgba(255, 255, 255, 0.9);
+                    animation: pour-powder 3s forwards;
+                    filter: blur(1px);
+                    transform-origin: top center;
+                }
+                @keyframes pour-powder {
+                    0% { height: 0; opacity: 0; }
+                    20% { height: 80px; opacity: 1; }
+                    80% { height: 80px; opacity: 1; }
+                    100% { height: 0; opacity: 0; }
+                }
+                .bubbles {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                    animation: show-bubbles 4s forwards;
+                    animation-delay: 2s;
+                }
+                @keyframes show-bubbles {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+                .bubble {
+                    position: absolute;
+                    background: rgba(200, 200, 200, 0.5);  /* Light gray bubbles */
+                    border-radius: 50%;
+                    animation: rise 1.5s infinite;
+                }
+                @keyframes rise {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-120px); opacity: 0; }
+                }
+            </style>
+        """, unsafe_allow_html=True)
 import time
-
-def run_experiment():
-    # Custom CSS for styling and animations
-    st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-        .title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 3em;
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            background: linear-gradient(45deg, #ff4757, #2ed573, #1e90ff, #ffa502);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient 3s ease infinite;
-        }
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .experiment-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            height: 400px;
-        }
+def lab():
+    st.markdown(
+        """
+        <style>
         .beaker {
-            width: 100px;
-            height: 150px;
-            border: 3px solid #555;
-            border-radius: 5px 5px 10px 10px;
-            background: rgba(255, 182, 193, 0.6);
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            display: inline-block;
+            width: 140px;
+            height: 200px;
+            border: 5px solid #ddd;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            margin: 40px;
+            background: transparent;
             overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
         }
-        .beaker-fill {
-            width: 100%;
-            height: 75px;
-            background: rgba(255, 182, 193, 0.6);
+        .beaker .liquid {
             position: absolute;
             bottom: 0;
-            animation: fill 2s ease-in-out forwards;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255, 100, 100, 0.7); /* light red liquid */
+            transition: transform 0.5s;
+            animation: swirl 4s infinite linear; /* gentle swirling animation */
         }
-        .label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
-            text-align: center;
-            margin-top: 5px;
+        @keyframes swirl {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(1deg); }
+            100% { transform: rotate(0deg); }
         }
         .spoon {
-            width: 80px;
-            height: 20px;
-            background: #d3d3d3;
-            border-radius: 10px;
             position: absolute;
-            left: 50%;
-            top: 80px;
-            transform-origin: center right;
-            transform: translateX(-50%);
-            transition: transform 1s;
-        }
-        .spoon-content {
-            font-size: 14px;
-            color: #555;
-            position: absolute;
-            right: -30px;
-            top: -10px;
+            top: -40px;
+            right: -20px;
             width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #d3d3d3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 20px;
+            background: #333; /* black spoon */
+            clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+            transform: rotate(-15deg);
         }
-        .pouring {
-            transform: translateX(-50%) rotate(-45deg);
-        }
-        .powder-particle {
-            width: 3px;
-            height: 3px;
-            background-color: #f5f5f5;
-            border: 1px solid #d3d3d3;
-            border-radius: 50%;
+        .powder {
             position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 15px;
+            height: 10px;
+            background: #fff;
+            filter: blur(1px);
+            border-radius: 3px;
+            animation: pour-powder 3s forwards;
             opacity: 0;
-            left: 50%;
-            top: 110px;
         }
-        @keyframes fall {
-            0% {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, 60px);
-                opacity: 0;
-            }
+        @keyframes pour-powder {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(100px); opacity: 0; } /* pour powder down */
         }
-        .reaction {
-            width: 100%;
-            height: 0;
-            background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
-            border-radius: 50% 50% 0 0;
+        .bubbles {
             position: absolute;
             bottom: 0;
-            animation: bubbles 2s ease forwards;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            animation: bubble-rise 3s forwards;
         }
-        @keyframes bubbles {
-            0% { height: 0; }
-            50% { height: 200px; }
-            100% { height: 300px; opacity: 0; }
-        }
-        .small-bubble {
-            width: 10px;
-            height: 10px;
-            background-color: #2ed573;
-            border-radius: 50%;
+        .bubble {
             position: absolute;
-            animation: smallBubbles 1s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: rise 1.5s infinite;
         }
-        @keyframes smallBubbles {
-            0% { bottom: 0; opacity: 0; }
-            50% { bottom: 150px; opacity: 1; }
-            100% { bottom: 300px; opacity: 0; }
+        @keyframes bubble-rise {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 1; }
         }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Display the title
-    st.markdown("<h1 class='title'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
-
-    # Container for the experiment setup
-    container = st.empty()
-
-    def render_initial_state():
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="beaker-fill"></div>
-                    <div class="label">CH₃COOH</div>
-                </div>
-                <div class="spoon">
-                    <div class="spoon-content">NaHCO₃</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-    def animate_experiment():
-        # Step 1: Animate the spoon bending and show falling particles
-        particles_html = "".join([
-            f'<div class="powder-particle" style="animation: fall 1s ease-in-out {i * 0.1}s forwards;"></div>'
-            for i in range(15)
-        ])
-        
-        container.markdown(f"""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="beaker-fill"></div>
-                    <div class="label">CH₃COOH</div>
-                </div>
-                <div class="spoon pouring">
-                    <div class="spoon-content">NaHCO₃</div>
-                </div>
-                {particles_html}
-            </div>
-        """, unsafe_allow_html=True)
-        time.sleep(1.5)  # Longer pause to show the falling particles
-
-        # Step 2: Show the reaction with bubbles
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="beaker-fill"></div>
-                    <div class="label">CH₃COOH</div>
-                    <div class="reaction"></div>
-                    <div class="small-bubble" style="left: 20px; animation-delay: 0.2s;"></div>
-                    <div class="small-bubble" style="left: 40px; animation-delay: 0.5s;"></div>
-                    <div class="small-bubble" style="left: 60px; animation-delay: 0.8s;"></div>
-                    <div class="small-bubble" style="left: 80px; animation-delay: 1.2s;"></div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-    # Initial render
-    render_initial_state()
-
-    # Button to start the experiment
-    if st.button("Start Experiment"):
-        animate_experiment()
-        # Display the chemical equation
+        .reaction-bubbles .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: rise 2s infinite;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) translateX(var(--x-start)); opacity: 0.8; width: var(--size); height: var(--size); }
+            100% { transform: translateY(-120px) translateX(var(--x-end)); opacity: 0; width: calc(var(--size) * 2); height: calc(var(--size) * 2); }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown('<h1 style="text-align: center; margin-bottom: 2em;">Virtual Chemistry Lab 🧪</h1>', unsafe_allow_html=True)
+    st.subheader("Baking Soda and Vinegar Reaction Simulator")
+    
+    # Display "Start Reaction" button
+    if st.button("Start Reaction"):
         st.markdown("""
-            **Chemical Equation:**
-            NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO
-        """)
+            <div class='beaker'>
+                <div class='liquid'></div>
+                <div class='powder-stream'></div>
+                <div class='bubbles'></div>
+            </div>
+            <div class='spoon'>
+                <div style='width: 20px; height: 5px; background: white; border-radius: 10px;'></div>
+                <div style='width: 30px; height: 30px; background: #fff; border-radius: 50%; margin-top: -10px;'></div> <!-- Spoon and powder -->
+                <div class='spoon'>
+                    <div class='powder'></div> <!-- Powder falling effect -->
+                </div>
+                <div class='bubbles'>
+                    <!-- Dynamic bubbles that rise during the reaction -->
+                    <div class='bubble' style='--x-start: 10px; --x-end: 20px; --size: 10px;'></div>
+                    <div class='bubble' style='--x-start: -15px; --x-end: -25px; --size: 15px;'></div>
+                    <div class='bubble' style='--x-start: 5px; --x-end: -10px; --size: 12px;'></div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button('Start Reaction'):
+            # Start the pouring animation
+            st.markdown("""
+                <script>
+                const powderStream = document.querySelector('.powder-stream');
+                powderStream.style.animation = 'pour-powder 3s forwards';
+                </script>
+            """, unsafe_allow_html=True)
+            # Trigger the bubbles animation
+            st.markdown("""
+                <script>
+                const bubbles = document.querySelector('.bubbles');
+                bubbles.style.animation = 'show-bubbles 4s forwards';
+                </script>
+            """, unsafe_allow_html=True)
+            st.write("Step 1: Slowly adding baking soda to vinegar solution...")
+            st.write("Step 2: Observing the vigorous bubble formation...")
+            st.write("Chemical Reaction: NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO")
+        
+        st.write("Step 1: The baking soda gradually pours into the vinegar.")
+        st.write("Step 2: Vigorous fizzing reaction as the vinegar solution becomes agitated.")
+        st.write("NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO")
 
 if __name__ == "__main__":
-    run_experiment()
+    main()
+    lab()
