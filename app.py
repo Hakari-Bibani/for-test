@@ -37,7 +37,7 @@ def run_experiment():
             border: 3px solid #ddd;
             border-radius: 5px 5px 10px 10px;
             position: absolute;
-            left: 35%;  /* Moved more to the left */
+            left: 28%;  /* Moved even more to the left */
             top: 15%;
             transform-origin: bottom right;
             transition: transform 1s ease;
@@ -82,7 +82,7 @@ def run_experiment():
         
         .cylinder .label {
             position: absolute;
-            bottom: -30px;  /* Moved label below cylinder */
+            bottom: -30px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 14px;
@@ -96,49 +96,53 @@ def run_experiment():
             100% { height: 0%; }
         }
         
-        @keyframes reaction {
-            0% {
-                height: 50%;
-                background: linear-gradient(to top, #000000, #ff0000);
-            }
-            20% {
-                height: 140%;
-                background: linear-gradient(to top, #000000, #ff0000);
-            }
-            40% {
-                height: 180%;
-                background: linear-gradient(to top, #000000, #ff0000);
-                transform: scaleX(1.1);
-            }
-            60% {
-                height: 220%;
-                background: linear-gradient(to top, #000000, #ff0000);
-                transform: scaleX(1);
-            }
-            80% {
-                height: 200%;
-                background: linear-gradient(to top, #000000, #ff0000);
-                transform: scaleX(1.1);
-            }
-            100% {
-                height: 190%;
-                background: linear-gradient(to top, #000000, #ff0000);
-                transform: scaleX(1);
-            }
-        }
-        
         .foam {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 0;
-            background: linear-gradient(to top, #000000, #ff0000);
+            background: repeating-linear-gradient(
+                0deg,
+                #000000 0px,
+                #000000 20px,
+                #ff0000 20px,
+                #ff0000 40px
+            );
             animation: none;
             filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
         }
         
+        @keyframes reaction {
+            0% {
+                height: 50%;
+                transform: translateY(0);
+            }
+            20% {
+                height: 100%;
+                transform: translateY(0);
+            }
+            40% {
+                height: 100%;
+                transform: translateY(-50%);
+            }
+            60% {
+                height: 100%;
+                transform: translateY(-100%);
+            }
+            80% {
+                height: 100%;
+                transform: translateY(-120%);
+                opacity: 1;
+            }
+            100% {
+                height: 100%;
+                transform: translateY(-140%);
+                opacity: 0;
+            }
+        }
+        
         .pouring {
-            transform: rotate(55deg) translateY(-20px) translateX(40px);  /* Adjusted angle for better pouring */
+            transform: rotate(65deg) translateY(-20px) translateX(60px);  /* Adjusted angle for better pouring */
         }
         
         .pouring .solution {
@@ -149,29 +153,44 @@ def run_experiment():
             animation: reaction 1.5s ease-out forwards;
         }
         
+        .reacting .solution {
+            animation: empty 1.5s ease-out forwards;
+        }
+        
+        @keyframes empty {
+            0% { height: 50%; }
+            100% { height: 0%; }
+        }
+        
         /* Foam particles effect */
         .particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
+            background: repeating-linear-gradient(
+                45deg,
+                #000000 0px,
+                #000000 6px,
+                #ff0000 6px,
+                #ff0000 12px
+            );
             border-radius: 50%;
-            background: #ff0000;
             opacity: 0;
         }
         
         @keyframes particle {
             0% {
-                transform: translate(0, 0);
+                transform: translate(0, 0) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(var(--tx), var(--ty));
+                transform: translate(var(--tx), var(--ty)) rotate(360deg);
                 opacity: 0;
             }
         }
         
         .reacting .particle {
-            animation: particle 0.8s ease-out forwards;
+            animation: particle 1s ease-out forwards;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -227,9 +246,10 @@ def run_experiment():
                     <div class="foam"></div>
                     <div class="label">30% KI</div>
                     <!-- Add foam particles -->
-                    <div class="particle" style="--tx: 20px; --ty: -40px;"></div>
-                    <div class="particle" style="--tx: -15px; --ty: -35px;"></div>
-                    <div class="particle" style="--tx: 10px; --ty: -45px;"></div>
+                    <div class="particle" style="--tx: 30px; --ty: -60px;"></div>
+                    <div class="particle" style="--tx: -25px; --ty: -55px;"></div>
+                    <div class="particle" style="--tx: 15px; --ty: -65px;"></div>
+                    <div class="particle" style="--tx: -35px; --ty: -50px;"></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
