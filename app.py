@@ -2,7 +2,7 @@ import streamlit as st
 import time
 
 def run_experiment():
-    # Custom CSS for enhanced styling and animations
+    # [Previous CSS remains the same until .beaker class]
     st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
@@ -38,7 +38,7 @@ def run_experiment():
             border-radius: 5px 5px 10px 10px;
             position: absolute;
             left: 28%;
-            top: 5%;  /* Moved higher up */
+            top: 0%;  /* Moved even higher up */
             transform-origin: bottom right;
             transition: transform 1s ease;
             z-index: 2;
@@ -103,9 +103,9 @@ def run_experiment():
             height: 0;
             background: repeating-linear-gradient(
                 0deg,
-                rgba(0, 0, 0, 0.3) 0px,   /* Made black more transparent */
+                rgba(0, 0, 0, 0.3) 0px,
                 rgba(0, 0, 0, 0.3) 20px,
-                rgba(255, 0, 0, 0.3) 20px, /* Made red more transparent */
+                rgba(255, 0, 0, 0.3) 20px,
                 rgba(255, 0, 0, 0.3) 40px
             );
             animation: none;
@@ -168,7 +168,7 @@ def run_experiment():
             height: 12px;
             background: repeating-linear-gradient(
                 45deg,
-                rgba(0, 0, 0, 0.3) 0px,    /* Made particles more transparent */
+                rgba(0, 0, 0, 0.3) 0px,
                 rgba(0, 0, 0, 0.3) 6px,
                 rgba(255, 0, 0, 0.3) 6px,
                 rgba(255, 0, 0, 0.3) 12px
