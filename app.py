@@ -6,7 +6,7 @@ def run_experiment():
     st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-        
+
         .title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 3em;
@@ -83,20 +83,35 @@ def run_experiment():
         }
 
         .reaction {
-            width: 100px;
-            height: 0;
-            background: linear-gradient(to top, #ff4757, #2ed573, #1e90ff);
-            border-radius: 50% 50% 0 0;
             position: absolute;
             bottom: 0;
-            animation: bubbles 2s ease forwards;
+            width: 100px;
+            height: 150px;
+            overflow: hidden;
         }
 
-        @keyframes bubbles {
-            0% { height: 0; }
-            50% { height: 200px; }
-            100% { height: 300px; opacity: 0; }
+        .bubble {
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            height: 10px;
+            background: #2ed573;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: rise 3s infinite ease-in;
         }
+
+        @keyframes rise {
+            0% { transform: translateY(0); opacity: 0.8; }
+            100% { transform: translateY(-150px); opacity: 0; }
+        }
+
+        /* Randomize bubble positions and animation durations */
+        .bubble:nth-child(1) { left: 10px; animation-duration: 2s; }
+        .bubble:nth-child(2) { left: 30px; animation-duration: 2.5s; }
+        .bubble:nth-child(3) { left: 50px; animation-duration: 3s; }
+        .bubble:nth-child(4) { left: 70px; animation-duration: 2.2s; }
+        .bubble:nth-child(5) { left: 90px; animation-duration: 2.8s; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -133,12 +148,18 @@ def run_experiment():
         
         time.sleep(1)  # Pause before showing the reaction
 
-        # Step 2: Show the reaction with bubbles
+        # Step 2: Show the reaction with multiple bubbles
         container.markdown("""
             <div class="experiment-container">
                 <div class="beaker">
                     <div class="label">CH₃COOH</div>
-                    <div class="reaction"></div>
+                    <div class="reaction">
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
