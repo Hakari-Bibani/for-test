@@ -1,221 +1,47 @@
 import streamlit as st
 import time
+from PIL import Image, ImageDraw
 
-def run_experiment():
-    # Custom CSS for styling and animations
-    st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-        .title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 3em;
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            background: linear-gradient(45deg, #ff4757, #2ed573, #1e90ff, #ffa502);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient 3s ease infinite;
-        }
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .experiment-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            height: 400px;
-        }
-        .beaker {
-            width: 120px;
-            height: 180px;
-            border: 3px solid #555;
-            border-radius: 5px 5px 10px 10px;
-            background: transparent;
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            overflow: hidden;
-        }
-        .water {
-            width: 100%;
-            height: 90px;
-            background: rgba(173, 216, 230, 0.6);
-            position: absolute;
-            bottom: 0;
-            animation: wave 2s ease-in-out infinite;
-        }
-        @keyframes wave {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        .label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
-            text-align: center;
-            margin-top: 5px;
-        }
-        .spoon {
-            width: 80px;
-            height: 20px;
-            background: #d3d3d3;
-            border-radius: 10px;
-            position: absolute;
-            left: 50%;
-            top: 80px;
-            transform-origin: center right;
-            transform: translateX(-50%);
-            transition: transform 1s;
-        }
-        .spoon-content {
-            font-size: 14px;
-            color: #fff;
-            position: absolute;
-            right: -30px;
-            top: -10px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .pouring {
-            transform: translateX(-50%) rotate(-45deg);
-        }
-        .sodium-piece {
-            width: 5px;
-            height: 5px;
-            background-color: #333;
-            border-radius: 50%;
-            position: absolute;
-            opacity: 0;
-            left: 50%;
-            top: 110px;
-        }
-        @keyframes fall {
-            0% {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, 60px);
-                opacity: 0;
-            }
-        }
-        .reaction {
-            width: 100%;
-            height: 0;
-            background: linear-gradient(to top, #ff4757, #ff8c42);
-            position: absolute;
-            bottom: 0;
-            animation: explosion 2s ease forwards;
-        }
-        @keyframes explosion {
-            0% { height: 0; opacity: 0; }
-            50% { height: 180px; opacity: 1; }
-            100% { height: 180px; opacity: 0; }
-        }
-        .boom-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 48px;
-            font-weight: bold;
-            color: #ff4757;
-            animation: boom 1s ease-out forwards;
-            animation-delay: 1s;
-        }
-        @keyframes boom {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.5); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-        .spark {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #ff4757;
-            border-radius: 50%;
-        }
-        @keyframes spark {
-            0% { transform: translate(0, 0); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
-        }
-    </style>
-    """, unsafe_allow_html=True)
+# Set page configuration
+st.set_page_config(page_title="Titration Animation", layout="centered")
 
-    # Display the title
-    st.markdown("<h1 class='title'>Sodium And Water Reaction</h1>", unsafe_allow_html=True)
+# Function to draw the titration setup
+def draw_titration_setup(volume_added):
+    img = Image.new("RGBA", (600, 400), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(img)
 
-    # Container for the experiment setup
-    container = st.empty()
+    # Draw the burette
+    draw.rectangle([250, 50, 270, 350], outline="black", width=2)
+    draw.rectangle([250, 50, 270, 50 + int(volume_added * 3)], fill=(135, 206, 250))  # Burette liquid
 
-    def render_initial_state():
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="water"></div>
-                    <div class="label">H₂O</div>
-                </div>
-                <div class="spoon">
-                    <div class="spoon-content">Na</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+    # Draw the beaker
+    draw.rectangle([150, 350, 450, 370], outline="black", width=2)
+    draw.rectangle([150, 360, 450, 370], fill=(100, 149, 237))  # Initial pale blue color in beaker
 
-    def animate_experiment():
-        # Step 1: Animate the spoon bending and show falling sodium pieces
-        sparks = "".join([
-            f'<div class="spark" style="--tx: {-20 + i * 10}px; --ty: {-30 + i * 5}px; animation: spark 0.5s ease-out {i * 0.1}s forwards;"></div>'
-            for i in range(10)
-        ])
-        
-        container.markdown(f"""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="water"></div>
-                    <div class="label">H₂O</div>
-                </div>
-                <div class="spoon pouring">
-                    <div class="spoon-content">Na</div>
-                </div>
-                <div class="sodium-piece" style="animation: fall 1s ease-in-out forwards;"></div>
-                {sparks}
-            </div>
-        """, unsafe_allow_html=True)
-        time.sleep(1.5)
+    # Change beaker color gradually based on volume added
+    if volume_added > 5:
+        color_change_intensity = min(255, int((volume_added - 5) * 10))
+        draw.rectangle([150, 360, 450, 370], fill=(255 - color_change_intensity, 149, 237))
 
-        # Step 2: Show the dramatic reaction with fire effect and boom text
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="water"></div>
-                    <div class="reaction"></div>
-                    <div class="boom-text">BOOM!</div>
-                    <div class="label">H₂O</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+    return img
 
-    # Initial render
-    render_initial_state()
+# Display the title
+st.title("Titration Animation")
 
-    # Button to start the experiment
-    if st.button("Start Experiment"):
-        animate_experiment()
-        # Display the chemical equation
-        st.markdown("""
-            **Chemical Equation:**
-            2Na(s) + 2H₂O(l) → 2NaOH(aq) + H₂(g)
-        """)
+# Description
+st.markdown(
+    "This simulation demonstrates a simple titration experiment. As the titrant is added from the burette, the color in the beaker changes gradually."
+)
 
-if __name__ == "__main__":
-    run_experiment()
+# Button to start titration
+if st.button("Start Titration"):
+    st.write("Titration in Progress...")
+
+    # Simulate titration process
+    for volume in range(0, 11):
+        img = draw_titration_setup(volume)
+        st.image(img, use_column_width=True)
+        time.sleep(0.5)
+
+    # Final message
+    st.write("Titration Complete!")
