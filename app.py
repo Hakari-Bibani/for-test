@@ -1,65 +1,51 @@
 import streamlit as st
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import time
 
-# Function to calculate pH at each step
-def calculate_ph(volume_naoh, concentration_naoh, initial_volume_hcl, concentration_hcl):
-    moles_hcl = initial_volume_hcl * concentration_hcl
-    moles_naoh = volume_naoh * concentration_naoh
+# Set the page title and configure layout
+st.set_page_config(page_title="Acid Base Titration", layout="centered")
 
-    if moles_naoh < moles_hcl:
-        # Before equivalence point (excess HCl)
-        moles_h_remaining = moles_hcl - moles_naoh
-        concentration_h = moles_h_remaining / (initial_volume_hcl + volume_naoh)
-        pH = -np.log10(concentration_h)
-    elif moles_naoh == moles_hcl:
-        # At equivalence point (neutral pH)
-        pH = 7.0
-    else:
-        # After equivalence point (excess NaOH)
-        moles_oh_excess = moles_naoh - moles_hcl
-        concentration_oh = moles_oh_excess / (initial_volume_hcl + volume_naoh)
-        pOH = -np.log10(concentration_oh)
-        pH = 14 - pOH
+# Title with moving animation effect
+st.title("🌊 Acid Base Titration")
 
-    return pH
+# Instructions and experiment setup
+st.markdown("### Experiment Setup")
+st.write("We have a setup where **NaOH** is in the burette, and **HCl** is in the conical flask.")
+st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Titration_setup.png/450px-Titration_setup.png", 
+         caption="Titration Setup (illustration for reference)")
 
-# Title of the app
-st.title("Titration of NaOH into HCl")
+# Button to start the experiment
+if st.button("Start Experiment"):
+    st.write("Adding **NaOH** to **HCl**...")
 
-# Initial setup
-st.write("This simulation shows the titration of NaOH into HCl and plots the pH change as NaOH is added.")
+    # Animation of adding NaOH
+    progress_bar = st.progress(0)
+    animation_text = st.empty()
 
-# Parameters
-initial_volume_hcl = 0.05  # 50 mL of HCl in liters
-concentration_hcl = 0.1  # Molarity of HCl
-concentration_naoh = 0.1  # Molarity of NaOH
-max_volume_naoh = 0.1  # Maximum volume of NaOH to add in liters
-
-# Initialize data for plotting
-volumes_naoh = np.linspace(0, max_volume_naoh, 100)
-pH_values = []
-
-# Animation: Simulate adding NaOH and calculate pH
-st.write("Adding NaOH...")
-progress_bar = st.progress(0)
-
-for i, volume_naoh in enumerate(volumes_naoh):
-    pH = calculate_ph(volume_naoh, concentration_naoh, initial_volume_hcl, concentration_hcl)
-    pH_values.append(pH)
+    for i in range(101):
+        time.sleep(0.05)  # Simulate time for adding NaOH
+        progress_bar.progress(i)
+        animation_text.text(f"NaOH added: {i}%")
     
-    # Update progress
-    progress_bar.progress((i + 1) / len(volumes_naoh))
-    time.sleep(0.05)
+    st.write("The color of the solution has changed, indicating the end point!")
 
-# Plotting the titration curve
-st.write("Titration Complete. Here is the titration curve:")
+    # Plot the pH change
+    st.write("### Titration Curve")
+    volume_NaOH = np.linspace(0, 25, 100)
+    pH = 7 + (10 * np.arctan((volume_NaOH - 12.5) / 2))  # Sigmoid curve representing pH change
 
-plt.figure(figsize=(8, 5))
-plt.plot(volumes_naoh * 1000, pH_values, marker='o')  # Convert volume to mL for the plot
-plt.title("Titration Curve: NaOH added to HCl")
-plt.xlabel("Volume of NaOH added (mL)")
-plt.ylabel("pH")
-plt.grid(visible=True)
-st.pyplot(plt)
+    plt.figure(figsize=(8, 5))
+    plt.plot(volume_NaOH, pH, label="pH vs Volume of NaOH", color="blue")
+    plt.axhline(y=7, color='r', linestyle='--', label="Neutral pH")
+    plt.axvline(x=12.5, color='g', linestyle='--', label="End Point")
+    plt.xlabel("Volume of NaOH (mL)")
+    plt.ylabel("pH")
+    plt.title("Titration Curve of NaOH and HCl")
+    plt.legend()
+    plt.grid()
+
+    st.pyplot(plt)
+
+# Footer
+st.write("**Note:** This is a simplified simulation of an acid-base titration.")
