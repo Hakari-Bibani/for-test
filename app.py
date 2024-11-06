@@ -1,49 +1,46 @@
 import streamlit as st
 import time
 
-def run_chemical_reaction_app():
-    # Custom CSS with improved styling and animations
+def main():
+    # Custom CSS for styling and animations
     st.markdown("""
     <style>
-        /* Modern gradient title animation */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+        /* Title styling with gradient animation */
         .title {
-            font-family: 'Poppins', sans-serif;
             font-size: 2.5em;
             text-align: center;
-            background: linear-gradient(120deg, #ff6b6b, #4ecdc4, #45b7d1, #96e6a1);
-            background-size: 300% 300%;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96E6A1);
+            background-size: 300% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradient-shift 8s ease infinite;
+            animation: gradient 6s ease infinite;
         }
-        @keyframes gradient-shift {
+
+        @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* Container styling */
+        /* Container for experiment */
         .experiment-container {
-            width: 100%;
-            height: 500px;
             position: relative;
+            width: 100%;
+            height: 400px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            background: #f8f9fa;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            align-items: flex-end;
+            margin: 20px 0;
         }
 
-        /* Improved beaker design */
+        /* Beaker styling */
         .beaker {
-            width: 160px;
-            height: 200px;
             position: relative;
-            background: rgba(255, 255, 255, 0.9);
-            border: 4px solid #2c3e50;
-            border-radius: 10px 10px 20px 20px;
+            width: 120px;
+            height: 160px;
+            background: transparent;
+            border: 4px solid #333;
+            border-radius: 5px 5px 15px 15px;
             overflow: hidden;
         }
 
@@ -53,118 +50,110 @@ def run_chemical_reaction_app():
             bottom: 0;
             width: 100%;
             height: 50%;
-            background: rgba(255, 182, 193, 0.7);
+            background: rgba(255, 182, 193, 0.6);
             transition: all 0.5s ease;
         }
 
-        /* Spoon design */
+        /* Spoon styling */
         .spoon {
             position: absolute;
-            right: calc(50% - 120px);
-            top: 30%;
+            right: calc(50% - 80px);
+            top: 40%;
             transform-origin: right center;
-            transition: transform 1.5s ease;
+            transition: transform 1s ease;
         }
 
         .spoon-handle {
             width: 100px;
-            height: 15px;
-            background: #95a5a6;
-            border-radius: 15px;
+            height: 10px;
+            background: #999;
+            border-radius: 5px;
         }
 
         .spoon-bowl {
             position: absolute;
-            left: -40px;
+            left: -30px;
             top: -15px;
-            width: 45px;
-            height: 45px;
-            background: #bdc3c7;
+            width: 40px;
+            height: 40px;
+            background: #999;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: #333;
             font-size: 12px;
-            color: #2c3e50;
         }
 
-        /* Animation classes */
-        .pouring {
-            transform: rotate(45deg);
+        /* Reaction animations */
+        @keyframes bubble {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-300px) scale(0); opacity: 0; }
         }
 
-        /* Reaction effects */
         .bubble {
             position: absolute;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
-            animation: rise 2s ease-in infinite;
-            opacity: 0;
-        }
-
-        @keyframes rise {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0;
-            }
-            50% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-400px) scale(2);
-                opacity: 0;
-            }
+            animation: bubble 1s ease-out forwards;
         }
 
         /* Chemical formula styling */
         .chemical-equation {
-            font-family: 'Times New Roman', serif;
-            font-size: 1.2em;
             text-align: center;
+            font-size: 1.2em;
             margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        /* Label styling */
+        .label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
         }
     </style>
     """, unsafe_allow_html=True)
 
-    # Title
-    st.markdown("<h1 class='title'>Baking Soda and Vinegar Reaction</h1>", unsafe_allow_html=True)
+    # Display title
+    st.markdown('<h1 class="title">Baking Soda and Vinegar Reaction</h1>', unsafe_allow_html=True)
 
-    # Create container for the experiment
+    # Create container for experiment
     experiment_container = st.empty()
 
     def create_bubbles():
         bubbles = ""
         for i in range(15):
-            size = np.random.randint(10, 30)
-            left = np.random.randint(10, 150)
-            delay = np.random.random() * 2
+            size = random.randint(10, 20)
+            left = random.randint(10, 90)
+            delay = random.uniform(0, 0.5)
             bubbles += f"""
                 <div class="bubble" style="
                     width: {size}px;
                     height: {size}px;
-                    left: {left}px;
+                    left: {left}%;
                     animation-delay: {delay}s;
                 "></div>
             """
         return bubbles
 
-    def render_experiment(pouring=False, show_reaction=False):
-        bubbles = create_bubbles() if show_reaction else ""
+    def render_experiment(pouring=False, reacting=False):
+        spoon_class = "transform: rotate(45deg);" if pouring else ""
+        bubbles = create_bubbles() if reacting else ""
         
         experiment_container.markdown(f"""
             <div class="experiment-container">
                 <div class="beaker">
                     <div class="liquid"></div>
-                    <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: #2c3e50;">
-                        CH₃COOH
-                    </div>
                     {bubbles}
+                    <div class="label">CH₃COOH</div>
                 </div>
-                <div class="spoon {'pouring' if pouring else ''}">
+                <div class="spoon" style="{spoon_class}">
                     <div class="spoon-handle"></div>
                     <div class="spoon-bowl">NaHCO₃</div>
                 </div>
@@ -174,15 +163,17 @@ def run_chemical_reaction_app():
     # Initial render
     render_experiment()
 
-    # Add the start button
+    # Button to start experiment
     if st.button("Start Experiment"):
-        # Animation sequence
+        # Pour animation
         render_experiment(pouring=True)
         time.sleep(1)
-        render_experiment(pouring=True, show_reaction=True)
-        time.sleep(0.5)
         
-        # Show chemical equation
+        # Reaction animation
+        render_experiment(pouring=True, reacting=True)
+        time.sleep(2)
+        
+        # Display chemical equation
         st.markdown("""
             <div class="chemical-equation">
                 NaHCO₃ + CH₃COOH → CO₂ + H₂O + NaCH₃COO
@@ -190,5 +181,5 @@ def run_chemical_reaction_app():
         """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    import numpy as np
-    run_chemical_reaction_app()
+    import random
+    main()
