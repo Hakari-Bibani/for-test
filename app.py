@@ -1,7 +1,5 @@
 import streamlit as st
 import time
-import matplotlib.pyplot as plt
-import numpy as np
 
 # Title
 st.title("Baking Soda and Vinegar Reaction")
@@ -9,37 +7,33 @@ st.title("Baking Soda and Vinegar Reaction")
 # Initial Setup
 st.subheader("Initial Setup")
 
-# Beaker and Spoon Visualization
-st.write("Imagine a beaker half-filled with a pale red solution labeled *CH₃COOH* (vinegar) and a spoon with a light gray powder labeled *NaHCO₃* (baking soda) above it.")
+# Description of Setup
+st.write(
+    "Below is a beaker half-filled with a pale red solution labeled **CH₃COOH** (vinegar). "
+    "Above the beaker, there is a spoon filled with white powder labeled **NaHCO₃** (baking soda)."
+)
 
-# Placeholder for animation
-beaker_placeholder = st.empty()
+# Visual Representation (static images or placeholders)
+st.image("path_to_beaker_image.jpg", caption="Beaker with CH₃COOH (Vinegar)", use_column_width=True)
+st.image("path_to_spoon_image.jpg", caption="Spoon with NaHCO₃ (Baking Soda)", use_column_width=True)
 
-# Animation Button
+# Button to Start the Experiment
 if st.button("Start Experiment"):
-    # Simulate the reaction animation step-by-step
-    for i in range(5):
-        with beaker_placeholder.container():
-            st.write("Pouring...")
-            time.sleep(0.5)
-        if i == 4:
-            st.write("Reacting... 💥💨")
-            time.sleep(1)
-            break
+    st.write("Pouring the baking soda into the vinegar...")
 
-    # Visual Representation of Reaction
-    fig, ax = plt.subplots()
-    x = np.linspace(0, 2 * np.pi, 100)
-    y = np.sin(x) * np.exp(-0.1 * x) + np.random.normal(0, 0.1, len(x))
-    ax.plot(x, y)
-    ax.set_title("Reaction Simulated in 2D Format")
+    # Simulate the reaction step-by-step
+    with st.spinner("Reacting..."):
+        time.sleep(2)  # Delay to simulate the pouring
 
-    st.pyplot(fig)
+    st.success("Reaction Complete!")
+    
+    # Show Reaction Animation (you can add more complex animations if needed)
+    st.write("A dramatic reaction occurs, with bubbles overflowing the beaker!")
+    st.balloons()  # Simple celebratory animation
+    
+    # Chemical Equation
+    st.subheader("Chemical Equation")
+    st.latex(r"NaHCO_3 (s) + CH_3COOH (aq) \rightarrow CO_2 (g) + H_2O (l) + NaCH_3COO (aq)")
 
-st.subheader("Reaction Outcome")
-
-# Display the chemical equation
-st.latex(r"NaHCO_3 (s) + CH_3COOH (aq) \rightarrow CO_2 (g) + H_2O (l) + NaCH_3COO (aq)")
-
-# Ending Note
-st.write("The rapid reaction releases carbon dioxide gas, causing the bubbly overflow!")
+# Footer Note
+st.write("The reaction produces carbon dioxide gas, causing the overflow of bubbles.")
