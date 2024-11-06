@@ -10,12 +10,13 @@
     }
     
     #solution {
-      fill: #e6f3ff;
+      fill: #e6f3ff; /* Initial color */
     }
     
     #drop {
       opacity: 0;
       transform: translateY(0);
+      transition: transform 0.8s ease, opacity 0.8s ease;
     }
     
     @keyframes dropFall {
@@ -27,11 +28,6 @@
         transform: translateY(150px);
         opacity: 0;
       }
-    }
-    
-    #burette-solution {
-      height: 200px;
-      transition: height 0.5s ease;
     }
   </style>
 </head>
@@ -58,7 +54,7 @@
           <line x1="340" y1="270" x2="345" y2="270"/>
         </g>
         <!-- Solution in burette -->
-        <rect id="burette-solution" x="351" y="51" width="38" fill="#e6f3ff"/>
+        <rect id="burette-solution" x="351" y="51" width="38" height="200" fill="#e6f3ff"/>
       </g>
       
       <!-- Dropping solution -->
@@ -89,37 +85,38 @@
 
   <script>
     let dropCount = 0;
-    let maxDrops = 5; // Number of drops before the color changes
-    
-    function startExperiment() {
-      const drop = document.getElementById('drop');
-      const solution = document.getElementById('solution');
-      const buretteSolution = document.getElementById('burette-solution');
+    const maxDrops = 5; // Number of drops before the color changes
+    const drop = document.getElementById('drop');
+    const solution = document.getElementById('solution');
+
+    function addDrop() {
+      // Animate the drop
+      drop.style.opacity = 1;
+      drop.style.transform = 'translateY(150px)';
       
-      function addDrop() {
-        if (dropCount < maxDrops) {
-          drop.style.animation = 'dropFall 0.8s ease-in-out';
-          setTimeout(() => {
-            drop.style.animation = '';
-            dropCount++;
-            if (dropCount === maxDrops) {
-              // Change the color of the solution in the flask
-              solution.style.fill = '#ffcce6';
-            }
-          }, 800);
+      // Reset the drop after animation
+      setTimeout(() => {
+        drop.style.opacity = 0;
+        drop.style.transform = 'translateY(0)';
+        dropCount++;
+        
+        // Change the color of the solution in the flask after maxDrops
+        if (dropCount >= maxDrops) {
+          solution.style.fill = '#ffcce6'; // Change to pink
         }
-      }
-      
-      // Simulate drops being added every second
-      const dropInterval = setInterval(() => {
+      }, 800); // Duration of the drop animation
+    }
+
+    function startExperiment() {
+      let interval = setInterval(() => {
         if (dropCount < maxDrops) {
           addDrop();
         } else {
-          clearInterval(dropInterval);
+          clearInterval(interval);
         }
-      }, 1000);
+      }, 1000); // Interval between each drop
     }
-    
+
     // Add this function to your Streamlit component
     window.addEventListener('message', function(event) {
       if (event.data.type === 'start_experiment') {
