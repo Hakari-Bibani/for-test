@@ -101,8 +101,7 @@
 
   <script>
     let isExperimentRunning = false;
-    let dropAnimation;
-    let colorChangeTimeout;
+    let dropCount = 0;
     
     function startExperiment() {
       if (isExperimentRunning) return;
@@ -110,18 +109,21 @@
       
       const drop = document.getElementById('drop');
       const solution = document.getElementById('solution');
-      const buretteSolution = document.getElementById('burette-solution');
-      
-      // Start burette solution animation
-      buretteSolution.style.animationPlayState = 'running';
       
       // Start dropping animation
       drop.style.animationPlayState = 'running';
       
-      // Change color after 15 seconds
-      colorChangeTimeout = setTimeout(() => {
-        solution.style.animationPlayState = 'running';
-      }, 15000);
+      // Drop 3 times and then stop
+      const dropInterval = setInterval(() => {
+        dropCount++;
+        if (dropCount >= 3) {
+          clearInterval(dropInterval);
+          drop.style.animationPlayState = 'paused';
+          
+          // Change color of the solution
+          solution.style.animationPlayState = 'running';
+        }
+      }, 1000); // Drops every second
     }
     
     // Add this function to your Streamlit component
