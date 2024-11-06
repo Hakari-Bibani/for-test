@@ -60,9 +60,9 @@ def run_experiment():
             background: #d3d3d3;
             border-radius: 10px;
             position: absolute;
-            right: 30px;
-            top: 120px;
-            transform-origin: right center;
+            left: 10px;
+            top: 40px;
+            transform-origin: center bottom;
             transition: transform 1s;
         }
         .spoon-content {
@@ -80,7 +80,19 @@ def run_experiment():
             align-items: center;
         }
         .pouring {
-            transform: rotate(-45deg);
+            transform: rotate(-30deg);
+        }
+        .ball {
+            width: 8px;
+            height: 8px;
+            background-color: #d3d3d3;
+            border-radius: 50%;
+            position: absolute;
+            animation: ballDrop 1s ease-in-out forwards;
+        }
+        @keyframes ballDrop {
+            0% { top: 50px; opacity: 1; }
+            100% { top: 150px; opacity: 0; }
         }
         .reaction {
             width: 100px;
@@ -138,6 +150,11 @@ def run_experiment():
                 <div class="beaker">
                     <div class="beaker-fill"></div>
                     <div class="label">CH₃COOH</div>
+                    <!-- Small balls representing NaHCO₃ pouring into the beaker -->
+                    <div class="ball" style="left: 45px; animation-delay: 0s;"></div>
+                    <div class="ball" style="left: 50px; animation-delay: 0.1s;"></div>
+                    <div class="ball" style="left: 55px; animation-delay: 0.2s;"></div>
+                    <div class="ball" style="left: 60px; animation-delay: 0.3s;"></div>
                 </div>
                 <div class="spoon pouring">
                     <div class="spoon-content">NaHCO₃</div>
