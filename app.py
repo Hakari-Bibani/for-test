@@ -10,40 +10,22 @@ st.set_page_config(page_title="Acid Base Titration", layout="wide")
 # Title
 st.title("Acid Base Titration Simulation")
 
-# Load the HTML content
+# Load the HTML content from the file
 with open("animation.html", "r") as file:
     html_content = file.read()
 
 # Embed the HTML content in Streamlit
-html_container = components.html(
-    html_content,
-    height=600,
-    scrolling=False
-)
-
-# JavaScript code to communicate with the HTML
-st.write("""
-    <script>
-        // Function to send a message to the HTML animation
-        function startTitrationAnimation() {
-            const iframe = window.parent.document.querySelector('iframe');
-            if (iframe) {
-                iframe.contentWindow.postMessage({ type: 'start_experiment' }, '*');
-            }
-        }
-    </script>
-""", unsafe_allow_html=True)
+components.html(html_content, height=600, scrolling=False)
 
 # Button to start the experiment
 if st.button("Start Experiment"):
-    # Trigger the JavaScript function to start the animation
-    st.write('<script>startTitrationAnimation();</script>', unsafe_allow_html=True)
-    
-    # Progress indication
+    # Indicate that the experiment is starting
     st.write("Starting titration...")
+
+    # Simulate the progress of the titration with a progress bar
     progress_bar = st.progress(0)
     status = st.empty()
-    
+
     # Simulate titration progress
     for i in range(101):
         progress_bar.progress(i)
@@ -54,11 +36,11 @@ if st.button("Start Experiment"):
         else:
             status.text("Titration complete!")
         time.sleep(0.2)
-    
+
     # Generate and display the pH curve
     volume = np.linspace(0, 50, 100)
     equivalence_point = 25
-    
+
     def calculate_ph(v):
         if v < equivalence_point:
             return -np.log10(abs(0.1 - (0.1 * v / equivalence_point)))
@@ -66,9 +48,9 @@ if st.button("Start Experiment"):
             return 7
         else:
             return 14 + np.log10(abs((0.1 * (v - equivalence_point)) / v))
-    
+
     ph = [calculate_ph(v) for v in volume]
-    
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=volume,
@@ -90,7 +72,7 @@ if st.button("Start Experiment"):
         showlegend=True
     )
     st.plotly_chart(fig, use_container_width=True)
-    
+
     st.success(f"""
         Titration Complete!
         - Equivalence Point reached at {equivalence_point} mL
