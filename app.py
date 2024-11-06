@@ -2,7 +2,7 @@ import streamlit as st
 import time
 
 def run_experiment():
-    # [Previous CSS remains the same until .beaker class]
+    # Custom CSS for enhanced styling and animations
     st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
@@ -38,7 +38,7 @@ def run_experiment():
             border-radius: 5px 5px 10px 10px;
             position: absolute;
             left: 28%;
-            top: 0%;  /* Moved even higher up */
+            top: -5%;  /* Moved even higher up from 5% to -5% */
             transform-origin: bottom right;
             transition: transform 1s ease;
             z-index: 2;
