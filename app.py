@@ -69,6 +69,13 @@ def run_experiment():
             position: absolute;
             right: -30px;
             top: -10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d3d3d3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .pouring {
@@ -135,22 +142,6 @@ def run_experiment():
                 </div>
             </div>
         """, unsafe_allow_html=True)
-
-        # Step 3: Increase the size of the bubbles and send them flying upwards
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="label">CH₃COOH</div>
-                    <div class="reaction" style="height: 300px; animation: bubbles-up 2s ease forwards;"></div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        @keyframes bubbles-up {
-            0% { height: 0; }
-            50% { height: 300px; }
-            100% { height: 600px; opacity: 0; }
-        }
 
     # Initial render
     render_initial_state()
