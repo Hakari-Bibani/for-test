@@ -1,177 +1,65 @@
 import streamlit as st
-import streamlit.components.v1 as components
-import time
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import numpy as np
 
-def app():
-    st.markdown("""
-        <style>
-            @keyframes titleColor {
-                0% { color: #ff4b4b; }
-                50% { color: #4b4bff; }
-                100% { color: #ff4b4b; }
-            }
-            
-            .animated-title {
-                font-size: 2.5rem;
-                text-align: center;
-                margin: 2rem 0;
-                animation: titleColor 4s infinite;
-            }
-            
-            .container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin: 2rem auto;
-                position: relative;
-                height: 500px;
-                width: 100%;
-            }
-            
-            .tube {
-                width: 40px;
-                height: 120px;
-                background: #f0f0f0;
-                border: 2px solid #333;
-                position: absolute;
-                top: 50px;
-                transform-origin: bottom center;
-                transition: transform 2s;
-            }
-            
-            .tube.pour {
-                transform: rotate(135deg);
-            }
-            
-            .powder {
-                width: 30px;
-                height: 100px;
-                background: #ddd;
-                position: absolute;
-                bottom: 5px;
-                left: 5px;
-            }
-            
-            .beaker {
-                width: 200px;
-                height: 250px;
-                background: transparent;
-                border: 3px solid #333;
-                position: absolute;
-                bottom: 50px;
-                border-radius: 5px;
-                overflow: hidden;
-            }
-            
-            .liquid {
-                width: 100%;
-                height: 50%;
-                background: rgba(255, 200, 200, 0.8);
-                position: absolute;
-                bottom: 0;
-                transition: height 2s;
-            }
-            
-            @keyframes bubble {
-                0% { transform: scale(0); opacity: 0; }
-                50% { transform: scale(1); opacity: 1; }
-                100% { transform: scale(1.5); opacity: 0; }
-            }
-            
-            .bubbles {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                display: none;
-            }
-            
-            .bubbles.active {
-                display: block;
-            }
-            
-            .bubble {
-                position: absolute;
-                background: rgba(255, 255, 255, 0.8);
-                border-radius: 50%;
-                animation: bubble 1s infinite;
-            }
-            
-            .equation {
-                text-align: center;
-                margin-top: 2rem;
-                font-size: 1.2rem;
-                opacity: 0;
-                transition: opacity 1s;
-            }
-            
-            .equation.show {
-                opacity: 1;
-            }
-            
-            .label {
-                position: absolute;
-                font-size: 0.9rem;
-                color: #333;
-            }
-        </style>
-        
-        <div class="animated-title">Baking Soda and Vinegar Reaction</div>
-        
-        <div class="container">
-            <div class="tube">
-                <div class="powder"></div>
-                <div class="label" style="top: -25px; left: 45px;">NaHCO₃</div>
-            </div>
-            
-            <div class="beaker">
-                <div class="liquid"></div>
-                <div class="bubbles"></div>
-                <div class="label" style="bottom: -25px; left: 45px;">CH₃COOH</div>
-            </div>
-        </div>
-        
-        <div class="equation">
-            NaHCO₃ (s) + CH₃COOH (aq) → CO₂ (g) + H₂O (l) + NaCH₃COO (aq)
-        </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("Start Experiment"):
-        js = """
-        <script>
-            function createBubbles() {
-                const bubbles = document.querySelector('.bubbles');
-                bubbles.classList.add('active');
-                
-                for (let i = 0; i < 50; i++) {
-                    const bubble = document.createElement('div');
-                    bubble.className = 'bubble';
-                    bubble.style.left = Math.random() * 100 + '%';
-                    bubble.style.bottom = Math.random() * 100 + '%';
-                    bubble.style.width = Math.random() * 20 + 10 + 'px';
-                    bubble.style.height = bubble.style.width;
-                    bubble.style.animationDelay = Math.random() * 2 + 's';
-                    bubbles.appendChild(bubble);
-                }
-            }
-            
-            function startReaction() {
-                const tube = document.querySelector('.tube');
-                const equation = document.querySelector('.equation');
-                
-                tube.classList.add('pour');
-                
-                setTimeout(() => {
-                    createBubbles();
-                    equation.classList.add('show');
-                }, 2000);
-            }
-            
-            startReaction();
-        </script>
-        """
-        components.html(js, height=0)
-        time.sleep(2)  # Give animation time to complete
+# App title
+st.title("Baking Soda and Vinegar Reaction 🌋")
 
-if __name__ == "__main__":
-    st.set_page_config(page_title="Chemical Reaction Simulation")
-    app()
+# Initial setup
+st.subheader("Initial Setup:")
+st.write("Below, you see a beaker filled with a pale red solution, which represents vinegar (CH₃COOH), and a spoon holding baking soda (NaHCO₃).")
+
+# Displaying the initial setup (use placeholders for animations)
+fig, ax = plt.subplots()
+
+# Setting up the beaker and spoon representation
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 10)
+ax.axis("off")
+
+# Drawing the beaker
+beaker = plt.Rectangle((3, 1), 4, 5, fill=None, edgecolor='black', linewidth=2)
+ax.add_patch(beaker)
+
+# Vinegar solution in the beaker
+vinegar = plt.Rectangle((3, 1), 4, 2.5, color='lightcoral')
+ax.add_patch(vinegar)
+
+# Spoon with baking soda
+spoon, = ax.plot([4, 6], [7, 7], 'lightgray', linewidth=3)  # Spoon handle
+baking_soda, = ax.plot(5, 7, 'o', color='lightgray', markersize=10)  # Baking soda blob
+
+# Animation function
+def animate(frame):
+    if frame < 20:
+        spoon.set_ydata([7 - frame * 0.1, 7 - frame * 0.1])  # Bend spoon downwards
+        baking_soda.set_ydata(7 - frame * 0.1)  # Move baking soda
+    elif frame == 20:
+        ax.add_patch(plt.Circle((5, 3.5), 0.1, color='white'))  # Small initial bubble
+    elif frame > 20:
+        # Simulate bubbles rising and expanding
+        for _ in range(5):
+            x = np.random.uniform(3.5, 6.5)
+            y = np.random.uniform(3, 5.5)
+            size = np.random.uniform(0.05, 0.2)
+            ax.add_patch(plt.Circle((x, y), size, color='white', alpha=0.6))
+
+# Run animation
+anim = FuncAnimation(fig, animate, frames=40, interval=100)
+
+# Show animation
+st.pyplot(fig)
+
+# Button to start experiment
+if st.button("Start Experiment"):
+    st.write("Watch the reaction unfold!")
+
+# Reaction output and equation
+st.subheader("Reaction:")
+st.write("As the baking soda falls into the vinegar, a vigorous reaction occurs, creating carbon dioxide gas, water, and sodium acetate.")
+st.latex(r"NaHCO_3 (s) + CH_3COOH (aq) \rightarrow CO_2 (g) + H_2O (l) + NaCH_3COO (aq)")
+
+# Ending message
+st.write("Enjoy the fascinating chemistry behind this classic experiment!")
+
