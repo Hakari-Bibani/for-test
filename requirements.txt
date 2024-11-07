@@ -1,4 +1,1 @@
-streamlit
-numpy
-matplotlib
-PIL
+pip install --upgrade streamlit
