@@ -1,52 +1,60 @@
 import streamlit as st
 import numpy as np
-import time
-from PIL import Image
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib import style
 
-# Set page title and layout
-st.set_page_config(page_title="Acid-Base Titration", layout="wide")
+# Set page config
+st.set_page_config(page_title="Acid Base Titration", layout="centered")
 
-# Define function to simulate titration
-def titrate(initial_ph, volume_naoh, volume_hcl):
-    # Simulate adding NaOH to HCl
-    ph = initial_ph
-    ph_values = [ph]
-    for i in range(int(volume_naoh)):
-        ph += 0.1
-        ph_values.append(ph)
-        time.sleep(0.1)
-    
-    # Find endpoint
-    endpoint = ph_values[-1]
-    
-    # Plotting
-    x = np.arange(len(ph_values))
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(x, ph_values)
-    ax.axvline(x=len(ph_values)-1, color='r', linestyle='--')
-    ax.set_xlabel('Volume of NaOH Added (mL)')
-    ax.set_ylabel('pH')
-    ax.set_title('Acid-Base Titration')
-    
-    return endpoint, fig
+# Title
+st.title("🌊 Acid Base Titration 🌡️")
 
-# App layout
-st.title("Acid-Base Titration")
+# Display a brief description
+st.markdown("### Simulate the titration of HCl with NaOH. Press 'Start Experiment' to begin!")
 
-# Show animation of adding NaOH
+# Visuals for NaOH in Burette and HCl in Conical Flask
+st.subheader("Setup")
+st.markdown("""
+1. **NaOH in the Burette**  
+   The burette is filled with sodium hydroxide (NaOH) solution.
+   
+2. **HCl in the Conical Flask**  
+   The conical flask contains hydrochloric acid (HCl) with a few drops of phenolphthalein indicator.
+""")
+
+# Start Experiment button
 if st.button("Start Experiment"):
-    st.subheader("Adding NaOH to HCl")
-    
-    # Display animation
-    image = Image.open('burette.gif')
-    st.image(image, use_column_width=True)
-    
-    # Simulate titration
-    endpoint, plot = titrate(2.0, 10, 25)
-    
-    # Display plot
+    # HTML to simulate animation of NaOH being added to HCl
+    st.markdown("""
+    <div style="text-align: center;">
+        <h3>Adding NaOH to HCl...</h3>
+        <div style="background-color: lightblue; padding: 20px; border-radius: 10px;">
+            <p style="animation: changeColor 5s infinite;">Color Change Simulation</p>
+        </div>
+        <style>
+        @keyframes changeColor {
+            0% {color: red;}
+            50% {color: pink;}
+            100% {color: clear;}
+        }
+        </style>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Simulating pH change
+    volume_naoh = np.linspace(0, 25, 100)  # Volume of NaOH added
+    pH = np.array([1 + 13 * (v / 25) for v in volume_naoh])  # Simulating pH change
+
+    # Plotting the pH curve
     st.subheader("Titration Curve")
-    st.pyplot(plot)
-    
-    st.success(f"Endpoint reached at pH {endpoint:.2f}")
+    fig, ax = plt.subplots()
+    ax.plot(volume_naoh, pH, label="pH vs Volume NaOH", color="blue")
+    ax.axhline(y=7, color='r', linestyle='--', label="End Point (pH 7)")
+    ax.set_xlabel("Volume of NaOH (mL)")
+    ax.set_ylabel("pH")
+    ax.set_title("pH vs Volume of NaOH Added")
+    ax.legend()
+    st.pyplot(fig)
+
+    st.markdown("### Experiment Complete!")
