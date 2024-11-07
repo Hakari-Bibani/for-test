@@ -1,64 +1,70 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from math import log10
 
-# Set page title
-st.set_page_config(page_title="Acid Base Titration")
+def app():
+    st.set_page_config(page_title="Acid Base Titration")
 
-# Add title with wave animation
-st.title("Acid Base Titration")
-st.markdown("""<style>
-@keyframes wave {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-}
-h1 {
-    animation: wave 10s linear infinite;
-}
-</style>""", unsafe_allow_html=True)
+    st.title("Acid Base Titration 🌊")
 
-# Function to simulate titration
-def titrate(initial_volume, initial_pH, base_volume, base_concentration):
-    # Calculate pH at each step
-    volumes = np.linspace(0, base_volume, 100)
-    pH = [initial_pH]
-    for vol in volumes[1:]:
-        new_pH = initial_pH - np.log10(vol * base_concentration / (initial_volume + vol))
-        pH.append(new_pH)
+    # Create a beaker and a burette
+    st.markdown(
+        """
+        <div style="position: relative; width: 400px; height: 500px;">
+            <div style="position: absolute; bottom: 0; left: 0; width: 200px; height: 300px; background-color: #4682B4; border-radius: 20px; animation: wave 5s ease-in-out infinite;">
+                <div style="position: absolute; bottom: 0; left: 50px; width: 100px; height: 200px; background-color: #FF0000; border-radius: 10px;"></div>
+            </div>
+            <div style="position: absolute; top: 100px; right: 50px; width: 50px; height: 300px; background-color: #008000; border-radius: 10px;"></div>
+        </div>
+        <style>
+            @keyframes wave {
+                0% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                100% { transform: translateX(-10px); }
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    # Find the end point
-    end_point = volumes[np.argmin(np.abs(np.array(pH) - 7))]
+    if st.button("Start Experiment"):
+        st.markdown(
+            """
+            <div style="position: relative; width: 400px; height: 500px;">
+                <div style="position: absolute; bottom: 0; left: 0; width: 200px; height: 300px; background-color: #4682B4; border-radius: 20px; animation: wave 5s ease-in-out infinite;">
+                    <div style="position: absolute; bottom: 0; left: 50px; width: 100px; height: 200px; background-color: #FF0000; border-radius: 10px; animation: add-naoh 10s linear forwards;">
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background-color: #008000; border-radius: 10px;"></div>
+                    </div>
+                </div>
+                <div style="position: absolute; top: 100px; right: 50px; width: 50px; height: 300px; background-color: #008000; border-radius: 10px;"></div>
+            </div>
+            <style>
+                @keyframes wave {
+                    0% { transform: translateX(-10px); }
+                    50% { transform: translateX(10px); }
+                    100% { transform: translateX(-10px); }
+                }
+                @keyframes add-naoh {
+                    0% { height: 0%; }
+                    100% { height: 100%; }
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
 
-    return volumes, pH, end_point
+        # Titration calculation
+        volume_naoh = np.linspace(0, 50, 101)
+        ph = 7 - log10(volume_naoh)
 
-# Streamlit app
-if st.button("Start Experiment"):
-    # Simulate the titration
-    initial_volume = 50  # mL
-    initial_pH = 2
-    base_volume = 20  # mL
-    base_concentration = 0.1  # M
+        # Plot the pH curve
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(volume_naoh, ph)
+        ax.axvline(x=25, color='r', linestyle='--', label='Equivalence Point')
+        ax.set_xlabel('Volume of NaOH (mL)')
+        ax.set_ylabel('pH')
+        ax.set_title('Acid Base Titration')
+        ax.legend()
 
-    volumes, pH, end_point = titrate(initial_volume, initial_pH, base_volume, base_concentration)
-
-    # Animate the titration
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.set_xlim(0, base_volume)
-    ax.set_ylim(initial_pH - 1, initial_pH + 1)
-    ax.set_xlabel("Volume of NaOH (mL)")
-    ax.set_ylabel("pH")
-    ax.set_title("Acid-Base Titration")
-    line, = ax.plot([], [], lw=2)
-
-    def animate(i):
-        line.set_data([volumes[i], volumes[i]], [initial_pH, pH[i]])
-        return line,
-
-    ani = FuncAnimation(fig, animate, frames=len(volumes), interval=50, blit=True)
-
-    # Show the plot
-    st.pyplot(fig)
-
-    # Display the end point
-    st.write(f"The end point of the titration is at {end_point:.2f} mL of NaOH.")
+        st.pyplot(fig)
