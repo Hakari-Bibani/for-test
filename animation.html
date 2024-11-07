@@ -43,7 +43,7 @@
     
     @keyframes decreaseLevel {
       from { height: 200px; }
-      to { height: 190px; }
+      to { height: 180px; }
     }
   </style>
 </head>
@@ -112,18 +112,16 @@
       const solution = document.getElementById('solution');
       const buretteSolution = document.getElementById('burette-solution');
       
-      // Start burette solution animation (only a few drops)
-      buretteSolution.style.animationName = 'decreaseLevel';
-      buretteSolution.style.animationDuration = '5s';
+      // Start burette solution animation (decrease by 20 mL)
       buretteSolution.style.animationPlayState = 'running';
       
-      // Start dropping animation
+      // Start dropping animation (5 drops)
       drop.style.animationPlayState = 'running';
       
-      // Change color after a short delay
+      // Change color after 5 seconds
       colorChangeTimeout = setTimeout(() => {
         solution.style.animationPlayState = 'running';
-      }, 3000);
+      }, 5000);
     }
     
     // Add this function to your Streamlit component
