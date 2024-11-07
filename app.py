@@ -1,35 +1,56 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import plotly.graph_objs as go
 import numpy as np
 
-# Function to simulate the titration process
-def animate_titration():
-    fig, ax = plt.subplots()
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
-    ax.set_xlabel("Volume of NaOH (mL)")
-    ax.set_ylabel("pH")
-    line, = ax.plot([], [], lw=2)
-
-    # Example data to simulate pH change as NaOH is added
-    volume_naoh = np.linspace(0, 10, 100)
-    pH_values = [3 + (i / 10) for i in range(100)]  # Simplified example
-
-    def init():
-        line.set_data([], [])
-        return line,
-
-    def update(frame):
-        line.set_data(volume_naoh[:frame], pH_values[:frame])
-        return line,
-
-    ani = FuncAnimation(fig, update, frames=len(volume_naoh), init_func=init, blit=True)
-    return fig
-
 # Streamlit UI
-st.title("Titration Animation: Adding NaOH to HCl Solution")
+st.title("Interactive Titration Animation: Adding NaOH to HCl Solution")
 
-# Generate and display the animation
-fig = animate_titration()
-st.pyplot(fig)
+# Example data for titration
+volume_naoh = np.linspace(0, 50, 100)  # Volume of NaOH added in mL
+pH_values = 1 + (13 * volume_naoh / (50 + volume_naoh))  # Simplified pH change curve
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Initial trace (empty)
+fig.add_trace(go.Scatter(x=[], y=[], mode="lines+markers", name="pH Curve"))
+
+# Frames for the animation
+frames = [
+    go.Frame(
+        data=[go.Scatter(x=volume_naoh[:i], y=pH_values[:i], mode="lines+markers")],
+        name=str(i),
+    )
+    for i in range(1, len(volume_naoh))
+]
+
+# Add frames to the figure
+fig.frames = frames
+
+# Layout for the animation
+fig.update_layout(
+    title="Titration of HCl with NaOH",
+    xaxis=dict(title="Volume of NaOH (mL)", range=[0, 50]),
+    yaxis=dict(title="pH", range=[0, 14]),
+    updatemenus=[
+        dict(
+            type="buttons",
+            showactive=False,
+            buttons=[
+                dict(
+                    label="Play",
+                    method="animate",
+                    args=[None, {"frame": {"duration": 50, "redraw": True}, "fromcurrent": True}],
+                ),
+                dict(
+                    label="Pause",
+                    method="animate",
+                    args=[[None], {"frame": {"duration": 0, "redraw": False}, "mode": "immediate"}],
+                ),
+            ],
+        )
+    ],
+)
+
+# Add animation to Streamlit
+st.plotly_chart(fig)
