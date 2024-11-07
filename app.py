@@ -3,68 +3,65 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import log10
 
-def app():
-    st.set_page_config(page_title="Acid Base Titration")
+# Define the titration parameters
+c_hcl = 0.1  # Concentration of HCl
+c_naoh = 0.1  # Concentration of NaOH
+v_hcl = 50    # Volume of HCl
+v_naoh = 0    # Volume of NaOH
 
-    st.title("Acid Base Titration 🌊")
+# Define the function to calculate pH
+def calculate_ph(v_naoh):
+    ph = 7 - log10(c_hcl * v_hcl / (v_hcl + v_naoh))
+    return ph
 
-    # Create a beaker and a burette
-    st.markdown(
-        """
-        <div style="position: relative; width: 400px; height: 500px;">
-            <div style="position: absolute; bottom: 0; left: 0; width: 200px; height: 300px; background-color: #4682B4; border-radius: 20px; animation: wave 5s ease-in-out infinite;">
-                <div style="position: absolute; bottom: 0; left: 50px; width: 100px; height: 200px; background-color: #FF0000; border-radius: 10px;"></div>
-            </div>
-            <div style="position: absolute; top: 100px; right: 50px; width: 50px; height: 300px; background-color: #008000; border-radius: 10px;"></div>
-        </div>
-        <style>
-            @keyframes wave {
-                0% { transform: translateX(-10px); }
-                50% { transform: translateX(10px); }
-                100% { transform: translateX(-10px); }
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+# Create the Streamlit app
+st.set_page_config(page_title="Acid-Base Titration")
+st.title("Acid-Base Titration")
 
-    if st.button("Start Experiment"):
-        st.markdown(
-            """
-            <div style="position: relative; width: 400px; height: 500px;">
-                <div style="position: absolute; bottom: 0; left: 0; width: 200px; height: 300px; background-color: #4682B4; border-radius: 20px; animation: wave 5s ease-in-out infinite;">
-                    <div style="position: absolute; bottom: 0; left: 50px; width: 100px; height: 200px; background-color: #FF0000; border-radius: 10px; animation: add-naoh 10s linear forwards;">
-                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background-color: #008000; border-radius: 10px;"></div>
-                    </div>
-                </div>
-                <div style="position: absolute; top: 100px; right: 50px; width: 50px; height: 300px; background-color: #008000; border-radius: 10px;"></div>
-            </div>
-            <style>
-                @keyframes wave {
-                    0% { transform: translateX(-10px); }
-                    50% { transform: translateX(10px); }
-                    100% { transform: translateX(-10px); }
-                }
-                @keyframes add-naoh {
-                    0% { height: 0%; }
-                    100% { height: 100%; }
-                }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+# Add a wave animation for the title
+st.markdown(
+    """
+    <style>
+    .title-wave {
+        font-size: 36px;
+        font-weight: bold;
+        background-image: linear-gradient(to right, #4CAF50, #2196F3, #E91E63);
+        background-size: 200% auto;
+        color: #fff;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: wave 5s ease infinite;
+    }
+    @keyframes wave {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    </style>
+    <div class="title-wave">Acid-Base Titration</div>
+    """,
+    unsafe_allow_html=True
+)
 
-        # Titration calculation
-        volume_naoh = np.linspace(0, 50, 101)
-        ph = 7 - log10(volume_naoh)
+# Add a button to start the experiment
+if st.button("Start Experiment"):
+    # Create the burette and conical flask
+    st.image("https://via.placeholder.com/300x400?text=Burette+and+Conical+Flask", width=300)
 
-        # Plot the pH curve
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(volume_naoh, ph)
-        ax.axvline(x=25, color='r', linestyle='--', label='Equivalence Point')
-        ax.set_xlabel('Volume of NaOH (mL)')
-        ax.set_ylabel('pH')
-        ax.set_title('Acid Base Titration')
-        ax.legend()
-
-        st.pyplot(fig)
+    # Animate the addition of NaOH to HCl
+    for i in range(50):
+        v_naoh += 0.5
+        ph = calculate_ph(v_naoh)
+        st.write(f"Adding NaOH: Volume of NaOH = {v_naoh:.1f} mL, pH = {ph:.2f}")
+        st.balloons()
+        plt.figure(figsize=(8, 6))
+        plt.plot([0, v_naoh], [calculate_ph(0), ph])
+        plt.xlabel("Volume of NaOH (mL)")
+        plt.ylabel("pH")
+        plt.title("Acid-Base Titration")
+        st.pyplot(plt)
+        plt.close()
+        st.write("Waiting for color change...")
+        st.write("Color changed!")
+        st.stop()
