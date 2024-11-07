@@ -1,137 +1,138 @@
 import streamlit as st
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
 import time
-from PIL import Image
-import base64
-import io
+import numpy as np
+import matplotlib.pyplot as plt
 
-def create_titration_curve(volume_naoh):
-    # Calculate pH values for titration curve
-    volumes = np.linspace(0, 50, 100)
-    pHs = []
+def create_burette_flask_ascii(drops, pink_level=0):
+    # Create ASCII art for burette and flask
+    burette = [
+        "  ┌─────────┐  ",
+        "  │         │  ",
+        "  │  NaOH   │  ",
+        "  │         │  ",
+        "  └────┬────┘  ",
+        "       │       ",
+        "       │       "
+    ]
     
-    for v in volumes:
-        if v < 25:  # Before equivalence point
-            h_conc = (0.1 * 25 - 0.1 * v) / (25 + v)
-            pH = -np.log10(h_conc)
-        elif v == 25:  # At equivalence point
-            pH = 7
-        else:  # After equivalence point
-            oh_conc = (0.1 * (v - 25)) / (25 + v)
-            pH = 14 + np.log10(oh_conc)
-        pHs.append(pH)
+    # Add drops
+    if drops > 0:
+        burette.append("       💧      ")
+    else:
+        burette.append("             ")
+        
+    flask = [
+        "       │       ",
+        "    ┌──┴──┐    ",
+        "   /  HCl  \\   ",
+        "  /         \\  ",
+        " /           \\ ",
+        "└─────────────┘"
+    ]
     
-    return volumes, pHs
+    # Combine burette and flask
+    return "\n".join(burette + flask)
 
 def main():
-    # Page config
-    st.set_page_config(page_title="Acid-Base Titration Simulation", layout="wide")
+    st.set_page_config(page_title="Acid-Base Titration", layout="wide")
     
-    # Custom CSS for animations
+    # Title with custom styling
     st.markdown("""
-        <style>
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .bouncing-text {
-            animation: bounce 2s infinite;
-            display: inline-block;
-        }
-        .stButton>button {
-            width: 200px;
-            height: 50px;
-            font-size: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        <h1 style='text-align: center; color: #2E86C1;'>
+            🧪 Acid-Base Titration Simulation 🧪
+        </h1>
+    """, unsafe_allow_html=True)
     
-    # Animated title
-    st.markdown('<h1 class="bouncing-text">Acid-Base Titration</h1>', unsafe_allow_html=True)
-    
-    # Initial setup description
-    st.markdown("### Experiment Setup")
+    # Experiment setup
+    st.markdown("### Initial Setup")
     col1, col2 = st.columns(2)
     
     with col1:
-        st.info("📝 Initial Conditions:")
+        st.info("📋 Reagents:")
         st.write("• Burette: 0.1M NaOH")
-        st.write("• Conical Flask: 25mL of 0.1M HCl")
+        st.write("• Flask: 25mL of 0.1M HCl")
     
-    # Create a placeholder for the animation
-    animation_placeholder = st.empty()
-    result_placeholder = st.empty()
-    graph_placeholder = st.empty()
+    with col2:
+        st.info("🔍 Indicator:")
+        st.write("• Phenolphthalein")
+        st.write("• Color change: Colorless → Pink")
     
-    # Start experiment button
-    if st.button("Start Experiment"):
-        # Show initial setup
-        animation_placeholder.info("🔬 Setting up the experiment...")
-        time.sleep(1)
+    # Create containers for animation and plot
+    animation_container = st.empty()
+    progress_container = st.empty()
+    result_container = st.empty()
+    plot_container = st.empty()
+    
+    # Add start button
+    if st.button("Start Titration"):
+        drops = 0
+        total_drops = 10
         
-        # Simulate drops and color change
-        for i in range(1, 6):
-            animation_placeholder.warning(f"""
-            ⚗️ Adding NaOH... Drop {i}
+        # Initialize progress bar
+        progress = progress_container.progress(0)
+        
+        for i in range(total_drops + 1):
+            # Update progress
+            progress.progress(i/total_drops)
             
-            Burette: {'▼' * i}
-            Flask: {'🌸' * i}
-            """)
-            time.sleep(1)
+            # Show burette and flask ASCII art
+            animation_container.code(create_burette_flask_ascii(1 if i < total_drops else 0))
+            
+            # Update drop count
+            drops = i
+            
+            # Show current status
+            if i < total_drops:
+                result_container.info(f"Adding drop {i+1} of {total_drops}...")
+            time.sleep(0.5)
         
         # Show completion message
-        result_placeholder.success("🎉 Endpoint reached! The solution has turned pink!")
+        result_container.success("🎉 Endpoint reached! Solution turned pink!")
         
-        # Generate and display titration curve
-        volumes, pHs = create_titration_curve(25)
+        # Create and display titration curve
+        fig, ax = plt.subplots(figsize=(10, 6))
         
-        fig = go.Figure()
+        # Generate data for the curve
+        volume = np.linspace(0, 50, 200)
+        ph = np.zeros_like(volume)
         
-        # Add titration curve
-        fig.add_trace(go.Scatter(
-            x=volumes,
-            y=pHs,
-            mode='lines',
-            name='pH Curve',
-            line=dict(color='blue', width=2)
-        ))
+        # Calculate pH values
+        for i, v in enumerate(volume):
+            if v < 25:
+                # Before endpoint
+                ph[i] = -np.log10((0.1 * (25 - v)) / (25 + v))
+            elif v == 25:
+                # At endpoint
+                ph[i] = 7
+            else:
+                # After endpoint
+                ph[i] = 14 + np.log10((0.1 * (v - 25)) / (25 + v))
         
-        # Add endpoint marker
-        fig.add_trace(go.Scatter(
-            x=[25],
-            y=[7],
-            mode='markers',
-            name='Endpoint',
-            marker=dict(color='red', size=12)
-        ))
+        # Plot the curve
+        ax.plot(volume, ph, 'b-', label='Titration Curve')
+        ax.axvline(x=25, color='r', linestyle='--', label='Endpoint')
+        ax.grid(True, alpha=0.3)
+        ax.set_xlabel('Volume of NaOH added (mL)')
+        ax.set_ylabel('pH')
+        ax.set_title('Titration Curve: HCl vs NaOH')
+        ax.legend()
         
-        # Update layout
-        fig.update_layout(
-            title='Titration Curve: HCl vs NaOH',
-            xaxis_title='Volume of NaOH added (mL)',
-            yaxis_title='pH',
-            hovermode='x',
-            showlegend=True,
-            width=800,
-            height=500
-        )
-        
-        # Add vertical line at endpoint
-        fig.add_vline(x=25, line_dash="dash", line_color="gray")
-        
-        # Show the plot
-        graph_placeholder.plotly_chart(fig)
+        # Display the plot
+        plot_container.pyplot(fig)
         
         # Add explanation
         st.markdown("""
-        ### Explanation of the Titration Curve:
+        ### 📊 Explanation:
         
-        1. **Initial pH**: The solution starts acidic (pH < 7) due to HCl
-        2. **Equivalence Point**: Occurs at 25mL when moles of acid = moles of base
-        3. **Buffer Region**: The curve is steepest near the equivalence point
-        4. **Final pH**: The solution becomes basic (pH > 7) after the equivalence point
+        1. **Initial Stage** (pH < 7):
+           - Solution is acidic due to HCl
+        
+        2. **Endpoint** (pH = 7):
+           - Reached when moles of acid = moles of base
+           - Solution turns pink
+        
+        3. **After Endpoint** (pH > 7):
+           - Solution becomes increasingly basic
         """)
 
 if __name__ == "__main__":
