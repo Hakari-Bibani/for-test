@@ -10,13 +10,14 @@
     }
     
     #solution {
-      fill: #e6f3ff; /* Initial color */
+      animation: colorChange 1s ease-in-out;
+      animation-play-state: paused;
     }
     
     #drop {
       opacity: 0;
-      transform: translateY(0);
-      transition: transform 0.8s ease, opacity 0.8s ease;
+      animation: dropFall 1s infinite;
+      animation-play-state: paused;
     }
     
     @keyframes dropFall {
@@ -28,6 +29,21 @@
         transform: translateY(150px);
         opacity: 0;
       }
+    }
+    
+    @keyframes colorChange {
+      0% { fill: #e6f3ff; }
+      100% { fill: #ffcce6; }
+    }
+    
+    #burette-solution {
+      animation: decreaseLevel 5s linear;
+      animation-play-state: paused;
+    }
+    
+    @keyframes decreaseLevel {
+      from { height: 200px; }
+      to { height: 190px; }
     }
   </style>
 </head>
@@ -84,39 +100,32 @@
   </div>
 
   <script>
-    let dropCount = 0;
-    const maxDrops = 5; // Number of drops before the color changes
-    const drop = document.getElementById('drop');
-    const solution = document.getElementById('solution');
-
-    function addDrop() {
-      // Animate the drop
-      drop.style.opacity = 1;
-      drop.style.transform = 'translateY(150px)';
-      
-      // Reset the drop after animation
-      setTimeout(() => {
-        drop.style.opacity = 0;
-        drop.style.transform = 'translateY(0)';
-        dropCount++;
-        
-        // Change the color of the solution in the flask after maxDrops
-        if (dropCount >= maxDrops) {
-          solution.style.fill = '#ffcce6'; // Change to pink
-        }
-      }, 800); // Duration of the drop animation
-    }
-
+    let isExperimentRunning = false;
+    let dropAnimation;
+    let colorChangeTimeout;
+    
     function startExperiment() {
-      let interval = setInterval(() => {
-        if (dropCount < maxDrops) {
-          addDrop();
-        } else {
-          clearInterval(interval);
-        }
-      }, 1000); // Interval between each drop
+      if (isExperimentRunning) return;
+      isExperimentRunning = true;
+      
+      const drop = document.getElementById('drop');
+      const solution = document.getElementById('solution');
+      const buretteSolution = document.getElementById('burette-solution');
+      
+      // Start burette solution animation (only a few drops)
+      buretteSolution.style.animationName = 'decreaseLevel';
+      buretteSolution.style.animationDuration = '5s';
+      buretteSolution.style.animationPlayState = 'running';
+      
+      // Start dropping animation
+      drop.style.animationPlayState = 'running';
+      
+      // Change color after a short delay
+      colorChangeTimeout = setTimeout(() => {
+        solution.style.animationPlayState = 'running';
+      }, 3000);
     }
-
+    
     // Add this function to your Streamlit component
     window.addEventListener('message', function(event) {
       if (event.data.type === 'start_experiment') {
@@ -124,5 +133,6 @@
       }
     });
   </script>
+</div>
 </body>
 </html>
