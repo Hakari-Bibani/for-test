@@ -1,121 +1,174 @@
-import React, { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import streamlit as st
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+from math import exp
+from PIL import Image
+from io import BytesIO
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
+def run_experiment():
+    st.set_page_config(layout="centered")
 
-const ExperimentContainer = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  height: 400px;
-  margin-bottom: 2rem;
-`;
+    # Custom CSS for styling and animations
+    st.write("""
+    <style>
+        .title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.8em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #2c3e50, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: gradient 3s linear infinite;
+        }
 
-const Burette = styled.div`
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 200px;
-  background-color: #ddd;
-  border: 2px solid #aaa;
-`;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
 
-const BuretteTab = styled.div`
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 12px;
-  background-color: #aaa;
-  border-radius: 2px;
-`;
+        .experiment-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
 
-const Beaker = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 180px;
-  border: 3px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
-  background-color: #ff6666;
-  transition: background-color 1s ease;
-`;
+        .burette {
+            width: 20px;
+            height: 200px;
+            background-color: #ddd;
+            border: 2px solid #aaa;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
-const dropAnimation = keyframes`
-  0% { top: 10px; opacity: 1; }
-  90% { top: 150px; opacity: 1; }
-  100% { top: 180px; opacity: 0; }
-`;
+        .burette-tab {
+            width: 30px;
+            height: 12px;
+            background-color: #aaa;
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
 
-const Drop = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 12px;
-  background-color: blue;
-  border-radius: 50%;
-  opacity: 0;
-  animation: ${dropAnimation} 2s forwards;
-  animation-delay: ${(props) => props.delay}s;
-`;
+        .beaker {
+            width: 120px;
+            height: 180px;
+            border: 3px solid #ddd;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            overflow: hidden;
+            background-color: #ff6666;
+            transition: background-color 1s ease;
+        }
 
-const AcidBaseChart = () => {
-  const [showExperiment, setShowExperiment] = useState(false);
+        .drop {
+            width: 8px;
+            height: 12px;
+            background-color: blue;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            animation: drop-animation 2s forwards;
+        }
 
-  const handleStartExperiment = () => {
-    setShowExperiment(true);
-  };
+        @keyframes drop-animation {
+            0% { top: 10px; opacity: 1; }
+            90% { top: 150px; opacity: 1; }
+            100% { top: 180px; opacity: 0; }
+        }
 
-  // Generate sample pH data
-  const pHData = Array.from({ length: 100 }, (_, i) => {
-    const volume = (i / 99) * 25;
-    return {
-      volume: volume.toFixed(2),
-      pH: 0 + (7 - 0) * (1 - Math.exp(-0.3 * (volume - 12.5))) + (14 - 7) * (1 - Math.exp(-0.3 * (volume - 12.5))),
-    };
-  });
+        .color-change {
+            background-color: #ffcc00;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-  return (
-    <Container>
-      <h1 className="title">Acid-Base Titration</h1>
-      <ExperimentContainer>
-        {showExperiment && (
-          <>
-            <Burette>
-              <BuretteTab />
-              <Drop delay={0} />
-              <Drop delay={0.5} />
-              <Drop delay={1} />
-            </Burette>
-            <Beaker className="color-change" />
-          </>
-        )}
-      </ExperimentContainer>
-      <button onClick={handleStartExperiment}>Start Experiment</button>
-      <LineChart width={600} height={400} data={pHData}>
-        <XAxis dataKey="volume" type="number" domain={[0, 25]} />
-        <YAxis type="number" domain={[0, 14]} />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="pH" stroke="#8884d8" />
-      </LineChart>
-    </Container>
-  );
-};
+    # Display the animated title
+    st.markdown("<h1 class='title'>Acid-Base Titration</h1>", unsafe_allow_html=True)
 
-export default AcidBaseChart;
+    # Setup for the experiment
+    st.write("## Experiment Setup")
+    st.write("This experiment involves adding NaOH from the burette to HCl in the beaker.")
+
+    # Container for the animation
+    experiment_container = st.empty()
+
+    # Initial state
+    def render_initial_state():
+        experiment_container.markdown("""
+        <div class="experiment-container">
+            <div class="burette">
+                <div class="burette-tab"></div>
+            </div>
+            <div class="beaker"></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Animation when the button is pressed
+    def animate_titration():
+        # Step 1: Show the drops falling
+        experiment_container.markdown("""
+        <div class="experiment-container">
+            <div class="burette">
+                <div class="burette-tab"></div>
+                <div class="drop"></div>
+                <div class="drop" style="animation-delay: 0.5s;"></div>
+                <div class="drop" style="animation-delay: 1s;"></div>
+            </div>
+            <div class="beaker"></div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(2)  # Wait for the drops to fall
+
+        # Step 2: Change the beaker's color
+        experiment_container.markdown("""
+        <div class="experiment-container">
+            <div class="burette">
+                <div class="burette-tab"></div>
+            </div>
+            <div class="beaker color-change"></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Initial rendering
+    render_initial_state()
+
+    # Button to start the experiment
+    if st.button("Start Experiment"):
+        animate_titration()
+
+        # Plotting the pH curve
+        st.write("## Titration pH Curve")
+        volume = np.linspace(0, 25, 100)
+        pH = 0 + (7 - 0) * (1 - exp(-0.3 * (volume - 12.5))) + (14 - 7) * (1 - exp(-0.3 * (volume - 12.5)))
+        fig, ax = plt.subplots()
+        ax.plot(volume, pH, label='pH Curve')
+        ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
+        ax.axvline(x=12.5, color='red', linestyle='--', label='Volume at End Point')
+        ax.set_xlabel("Volume of NaOH (mL)")
+        ax.set_ylabel("pH")
+        ax.set_title("pH vs. Volume of NaOH")
+        ax.set_ylim(0, 14)
+        ax.legend()
+        st.pyplot(fig)
+
+if __name__ == "__main__":
+    run_experiment()
