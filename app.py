@@ -1,135 +1,140 @@
 import streamlit as st
-from streamlit.components.v1 import html
+import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Title with animation
-st.markdown(
-    """
-    <div style="text-align: center; font-size: 40px; font-weight: bold; animation: float 2s infinite alternate;">
-        Acid-Base Titration
-    </div>
+def run_experiment():
+    # Custom CSS for styling and animations
+    st.markdown("""
     <style>
-        @keyframes float {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(10px); }
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
+
+        .title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.8em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #2c3e50, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: gradient 3s linear infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .experiment-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .burette {
+            width: 10px;
+            height: 200px;
+            background-color: #ddd;
+            border: 2px solid #aaa;
+            position: relative;
+        }
+
+        .beaker {
+            width: 100px;
+            height: 120px;
+            border: 3px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+            background-color: #ff6666;
+        }
+
+        .drop {
+            width: 6px;
+            height: 10px;
+            background-color: blue;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 2px;
+            opacity: 0;
+            animation: drop-animation 3s forwards;
+        }
+
+        @keyframes drop-animation {
+            0% { top: 10px; opacity: 1; }
+            90% { top: 100px; opacity: 1; }
+            100% { top: 100px; opacity: 0; }
+        }
+
+        .color-change {
+            animation: color-change 1s forwards;
+        }
+
+        @keyframes color-change {
+            0% { background-color: #ff6666; }
+            100% { background-color: #ffcc00; }
         }
     </style>
-    """,
-    unsafe_allow_html=True
-)
+    """, unsafe_allow_html=True)
 
-# Experiment setup with burette and beaker
-st.write("## Experiment Setup")
-st.write("A thin rectangular burette containing NaOH and a half-filled beaker labeled HCl are shown below.")
+    # Display the animated title
+    st.markdown("<h1 class='title'>Acid-Base Titration</h1>", unsafe_allow_html=True)
 
-# HTML code for burette and beaker animation
-experiment_html = """
-<div class="experiment-container">
-    <div class="burette">
-        <div class="label">NaOH</div>
-        <div class="drop"></div>
-    </div>
-    <div class="beaker">
-        <div class="label">HCl</div>
-    </div>
-</div>
-<style>
-    .experiment-container {
-        position: relative;
-        width: 250px;
-        height: 400px;
-        margin: auto;
-    }
-    .burette {
-        position: absolute;
-        top: 0;
-        left: 90px;
-        width: 20px;
-        height: 300px;
-        background-color: #ddd;
-        border: 2px solid #aaa;
-        border-radius: 5px;
-    }
-    .burette .label {
-        position: absolute;
-        bottom: -20px;
-        left: -10px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-    .drop {
-        position: absolute;
-        top: 50px;
-        left: 7px;
-        width: 6px;
-        height: 10px;
-        background-color: blue;
-        border-radius: 50%;
-        opacity: 0;
-    }
-    .beaker {
-        position: absolute;
-        bottom: 0;
-        left: 50px;
-        width: 150px;
-        height: 100px;
-        background-color: #ff6666;
-        border: 2px solid #aaa;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        overflow: hidden;
-        transition: background-color 1s ease;
-    }
-    .beaker .label {
-        position: absolute;
-        top: -20px;
-        left: 60px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-</style>
-<script>
-    function startExperiment() {
-        const drop = document.querySelector('.drop');
-        const beaker = document.querySelector('.beaker');
+    # Setup for the experiment
+    st.write("## Experiment Setup")
+    st.write("This experiment involves adding NaOH from the burette to HCl in the beaker.")
 
-        // Make the drop visible and animate it
-        drop.style.opacity = '1';
-        drop.style.animation = 'drop 4s forwards';
+    # Container for the animation
+    container = st.empty()
 
-        // Change the color of the beaker after 4 seconds
-        setTimeout(() => {
-            beaker.style.backgroundColor = '#ffcc00'; // Color change to represent neutralization
-        }, 4000);
-    }
-    @keyframes drop {
-        0% { top: 50px; opacity: 1; }
-        90% { top: 250px; opacity: 1; }
-        100% { top: 250px; opacity: 0; }
-    }
-</script>
-"""
+    # Initial state
+    def render_initial_state():
+        container.markdown("""
+        <div class="experiment-container">
+            <div class="burette"></div>
+            <div class="beaker"></div>
+        </div>
+        """, unsafe_allow_html=True)
 
-# Button to start the experiment
-if st.button("Start Experiment"):
-    # Display the HTML animation
-    html(experiment_html + '<script>startExperiment();</script>', height=500)
+    # Animation when the button is pressed
+    def animate_titration():
+        container.markdown("""
+        <div class="experiment-container">
+            <div class="burette">
+                <div class="drop"></div>
+            </div>
+            <div class="beaker color-change"></div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(3)
 
-# Plot the pH curve
-st.write("## Titration pH Curve")
-# Simulate pH curve data
-volume = np.linspace(0, 25, 100)
-pH = 7 + (14 - 7) * (1 - np.exp(-0.2 * (volume - 12.5)))
+    # Initial rendering
+    render_initial_state()
 
-# Plotting
-fig, ax = plt.subplots()
-ax.plot(volume, pH, label='pH Curve')
-ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH')
-ax.axvline(x=12.5, color='red', linestyle='--', label='End Point')
-ax.set_xlabel("Volume of NaOH (mL)")
-ax.set_ylabel("pH")
-ax.set_title("pH vs. Volume of NaOH")
-ax.legend()
+    # Button to start the experiment
+    if st.button("Start Experiment"):
+        animate_titration()
 
-st.pyplot(fig)
+        # Plotting the pH curve
+        st.write("## Titration pH Curve")
+        volume = np.linspace(0, 25, 100)
+        pH = 7 + (14 - 7) * (1 - np.exp(-0.2 * (volume - 12.5)))
+        fig, ax = plt.subplots()
+        ax.plot(volume, pH, label='pH Curve')
+        ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH')
+        ax.axvline(x=12.5, color='red', linestyle='--', label='End Point')
+        ax.set_xlabel("Volume of NaOH (mL)")
+        ax.set_ylabel("pH")
+        ax.set_title("pH vs. Volume of NaOH")
+        ax.legend()
+        st.pyplot(fig)
+
+if __name__ == "__main__":
+    run_experiment()
