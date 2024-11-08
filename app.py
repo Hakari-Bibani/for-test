@@ -77,7 +77,13 @@ def run_experiment():
             background-color: #ff6666;
             position: absolute;
             bottom: 0;
+            animation: wave 2s infinite ease-in-out;
             transition: background-color 1s;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
         }
 
         .drop {
@@ -169,10 +175,10 @@ def run_experiment():
         st.write("## Titration pH Curve")
         volume = np.linspace(0, 25, 100)
         pH = np.where(volume < 12.5, 
-                      0 + (7 - 0) * (volume / 12.5), 
-                      7 + (13 - 7) * ((volume - 12.5) / 12.5))
+                      1 + (6 * (volume / 12.5)),  # pH increases from 1 to 7
+                      7 + (7 * ((volume - 12.5) / 12.5)))  # pH increases from 7 to 13
         fig, ax = plt.subplots()
-        ax.plot(volume, pH, label='pH Curve')
+        ax.plot(volume, pH, label='pH Curve', color='blue')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
         ax.axvline(x=12.5, color='red', linestyle='--', label='Volume at End Point')
         ax.set_xlabel("Volume of NaOH (mL)")
@@ -181,6 +187,12 @@ def run_experiment():
         ax.set_ylim(0, 14)  # Set pH range from 0 to 14
         ax.legend()
         st.pyplot(fig)
+
+        # Display results
+        st.write("### Results")
+        st.write("- The pH curve shows the titration of a strong acid (HCl) with a strong base (NaOH).")
+        st.write("- The end point is at pH 7, where neutralization occurs.")
+        st.write("- The pH rapidly increases after the neutralization point due to the addition of excess NaOH.")
 
 if __name__ == "__main__":
     run_experiment()
