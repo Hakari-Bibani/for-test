@@ -43,7 +43,7 @@ def run_experiment():
             background-color: #ddd;
             border: 2px solid #aaa;
             position: absolute;
-            top: 40px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -59,23 +59,13 @@ def run_experiment():
             border-radius: 2px;
         }
 
-        .label {
-            font-size: 14px;
-            text-align: center;
+        .burette-label {
             position: absolute;
-            color: #2c3e50;
-        }
-
-        .label-burette {
             top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .label-beaker {
-            top: 350px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: calc(50% + 15px);
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: bold;
         }
 
         .beaker {
@@ -98,6 +88,16 @@ def run_experiment():
             bottom: 0;
             animation: wave 2s infinite ease-in-out;
             transition: background-color 1s;
+        }
+
+        .beaker-label {
+            position: absolute;
+            top: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: bold;
         }
 
         @keyframes wave {
@@ -144,14 +144,14 @@ def run_experiment():
     def render_initial_state():
         container.markdown("""
         <div class="experiment-container">
-            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
+                <div class="burette-label">Burette filled with NaOH</div>
             </div>
             <div class="beaker">
                 <div class="solution"></div>
+                <div class="beaker-label">HCl</div>
             </div>
-            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -160,17 +160,17 @@ def run_experiment():
         # Step 1: Show the drops falling
         container.markdown("""
         <div class="experiment-container">
-            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
+                <div class="burette-label">Burette filled with NaOH</div>
                 <div class="drop"></div>
                 <div class="drop" style="animation-delay: 0.5s;"></div>
                 <div class="drop" style="animation-delay: 1s;"></div>
             </div>
             <div class="beaker">
                 <div class="solution"></div>
+                <div class="beaker-label">HCl</div>
             </div>
-            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
         time.sleep(2)  # Wait for the drops to fall
@@ -178,14 +178,14 @@ def run_experiment():
         # Step 2: Change the color of the solution in the beaker
         container.markdown("""
         <div class="experiment-container">
-            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
+                <div class="burette-label">Burette filled with NaOH</div>
             </div>
             <div class="beaker">
                 <div class="solution color-change"></div>
+                <div class="beaker-label">HCl</div>
             </div>
-            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -196,14 +196,12 @@ def run_experiment():
     if st.button("Start Experiment"):
         animate_titration()
 
-        # Plotting the pH curve
+        # Plotting the real pH curve for strong acid and base titration
         st.write("## Titration pH Curve")
         volume = np.linspace(0, 25, 100)
-        pH = np.concatenate([
-            np.linspace(1, 2, 30),  # Initial slow increase
-            np.linspace(2, 11, 40),  # Sharp increase near equivalence
-            np.linspace(11, 13, 30)  # Final leveling off
-        ])
+        pH = np.where(volume < 12.5, 
+                      1 + (6 * (volume / 12.5)),  # pH increases gradually from 1 to 7
+                      7 + (7 * ((volume - 12.5) / 12.5)))  # pH increases steeply from 7 to 13
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve', color='blue')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
@@ -219,7 +217,7 @@ def run_experiment():
         st.write("### Results")
         st.write("- The pH curve represents the titration of a strong acid (HCl) with a strong base (NaOH).")
         st.write("- The end point is at pH 7, where neutralization occurs.")
-        st.write("- The pH rapidly increases near the equivalence point and levels off as more NaOH is added.")
+        st.write("- The pH increases rapidly after the neutralization point due to the excess NaOH added.")
 
 if __name__ == "__main__":
     run_experiment()
