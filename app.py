@@ -43,7 +43,7 @@ def run_experiment():
             background-color: #ddd;
             border: 2px solid #aaa;
             position: absolute;
-            top: 0;
+            top: 40px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -57,6 +57,25 @@ def run_experiment():
             left: 50%;
             transform: translateX(-50%);
             border-radius: 2px;
+        }
+
+        .label {
+            font-size: 14px;
+            text-align: center;
+            position: absolute;
+            color: #2c3e50;
+        }
+
+        .label-burette {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .label-beaker {
+            top: 350px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .beaker {
@@ -125,12 +144,14 @@ def run_experiment():
     def render_initial_state():
         container.markdown("""
         <div class="experiment-container">
+            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
             </div>
             <div class="beaker">
                 <div class="solution"></div>
             </div>
+            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -139,6 +160,7 @@ def run_experiment():
         # Step 1: Show the drops falling
         container.markdown("""
         <div class="experiment-container">
+            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
                 <div class="drop"></div>
@@ -148,6 +170,7 @@ def run_experiment():
             <div class="beaker">
                 <div class="solution"></div>
             </div>
+            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
         time.sleep(2)  # Wait for the drops to fall
@@ -155,12 +178,14 @@ def run_experiment():
         # Step 2: Change the color of the solution in the beaker
         container.markdown("""
         <div class="experiment-container">
+            <div class="label label-burette">Burette filled with NaOH</div>
             <div class="burette">
                 <div class="burette-tab"></div>
             </div>
             <div class="beaker">
                 <div class="solution color-change"></div>
             </div>
+            <div class="label label-beaker">HCl</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -174,9 +199,11 @@ def run_experiment():
         # Plotting the pH curve
         st.write("## Titration pH Curve")
         volume = np.linspace(0, 25, 100)
-        pH = np.where(volume < 12.5, 
-                      1 + (6 * (volume / 12.5)),  # pH increases from 1 to 7
-                      7 + (7 * ((volume - 12.5) / 12.5)))  # pH increases from 7 to 13
+        pH = np.concatenate([
+            np.linspace(1, 2, 30),  # Initial slow increase
+            np.linspace(2, 11, 40),  # Sharp increase near equivalence
+            np.linspace(11, 13, 30)  # Final leveling off
+        ])
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve', color='blue')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
@@ -190,9 +217,9 @@ def run_experiment():
 
         # Display results
         st.write("### Results")
-        st.write("- The pH curve shows the titration of a strong acid (HCl) with a strong base (NaOH).")
+        st.write("- The pH curve represents the titration of a strong acid (HCl) with a strong base (NaOH).")
         st.write("- The end point is at pH 7, where neutralization occurs.")
-        st.write("- The pH rapidly increases after the neutralization point due to the addition of excess NaOH.")
+        st.write("- The pH rapidly increases near the equivalence point and levels off as more NaOH is added.")
 
 if __name__ == "__main__":
     run_experiment()
