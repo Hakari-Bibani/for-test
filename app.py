@@ -48,6 +48,17 @@ def run_experiment():
             transform: translateX(-50%);
         }
 
+        .burette-tab {
+            width: 20px;
+            height: 10px;
+            background-color: #aaa;
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
         .beaker {
             width: 100px;
             height: 120px;
@@ -71,13 +82,13 @@ def run_experiment():
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
-            animation: drop-animation 3s forwards;
+            animation: drop-animation 2s forwards;
         }
 
         @keyframes drop-animation {
             0% { top: 10px; opacity: 1; }
             90% { top: 100px; opacity: 1; }
-            100% { top: 100px; opacity: 0; }
+            100% { top: 150px; opacity: 0; }
         }
 
         .color-change {
@@ -105,24 +116,38 @@ def run_experiment():
     def render_initial_state():
         container.markdown("""
         <div class="experiment-container">
-            <div class="burette"></div>
+            <div class="burette">
+                <div class="burette-tab"></div>
+            </div>
             <div class="beaker"></div>
         </div>
         """, unsafe_allow_html=True)
 
     # Animation when the button is pressed
     def animate_titration():
+        # Step 1: Show the drops falling
         container.markdown("""
         <div class="experiment-container">
             <div class="burette">
+                <div class="burette-tab"></div>
                 <div class="drop"></div>
                 <div class="drop" style="animation-delay: 0.5s;"></div>
                 <div class="drop" style="animation-delay: 1s;"></div>
             </div>
+            <div class="beaker"></div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(2)  # Wait for the drops to fall
+
+        # Step 2: Change the beaker's color
+        container.markdown("""
+        <div class="experiment-container">
+            <div class="burette">
+                <div class="burette-tab"></div>
+            </div>
             <div class="beaker color-change"></div>
         </div>
         """, unsafe_allow_html=True)
-        time.sleep(3)
 
     # Initial rendering
     render_initial_state()
@@ -134,11 +159,11 @@ def run_experiment():
         # Plotting the pH curve
         st.write("## Titration pH Curve")
         volume = np.linspace(0, 25, 100)
-        pH = 7 + (14 - 0) * (1 - np.exp(-0.3 * (volume - 12.5)))
+        pH = 0 + (7 - 0) * (1 - np.exp(-0.3 * (volume - 12.5))) + (14 - 7) * (1 - np.exp(-0.3 * (volume - 12.5)))
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve')
-        ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH')
-        ax.axvline(x=12.5, color='red', linestyle='--', label='End Point')
+        ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
+        ax.axvline(x=12.5, color='red', linestyle='--', label='Volume at End Point')
         ax.set_xlabel("Volume of NaOH (mL)")
         ax.set_ylabel("pH")
         ax.set_title("pH vs. Volume of NaOH")
