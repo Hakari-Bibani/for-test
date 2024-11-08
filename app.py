@@ -31,7 +31,7 @@ def run_experiment():
         .experiment-container {
             display: flex;
             justify-content: center;
-            align-items: flex-end;
+            align-items: flex-start;
             position: relative;
             height: 400px;
             margin-bottom: 20px;
@@ -42,7 +42,10 @@ def run_experiment():
             height: 200px;
             background-color: #ddd;
             border: 2px solid #aaa;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .beaker {
@@ -50,7 +53,10 @@ def run_experiment():
             height: 120px;
             border: 3px solid #ddd;
             border-radius: 5px;
-            position: relative;
+            position: absolute;
+            top: 220px;
+            left: 50%;
+            transform: translateX(-50%);
             overflow: hidden;
             background-color: #ff6666;
         }
@@ -62,7 +68,8 @@ def run_experiment():
             border-radius: 50%;
             position: absolute;
             top: 10px;
-            left: 2px;
+            left: 50%;
+            transform: translateX(-50%);
             opacity: 0;
             animation: drop-animation 3s forwards;
         }
@@ -109,6 +116,8 @@ def run_experiment():
         <div class="experiment-container">
             <div class="burette">
                 <div class="drop"></div>
+                <div class="drop" style="animation-delay: 0.5s;"></div>
+                <div class="drop" style="animation-delay: 1s;"></div>
             </div>
             <div class="beaker color-change"></div>
         </div>
@@ -125,7 +134,7 @@ def run_experiment():
         # Plotting the pH curve
         st.write("## Titration pH Curve")
         volume = np.linspace(0, 25, 100)
-        pH = 7 + (14 - 7) * (1 - np.exp(-0.2 * (volume - 12.5)))
+        pH = 7 + (14 - 0) * (1 - np.exp(-0.3 * (volume - 12.5)))
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH')
@@ -133,6 +142,7 @@ def run_experiment():
         ax.set_xlabel("Volume of NaOH (mL)")
         ax.set_ylabel("pH")
         ax.set_title("pH vs. Volume of NaOH")
+        ax.set_ylim(0, 14)  # Set pH range from 0 to 14
         ax.legend()
         st.pyplot(fig)
 
