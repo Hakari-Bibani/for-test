@@ -1,11 +1,11 @@
-import streamlit as st
+=import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 from matplotlib.patches import Ellipse, Polygon, Rectangle
 
 # Function to draw the titration setup with a burette and conical flask
-def draw_titration_setup(volume, drop_visible):
+def draw_titration_setup(volume, color_change):
     fig, ax = plt.subplots(figsize=(4, 8))
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 35)
@@ -24,17 +24,34 @@ def draw_titration_setup(volume, drop_visible):
     ax.add_patch(flask_body)
     ax.text(5, 0.5, "Conical Flask (HCl)", ha="center", fontsize=10)
 
-    # Draw the HCl solution in the conical flask
-    ax.add_patch(Polygon([(4.6, 1.5), (6.4, 1.5), (5.8, 4.2), (4.2, 4.2)], closed=True, edgecolor="none", facecolor="lightcoral"))
-
-    # Draw a drop if visible
-    if drop_visible:
-        ax.plot(5.5, 19, "o", color="blue", markersize=10)
+    # Draw the HCl solution in the conical flask, changing color based on the titration progress
+    solution_color = "lightcoral" if not color_change else "lightgreen"
+    ax.add_patch(Polygon([(4.6, 1.5), (6.4, 1.5), (5.8, 4.2), (4.2, 4.2)], closed=True, edgecolor="none", facecolor=solution_color))
 
     return fig
 
-# Set up the title
-st.title("Acid Base Titration Simulation")
+# Set up the title with a wave effect
+st.markdown(
+    """
+    <style>
+    @keyframes wave {
+        0% { transform: translateY(0px); }
+        25% { transform: translateY(-5px); }
+        50% { transform: translateY(0px); }
+        75% { transform: translateY(5px); }
+        100% { transform: translateY(0px); }
+    }
+    .wave-text {
+        display: inline-block;
+        animation: wave 2s infinite;
+        font-size: 30px;
+        font-weight: bold;
+    }
+    </style>
+    <div class="wave-text">Acid Base Titration</div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Create a start button for the experiment
 if st.button("Start Experiment"):
@@ -44,6 +61,7 @@ if st.button("Start Experiment"):
     pH_values = []
     volume_added = np.linspace(0, 25, 100)  # Simulating 25 mL of NaOH added in increments
     equivalence_point = 13  # Assuming the equivalence point occurs at around 13 mL
+    color_change = False
 
     # Simulate the pH change and the animation
     for i, volume in enumerate(volume_added):
@@ -53,10 +71,10 @@ if st.button("Start Experiment"):
             pH = 7 + (volume - equivalence_point) / (25 - equivalence_point) * 7  # Rapid increase after equivalence
 
         pH_values.append(pH)
-        drop_visible = (i % 5 == 0)  # Show a drop every 5 iterations
+        color_change = volume >= equivalence_point  # Change color after the equivalence point
 
         # Draw the setup and display it
-        fig = draw_titration_setup(volume, drop_visible)
+        fig = draw_titration_setup(volume, color_change)
         st.pyplot(fig)
         time.sleep(0.1)  # Pause for animation effect
 
