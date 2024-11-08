@@ -73,7 +73,7 @@ def run_experiment():
 
         .solution {
             width: 100%;
-            height: 100%;
+            height: 50%; /* Half-filled */
             background-color: #ff6666;
             position: absolute;
             bottom: 0;
@@ -86,7 +86,7 @@ def run_experiment():
             background-color: blue;
             border-radius: 50%;
             position: absolute;
-            top: 180px; /* Start near the tab of the burette */
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
@@ -94,9 +94,9 @@ def run_experiment():
         }
 
         @keyframes drop-animation {
-            0% { top: 180px; opacity: 1; }
-            90% { top: 300px; opacity: 1; }
-            100% { top: 300px; opacity: 0; }
+            0% { top: 10px; opacity: 1; }
+            90% { top: 180px; opacity: 1; }
+            100% { top: 200px; opacity: 0; }
         }
 
         .color-change {
@@ -135,7 +135,7 @@ def run_experiment():
         <div class="experiment-container">
             <div class="burette">
                 <div class="burette-tab"></div>
-                <div class="drop" style="animation-delay: 0s;"></div>
+                <div class="drop"></div>
                 <div class="drop" style="animation-delay: 0.5s;"></div>
                 <div class="drop" style="animation-delay: 1s;"></div>
             </div>
@@ -146,7 +146,7 @@ def run_experiment():
         """, unsafe_allow_html=True)
         time.sleep(2)  # Wait for the drops to fall
 
-        # Step 2: Change the solution color
+        # Step 2: Change the color of the solution in the beaker
         container.markdown("""
         <div class="experiment-container">
             <div class="burette">
@@ -167,16 +167,18 @@ def run_experiment():
 
         # Plotting the pH curve
         st.write("## Titration pH Curve")
-        volume = np.linspace(0, 13, 100)  # x-axis from 0 to 13
-        pH = 0 + (7 - 0) * (1 - np.exp(-0.3 * (volume - 6.5))) + (14 - 7) * (1 - np.exp(-0.3 * (volume - 6.5)))
+        volume = np.linspace(0, 25, 100)
+        pH = np.where(volume < 12.5, 
+                      0 + (7 - 0) * (volume / 12.5), 
+                      7 + (13 - 7) * ((volume - 12.5) / 12.5))
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
-        ax.axvline(x=6.5, color='red', linestyle='--', label='Volume at End Point')
+        ax.axvline(x=12.5, color='red', linestyle='--', label='Volume at End Point')
         ax.set_xlabel("Volume of NaOH (mL)")
         ax.set_ylabel("pH")
         ax.set_title("pH vs. Volume of NaOH")
-        ax.set_ylim(0, 14)  # Set y-axis from 0 to 14
+        ax.set_ylim(0, 14)  # Set pH range from 0 to 14
         ax.legend()
         st.pyplot(fig)
 
