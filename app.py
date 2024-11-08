@@ -198,10 +198,29 @@ def run_experiment():
 
         # Plotting the real pH curve for strong acid and base titration
         st.write("## Titration pH Curve")
-        volume = np.linspace(0, 25, 100)
-        pH = np.where(volume < 12.5, 
-                      1 + (6 * (volume / 12.5)),  # pH increases gradually from 1 to 7
-                      7 + (7 * ((volume - 12.5) / 12.5)))  # pH increases steeply from 7 to 13
+        # Parameters for the titration
+        volume = np.linspace(0, 25, 100)  # Volume of NaOH added
+        concentration_HCl = 0.1  # Molarity of HCl
+        concentration_NaOH = 0.1  # Molarity of NaOH
+        Ka_HCl = 10**-7  # Strong acid approximation
+
+        # Calculating pH for each volume
+        pH = []
+        for v in volume:
+            if v < 12.5:
+                # Before the equivalence point: excess HCl
+                moles_HCl = concentration_HCl * 25 - concentration_NaOH * v
+                concentration_H = moles_HCl / (25 + v)
+                pH.append(-np.log10(concentration_H))
+            elif v == 12.5:
+                # At the equivalence point: pH = 7
+                pH.append(7)
+            else:
+                # After the equivalence point: excess NaOH
+                moles_NaOH = concentration_NaOH * (v - 12.5)
+                concentration_OH = moles_NaOH / (25 + v)
+                pH.append(14 + np.log10(concentration_OH))
+
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve', color='blue')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
