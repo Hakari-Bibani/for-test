@@ -1,272 +1,135 @@
-
 import streamlit as st
-import time
+from streamlit.components.v1 import html
+import matplotlib.pyplot as plt
+import numpy as np
 
-def run_experiment():
-    # Custom CSS for enhanced styling and animations
-    st.markdown("""
+# Title with animation
+st.markdown(
+    """
+    <div style="text-align: center; font-size: 40px; font-weight: bold; animation: float 2s infinite alternate;">
+        Acid-Base Titration
+    </div>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
-        
-        .title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 2.8em;
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(45deg, #2c3e50, #3498db, #2c3e50);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: gradient 3s linear infinite;
-        }
-        
-        .experiment-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            position: relative;
-            height: 500px;
-            margin-bottom: 20px;
-            overflow: visible;
-        }
-        
-        .beaker {
-            width: 80px;
-            height: 120px;
-            border: 3px solid #ddd;
-            border-radius: 5px 5px 10px 10px;
-            position: absolute;
-            left: 22%;  /* Moved further left from 28% */
-            top: 5%;
-            transform-origin: bottom right;
-            transition: transform 1s ease;
-            z-index: 2;
-        }
-        
-        .cylinder {
-            width: 160px;
-            height: 240px;
-            border: 4px solid #ddd;
-            border-radius: 10px 10px 20px 20px;
-            position: relative;
-            overflow: visible;
-            margin-top: 120px;
-        }
-        
-        .solution {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50%;
-            transition: all 1s ease;
-        }
-        
-        .beaker .solution {
-            background: rgba(176, 224, 230, 0.7);
-        }
-        
-        .cylinder .solution {
-            background: rgba(169, 169, 169, 0.7);
-        }
-        
-        .beaker .label {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .cylinder .label {
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        @keyframes pour {
-            0% { height: 50%; }
-            50% { height: 0%; }
-            100% { height: 0%; }
-        }
-        
-        .foam {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.3) 0px,
-                rgba(0, 0, 0, 0.3) 20px,
-                rgba(255, 0, 0, 0.3) 20px,
-                rgba(255, 0, 0, 0.3) 40px
-            );
-            animation: none;
-            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.2));
-        }
-        
-        @keyframes reaction {
-            0% {
-                height: 50%;
-                transform: translateY(0);
-            }
-            20% {
-                height: 100%;
-                transform: translateY(0);
-            }
-            40% {
-                height: 100%;
-                transform: translateY(-50%);
-            }
-            60% {
-                height: 100%;
-                transform: translateY(-100%);
-            }
-            80% {
-                height: 100%;
-                transform: translateY(-120%);
-                opacity: 1;
-            }
-            100% {
-                height: 100%;
-                transform: translateY(-140%);
-                opacity: 0;
-            }
-        }
-        
-        .pouring {
-            transform: rotate(65deg) translateY(-20px) translateX(60px);
-        }
-        
-        .pouring .solution {
-            animation: pour 1s ease forwards;
-        }
-        
-        .reacting .foam {
-            animation: reaction 1.5s ease-out forwards;
-        }
-        
-        .reacting .solution {
-            animation: empty 1.5s ease-out forwards;
-        }
-        
-        @keyframes empty {
-            0% { height: 50%; }
-            100% { height: 0%; }
-        }
-        
-        .particle {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: repeating-linear-gradient(
-                45deg,
-                rgba(0, 0, 0, 0.3) 0px,
-                rgba(0, 0, 0, 0.3) 6px,
-                rgba(255, 0, 0, 0.3) 6px,
-                rgba(255, 0, 0, 0.3) 12px
-            );
-            border-radius: 50%;
-            opacity: 0;
-        }
-        
-        @keyframes particle {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty)) rotate(360deg);
-                opacity: 0;
-            }
-        }
-        
-        .reacting .particle {
-            animation: particle 1s ease-out forwards;
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
         }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
-    # Display the title
-    st.markdown("<h1 class='title'>Chemical Reaction Animation</h1>", unsafe_allow_html=True)
-    
-    # Container for the experiment
-    container = st.empty()
-    
-    def render_initial_state():
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="label">H₂O₂</div>
-                    <div class="solution"></div>
-                </div>
-                <div class="cylinder">
-                    <div class="solution"></div>
-                    <div class="foam"></div>
-                    <div class="label">30% KI</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    def animate_reaction():
-        # Step 1: Pour the solution
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker pouring">
-                    <div class="label">H₂O₂</div>
-                    <div class="solution"></div>
-                </div>
-                <div class="cylinder">
-                    <div class="solution"></div>
-                    <div class="foam"></div>
-                    <div class="label">30% KI</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        time.sleep(1)
-        
-        # Step 2: Return beaker and start reaction
-        container.markdown("""
-            <div class="experiment-container">
-                <div class="beaker">
-                    <div class="label">H₂O₂</div>
-                    <div class="solution"></div>
-                </div>
-                <div class="cylinder reacting">
-                    <div class="solution"></div>
-                    <div class="foam"></div>
-                    <div class="label">30% KI</div>
-                    <!-- Add foam particles -->
-                    <div class="particle" style="--tx: 30px; --ty: -60px;"></div>
-                    <div class="particle" style="--tx: -25px; --ty: -55px;"></div>
-                    <div class="particle" style="--tx: 15px; --ty: -65px;"></div>
-                    <div class="particle" style="--tx: -35px; --ty: -50px;"></div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    render_initial_state()
-    
-    if st.button("Start Reaction"):
-        animate_reaction()
-        st.markdown("""
-            **Chemical Reaction:**
-            2 H₂O₂ (aq) + 30% KI (aq) → 2 H₂O (l) + O₂ (g) + KI (aq)
-            
-            **Note:** The rapid decomposition of hydrogen peroxide is catalyzed by potassium iodide, 
-            producing water and oxygen gas. The dramatic foam effect is created by the rapid release of oxygen gas.
-            
-            Note: Optionally, you can add food coloring and liquid soap for more dramatic effect
-        """)
+# Experiment setup with burette and beaker
+st.write("## Experiment Setup")
+st.write("A thin rectangular burette containing NaOH and a half-filled beaker labeled HCl are shown below.")
 
-if __name__ == "__main__":
-    run_experiment()
+# HTML code for burette and beaker animation
+experiment_html = """
+<div class="experiment-container">
+    <div class="burette">
+        <div class="label">NaOH</div>
+        <div class="drop"></div>
+    </div>
+    <div class="beaker">
+        <div class="label">HCl</div>
+    </div>
+</div>
+<style>
+    .experiment-container {
+        position: relative;
+        width: 250px;
+        height: 400px;
+        margin: auto;
+    }
+    .burette {
+        position: absolute;
+        top: 0;
+        left: 90px;
+        width: 20px;
+        height: 300px;
+        background-color: #ddd;
+        border: 2px solid #aaa;
+        border-radius: 5px;
+    }
+    .burette .label {
+        position: absolute;
+        bottom: -20px;
+        left: -10px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .drop {
+        position: absolute;
+        top: 50px;
+        left: 7px;
+        width: 6px;
+        height: 10px;
+        background-color: blue;
+        border-radius: 50%;
+        opacity: 0;
+    }
+    .beaker {
+        position: absolute;
+        bottom: 0;
+        left: 50px;
+        width: 150px;
+        height: 100px;
+        background-color: #ff6666;
+        border: 2px solid #aaa;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        overflow: hidden;
+        transition: background-color 1s ease;
+    }
+    .beaker .label {
+        position: absolute;
+        top: -20px;
+        left: 60px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+<script>
+    function startExperiment() {
+        const drop = document.querySelector('.drop');
+        const beaker = document.querySelector('.beaker');
+
+        // Make the drop visible and animate it
+        drop.style.opacity = '1';
+        drop.style.animation = 'drop 4s forwards';
+
+        // Change the color of the beaker after 4 seconds
+        setTimeout(() => {
+            beaker.style.backgroundColor = '#ffcc00'; // Color change to represent neutralization
+        }, 4000);
+    }
+    @keyframes drop {
+        0% { top: 50px; opacity: 1; }
+        90% { top: 250px; opacity: 1; }
+        100% { top: 250px; opacity: 0; }
+    }
+</script>
+"""
+
+# Button to start the experiment
+if st.button("Start Experiment"):
+    # Display the HTML animation
+    html(experiment_html + '<script>startExperiment();</script>', height=500)
+
+# Plot the pH curve
+st.write("## Titration pH Curve")
+# Simulate pH curve data
+volume = np.linspace(0, 25, 100)
+pH = 7 + (14 - 7) * (1 - np.exp(-0.2 * (volume - 12.5)))
+
+# Plotting
+fig, ax = plt.subplots()
+ax.plot(volume, pH, label='pH Curve')
+ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH')
+ax.axvline(x=12.5, color='red', linestyle='--', label='End Point')
+ax.set_xlabel("Volume of NaOH (mL)")
+ax.set_ylabel("pH")
+ax.set_title("pH vs. Volume of NaOH")
+ax.legend()
+
+st.pyplot(fig)
