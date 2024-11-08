@@ -1,73 +1,45 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+from itertools import cycle
 import time
-from matplotlib.patches import Polygon, Rectangle
 
-# Function to draw the titration setup
-def draw_titration_setup(ax, volume, color_change):
-    ax.clear()
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 35)
-    ax.axis("off")
+# Set page title
+st.set_page_config(page_title="Acid-Base Titration")
 
-    # Draw the burette
-    ax.add_patch(Rectangle((4.5, 20), 1, 10, edgecolor="black", facecolor="none", lw=2))
-    ax.text(5, 31, "Burette (NaOH)", ha="center", fontsize=10)
+# Create a title with moving text effect
+st.title("Acid-Base Titration")
+st.markdown("<style>@keyframes bounce {0% {transform: translateY(0);} 50% {transform: translateY(-10px);} 100% {transform: translateY(0);}}</style>", unsafe_allow_html=True)
+st.markdown("<h1 style='animation: bounce 1s infinite;'>Acid-Base Titration</h1>", unsafe_allow_html=True)
 
-    # Draw the liquid level in the burette
-    liquid_level = 30 - volume  # Adjust the level based on volume
-    ax.add_patch(Rectangle((4.5, 20 + liquid_level / 3), 1, 10 - liquid_level / 3, edgecolor="none", facecolor="blue"))
+# Display the burette and flask
+col1, col2 = st.columns(2)
+with col1:
+    st.image("burette.png", width=200)
+with col2:
+    st.image("conical_flask.png", width=200)
 
-    # Draw the drop of NaOH being added
-    if volume < 25:
-        ax.plot(5.5, 19, "o", color="blue", markersize=6)  # Drop from the burette
-
-    # Draw the conical flask
-    flask_body = Polygon([(3, 1), (7, 1), (6, 5), (4, 5)], closed=True, edgecolor="black", facecolor="none", lw=2)
-    ax.add_patch(flask_body)
-    ax.text(5, 0.5, "Conical Flask (HCl)", ha="center", fontsize=10)
-
-    # Draw the HCl solution in the conical flask
-    solution_color = "lightcoral" if not color_change else "lightgreen"
-    ax.add_patch(Polygon([(3.5, 1.5), (6.5, 1.5), (6, 4.5), (4, 4.5)], closed=True, edgecolor="none", facecolor=solution_color))
-
-# Set up the title
-st.title("Acid Base Titration Simulation")
-
-# Create a start button for the experiment
+# Titration animation
 if st.button("Start Experiment"):
-    st.write("### Titration in Progress...")
-
-    # Simulate the titration process
-    fig, ax = plt.subplots(figsize=(4, 8))
-    pH_values = []
-    volume_added = np.linspace(0, 25, 100)  # Simulating 25 mL of NaOH added in increments
-    equivalence_point = 13  # Assuming the equivalence point occurs at around 13 mL
-    color_change = False
-
-    # Animate the titration process
-    for volume in volume_added:
-        if volume < equivalence_point:
-            pH = 1 + (volume / equivalence_point) * 6  # pH gradually increases
-        else:
-            pH = 7 + (volume - equivalence_point) / (25 - equivalence_point) * 7  # Rapid increase after equivalence
-
-        pH_values.append(pH)
-        color_change = volume >= equivalence_point  # Change color after the equivalence point
-
-        # Draw and update the plot
-        draw_titration_setup(ax, volume, color_change)
-        st.pyplot(fig)
-        time.sleep(0.05)  # Short pause for smoother animation
+    # Simulate adding NaOH to HCl
+    ph = 1.0
+    ph_values = []
+    while ph < 14:
+        # Simulate adding NaOH drop by drop
+        for _ in range(10):
+            ph += 0.1
+            ph_values.append(ph)
+            st.markdown(f"<span style='font-size:20px;'>🔴 Adding NaOH drop</span>", unsafe_allow_html=True)
+            time.sleep(0.2)
+        # Simulate the color change
+        st.markdown(f"<span style='font-size:20px;color:green;'>✨ Color change!</span>", unsafe_allow_html=True)
+        time.sleep(1)
 
     # Plot the pH curve
-    st.write("### pH vs Volume Added")
-    plt.figure()
-    plt.plot(volume_added, pH_values, label="pH Curve")
-    plt.axvline(equivalence_point, color="r", linestyle="--", label="Equivalence Point")
-    plt.xlabel("Volume of NaOH Added (mL)")
-    plt.ylabel("pH")
-    plt.title("Titration Curve")
-    plt.legend()
-    st.pyplot(plt)
+    fig, ax = plt.subplots()
+    ax.plot(ph_values)
+    ax.set_xlabel("Time")
+    ax.set_ylabel("pH")
+    ax.set_title("pH Titration Curve")
+    st.pyplot(fig)
