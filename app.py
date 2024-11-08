@@ -87,8 +87,8 @@ def run_experiment():
 
         @keyframes drop-animation {
             0% { top: 10px; opacity: 1; }
-            90% { top: 100px; opacity: 1; }
-            100% { top: 150px; opacity: 0; }
+            90% { top: 150px; opacity: 1; }
+            100% { top: 180px; opacity: 0; }
         }
 
         .color-change {
