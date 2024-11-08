@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
 from itertools import cycle
 import time
 
@@ -13,12 +12,8 @@ st.title("Acid-Base Titration")
 st.markdown("<style>@keyframes bounce {0% {transform: translateY(0);} 50% {transform: translateY(-10px);} 100% {transform: translateY(0);}}</style>", unsafe_allow_html=True)
 st.markdown("<h1 style='animation: bounce 1s infinite;'>Acid-Base Titration</h1>", unsafe_allow_html=True)
 
-# Display the burette and flask
-col1, col2 = st.columns(2)
-with col1:
-    st.image("burette.png", width=200)
-with col2:
-    st.image("conical_flask.png", width=200)
+# Placeholder images for burette and flask
+st.write("🧪 Burette and Conical Flask")
 
 # Titration animation
 if st.button("Start Experiment"):
