@@ -1,10 +1,10 @@
-=import streamlit as st
+import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 from matplotlib.patches import Ellipse, Polygon, Rectangle
 
-# Function to draw the titration setup with a burette and conical flask
+# Function to draw the titration setup
 def draw_titration_setup(volume, color_change):
     fig, ax = plt.subplots(figsize=(4, 8))
     ax.set_xlim(0, 10)
@@ -19,39 +19,23 @@ def draw_titration_setup(volume, color_change):
     liquid_level = 30 - volume  # Adjust the level based on volume
     ax.add_patch(Rectangle((4.5, 20 + liquid_level / 3), 1, 10 - liquid_level / 3, edgecolor="none", facecolor="blue"))
 
+    # Draw the drop of NaOH being added
+    if volume < 25:
+        ax.plot(5.5, 18, "o", color="blue", markersize=6)  # Drop from the burette
+
     # Draw the conical flask
-    flask_body = Polygon([(3, 1), (7, 1), (5.5, 5), (4.5, 5)], closed=True, edgecolor="black", facecolor="none", lw=2)
+    flask_body = Polygon([(3, 1), (7, 1), (6, 5), (4, 5)], closed=True, edgecolor="black", facecolor="none", lw=2)
     ax.add_patch(flask_body)
     ax.text(5, 0.5, "Conical Flask (HCl)", ha="center", fontsize=10)
 
-    # Draw the HCl solution in the conical flask, changing color based on the titration progress
+    # Draw the HCl solution in the conical flask
     solution_color = "lightcoral" if not color_change else "lightgreen"
-    ax.add_patch(Polygon([(4.6, 1.5), (6.4, 1.5), (5.8, 4.2), (4.2, 4.2)], closed=True, edgecolor="none", facecolor=solution_color))
+    ax.add_patch(Polygon([(3.5, 1.5), (6.5, 1.5), (6, 4.5), (4, 4.5)], closed=True, edgecolor="none", facecolor=solution_color))
 
     return fig
 
-# Set up the title with a wave effect
-st.markdown(
-    """
-    <style>
-    @keyframes wave {
-        0% { transform: translateY(0px); }
-        25% { transform: translateY(-5px); }
-        50% { transform: translateY(0px); }
-        75% { transform: translateY(5px); }
-        100% { transform: translateY(0px); }
-    }
-    .wave-text {
-        display: inline-block;
-        animation: wave 2s infinite;
-        font-size: 30px;
-        font-weight: bold;
-    }
-    </style>
-    <div class="wave-text">Acid Base Titration</div>
-    """,
-    unsafe_allow_html=True
-)
+# Set up the title
+st.title("Acid Base Titration Simulation")
 
 # Create a start button for the experiment
 if st.button("Start Experiment"):
@@ -64,7 +48,7 @@ if st.button("Start Experiment"):
     color_change = False
 
     # Simulate the pH change and the animation
-    for i, volume in enumerate(volume_added):
+    for volume in volume_added:
         if volume < equivalence_point:
             pH = 1 + (volume / equivalence_point) * 6  # pH gradually increases
         else:
