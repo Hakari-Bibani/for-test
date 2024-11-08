@@ -1,104 +1,47 @@
 import streamlit as st
 import numpy as np
-import time
+import matplotlib.pyplot as plt
 from PIL import Image
-import base64
+import time
 
-def app():
-    st.set_page_config(page_title="Acid-Base Titration Experiment")
-    st.title("Acid-Base Titration Experiment")
+st.set_page_config(page_title="Acid-Base Titration", layout="wide")
 
-    # Load the HTML animation
-    html_code = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Acid-Base Titration Animation</title>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                background-color: #f0f0f0;
-            }
-            .experiment-container {
-                position: relative;
-                width: 200px;
-                height: 400px;
-            }
-            .burette {
-                position: absolute;
-                top: 0;
-                left: 80px;
-                width: 10px;
-                height: 300px;
-                background-color: #ddd;
-                border: 2px solid #aaa;
-            }
-            .drop {
-                position: absolute;
-                top: 50px;
-                left: 80px;
-                width: 6px;
-                height: 10px;
-                background-color: blue;
-                border-radius: 50%;
-                animation: drop 4s infinite;
-            }
-            @keyframes drop {
-                0% { top: 50px; opacity: 1; }
-                90% { top: 250px; opacity: 1; }
-                100% { top: 250px; opacity: 0; }
-            }
-            .beaker {
-                position: absolute;
-                bottom: 0;
-                left: 50px;
-                width: 100px;
-                height: 120px;
-                border: 2px solid #aaa;
-                border-top: none;
-                background-color: #ff6666;
-                transition: background-color 1s ease;
-            }
-            .beaker.color-change {
-                background-color: #ffcc00;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="experiment-container">
-            <div class="burette"></div>
-            <div class="drop"></div>
-            <div class="beaker" id="beaker"></div>
-        </div>
-        <script>
-            // Change the color of the beaker after a delay
-            setTimeout(() => {
-                document.getElementById('beaker').classList.add('color-change');
-            }, 4000);
-        </script>
-    </body>
-    </html>
-    """
+# App title with moving effect
+st.title("Acid-Base Titration")
+st.markdown("<span style='font-size: 24px; font-weight: bold; animation: movement 2s infinite;'>Acid-Base Titration</span>", unsafe_allow_html=True)
 
-    # Display the HTML animation
-    st.write(f'<div style="text-align: center;">{html_code}</div>', unsafe_allow_html=True)
+@st.cache(allow_output_mutation=True)
+def load_images():
+    burette = Image.open("burette.png")
+    beaker = Image.open("beaker.png")
+    return burette, beaker
 
-    # Add a start button
-    if st.button("Start Experiment"):
-        st.write("The experiment is in progress...")
-        time.sleep(4)
-        st.success("The experiment is complete!")
+burette, beaker = load_images()
 
-        # Plot the pH curve
-        ph_values = np.linspace(0, 14, 100)
-        titration_curve = 14 - ph_values
-        st.line_chart(titration_curve)
+# Display burette and beaker
+col1, col2 = st.columns(2)
+with col1:
+    st.image(burette, width=200)
+with col2:
+    st.image(beaker, width=200)
 
-if __name__ == "__main__":
-    app()
+# Add a button to start the experiment
+if st.button("Start Experiment"):
+    # Animate the addition of NaOH to HCl
+    for i in range(50):
+        col1.image(burette, width=200)
+        col2.image(beaker, width=200)
+        time.sleep(0.1)
+    
+    # Change the color of the beaker
+    col2.image(beaker.convert("RGBA"), width=200)
+
+    # Plot the pH vs volume of NaOH added
+    x = np.linspace(0, 20, 100)
+    y = 7 - np.log10(x)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(x, y)
+    ax.set_xlabel("Volume of NaOH (mL)")
+    ax.set_ylabel("pH")
+    ax.set_title("pH Titration Curve")
+    st.pyplot(fig)
