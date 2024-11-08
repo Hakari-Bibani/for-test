@@ -70,6 +70,13 @@ def run_experiment():
             transform: translateX(-50%);
             overflow: hidden;
             background-color: #ff6666;
+            animation: solution-movement 5s linear infinite;
+        }
+
+        @keyframes solution-movement {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
         }
 
         .drop {
@@ -158,16 +165,17 @@ def run_experiment():
 
         # Plotting the pH curve
         st.write("## Titration pH Curve")
-        volume = np.linspace(0, 25, 100)
-        pH = 0 + (7 - 0) * (1 - np.exp(-0.3 * (volume - 12.5))) + (14 - 7) * (1 - np.exp(-0.3 * (volume - 12.5)))
+        volume = np.linspace(0, 80, 100)
+        pH = 0 + (7 - 0) * (1 - np.exp(-0.3 * (volume - 40))) + (14 - 7) * (1 - np.exp(-0.3 * (volume - 40)))
         fig, ax = plt.subplots()
         ax.plot(volume, pH, label='pH Curve')
         ax.axhline(y=7, color='gray', linestyle='--', label='Neutral pH (End Point)')
-        ax.axvline(x=12.5, color='red', linestyle='--', label='Volume at End Point')
+        ax.axvline(x=40, color='red', linestyle='--', label='Volume at End Point')
         ax.set_xlabel("Volume of NaOH (mL)")
         ax.set_ylabel("pH")
         ax.set_title("pH vs. Volume of NaOH")
-        ax.set_ylim(0, 14)  # Set pH range from 0 to 14
+        ax.set_ylim(0, 14)
+        ax.set_xlim(0, 80)
         ax.legend()
         st.pyplot(fig)
 
