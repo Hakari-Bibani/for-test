@@ -1,4 +1,2 @@
-streamlit
-gspread
-oauth2client
-matplotlib
+python-barcode streamlit
+pillow
