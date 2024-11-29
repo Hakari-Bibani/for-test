@@ -1,74 +1,52 @@
+import requests
+from barcode import Code128
+from barcode.writer import ImageWriter
 import streamlit as st
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+import os
 
-# Connect to Google Sheets
-def connect_to_gsheet():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("Chemistry Test Responses").sheet1  # Change name if your sheet is named differently
-    return sheet
+# Canvas API details
+BASE_URL = "https://canvas.instructure.com/api/v1"
+API_TOKEN = "7~Gc7HmJLnvhMPKemRKk44avE6ntBZTMwwekf6cTAPhPUCW2vc7xceUhQfEwNe4xWD"
 
-def submit_to_gsheet(data):
-    sheet = connect_to_gsheet()
-    sheet.append_row(data)
+# Function to fetch grades from Canvas
+def fetch_grades(course_id):
+    url = f"{BASE_URL}/courses/{course_id}/students/submissions"
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Error {response.status_code}: Unable to fetch grades")
+        return None
+
+# Function to generate barcode
+def generate_barcode(data, output_file):
+    barcode = Code128(data, writer=ImageWriter())
+    barcode.save(output_file)
 
 # Streamlit App
-st.title("Chemistry Test")
-st.image("https://drive.google.com/uc?export=view&id=1PpiIFmMgQu-XOoIf9PMLnI3QA_WE0bfG", caption="Chemistry Test", use_column_width=True)
+st.title("Canvas Grades and Barcode Generator")
 
-st.markdown("Welcome to the Chemistry Test. Please fill out the form below carefully.")
+course_id = st.text_input("Enter Canvas Course ID (e.g., 10606184)")
 
-# Personal Information Section
-st.markdown("### Personal Information")
-full_name = st.text_input("1. Full Name", placeholder="Enter your full name")
-school = st.text_input("2. Your School", placeholder="Enter the name of your school")
-code = st.text_input("3. Enter the code to access the test (Hint: Hakari)", type="password")
-
-# Conditional Test Questions
-if code == "Hakari":
-    st.success("Access granted! Please complete the questions below.")
-    st.markdown("### Test Questions")
-
-    # Short Answer Questions
-    username = st.text_input("4. Username", placeholder="Enter your username")
-    python_1 = st.text_input("5. What is Python 1?")
-    python_2 = st.text_input("6. What is Python 2?")
-    python_3 = st.text_input("7. What is Python 3?")
-    python_4 = st.text_input("8. What is Python 4?")
-
-    # Multiple Choice Questions
-    apple_1 = st.radio("9. What is Apple?", ["Orange", "Blue", "Yellow", "Green"])
-    apple_2 = st.radio("10. What is Apple?", ["Orange", "Blue", "Yellow", "Green"])
-    apple_3 = st.radio("11. What is Apple?", ["Orange", "Blue", "Yellow", "Green"])
-
-    # Additional Short Answer Questions
-    python_5 = st.text_input("12. What is Python?")
-    python_6 = st.text_input("13. What is Python 2?")
-
-    # Submit Button
-    if st.button("Submit"):
-        if not full_name or not school or not username:
-            st.error("Please fill out all the required fields.")
-        else:
-            try:
-                # Collect responses and submit to Google Sheet
-                responses = [
-                    full_name, school, code, username,
-                    python_1, python_2, python_3, python_4,
-                    apple_1, apple_2, apple_3, python_5, python_6
-                ]
-                submit_to_gsheet(responses)
-                st.success("Your responses have been submitted successfully!")
-            except Exception as e:
-                st.error(f"An error occurred while submitting your responses: {e}")
-else:
-    if code:
-        st.error("Incorrect code. Please try again.")
+if st.button("Fetch and Generate"):
+    grades = fetch_grades(course_id)
+    if grades:
+        for submission in grades:
+            if "user" in submission and "score" in submission:
+                student_name = submission["user"]["name"]
+                grade = submission["score"]
+                credential_data = f"{student_name}:{grade}"
+                
+                # Generate barcode
+                output_file = f"{student_name}_barcode.png"
+                generate_barcode(credential_data, output_file)
+                
+                # Display in Streamlit
+                st.write(f"Student: {student_name}, Grade: {grade}")
+                st.image(output_file)
+                
+                # Clean up
+                os.remove(output_file)
     else:
-        st.info("Enter the code to unlock the test questions.")
-
-st.markdown("---")
-st.markdown("© 2024 Chemistry Test | Designed for Educational Purposes")
-
+        st.warning("No grades found for the given course ID.")
