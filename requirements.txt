@@ -1,4 +1,8 @@
 streamlit==1.25.0
 requests==2.31.0
 python-barcode==0.14.0
-pillow==9.3.0
+pillow==10.0.0
+pip>=24.3.1
+setuptools>=65.0.0
+wheel>=0.41.0
+
